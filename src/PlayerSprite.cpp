@@ -394,9 +394,14 @@ void PlayerSprite::Tick(double DeltaTime)
 		}
 
 	}
+	SDL_Rect ScreenSpaceColRect = GetScreenSpaceCustomRect();
+	ScreenSpaceColRect.y++;
+
+	bool PastLeftEdge = PosX - TheMap->GetScrollX() < -4 && !bIsJumping;
+
 	bool bOriginalCheck = ((GetMapSpaceCollisionRect().x >= TheMap->GetScrollX()) || (VelocityY >= 0 && !bBumpedHead)) && bCollidedDuringFinalCheck;
 	bool bNewCheck = Rect.y % 64 == 0  && GetMapSpaceCollisionRect().x >= TheMap->GetScrollX() && !bCollided && bCollidedDuringFinalCheck;
-	if (bOriginalCheck)
+	if (bOriginalCheck || PastLeftEdge)
 	{
 		//if ((GetMapSpaceCollisionRect().x < TheMap->GetScrollX() && Flip & SDL_FLIP_HORIZONTAL) || GetMapSpaceCollisionRect().x >= TheMap->GetScrollX())
 		//{
