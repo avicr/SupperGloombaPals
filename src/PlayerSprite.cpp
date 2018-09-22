@@ -1314,6 +1314,10 @@ void PlayerSprite::CheckWarpCollision()
 
 void PlayerSprite::CheckControlCollision()
 {
+	if (IsDying())
+	{
+		return;
+	}
 	vector<ControlTrigger*> Controls = TheMap->GetControlTiles();
 	SDL_Rect CollisionRect = GetMapSpaceCollisionRect();
 	SDL_Rect ResultRect;
