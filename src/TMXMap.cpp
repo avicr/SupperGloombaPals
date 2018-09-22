@@ -630,11 +630,11 @@ void TMXMap::Render(SDL_Renderer* Renderer, int ScreenX, int ScreenY, int Source
 void TMXMap::RenderLayer(const TMXLayer* Layer, SDL_Renderer* Renderer, int ScreenX, int ScreenY, int SourceWidth, int SourceHeight)
 {		
 	
-	int TileOffsetX = (int)ScrollX % TilePixelWidth;
-	int TileOffsetY = (int)ScrollY % TilePixelHeight;
+	int TileOffsetX = (int)ceil(ScrollX) % TilePixelWidth;
+	int TileOffsetY = (int)ceil(ScrollY) % TilePixelHeight;
 
-	int StartTileX = ScrollX / TilePixelWidth;
-	int StartTileY = ScrollY / TilePixelHeight;
+	int StartTileX = ceil(ScrollX) / TilePixelWidth;
+	int StartTileY = ceil(ScrollY) / TilePixelHeight;
 
 	int StopTileX = SourceWidth / TilePixelWidth + StartTileX;
 	int StopTileY = SourceHeight / TilePixelHeight + StartTileY;
@@ -810,7 +810,7 @@ TMXMap::TMXMap()
 	KillY = -1;
 	bPlayingLevel = false;
 	WorldName = "1-1";
-	SecondsLeft = 30;
+	SecondsLeft = 300;
 	bRenderCollision = false;
 	ScrollX = 0;
 	ScrollY = 26;
@@ -1332,6 +1332,7 @@ double TMXMap::TradeTimeForPoints(int Amount)
 	}
 	else
 	{
+		Mix_PlayChannel(CHANNEL_COIN, CoinSound, 0);
 		ThePlayer->AddScore(Amount * 50);
 	}
 	return SecondsLeft;

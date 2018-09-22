@@ -33,13 +33,15 @@ void ItemSprite::GetCollected()
 void ItemSprite::GetBricked(int TileX, int TileY)
 {
 	// Only get bricked if we're not in the air
-	if (VelocityY != 0)
+	if (VelocityY == 0)
 	{
 		SDL_Rect MapSpaceCollisionRect = GetMapSpaceCollisionRect();
 		if ((MapSpaceCollisionRect.x) / 64 * 64 < TileX)
 		{
 			VelocityX *= -1;
 		}
+		PosY--;
+		Rect.y--;
 		VelocityY = -12;
 	}
 }

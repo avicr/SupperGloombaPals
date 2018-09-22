@@ -18,6 +18,9 @@ class Game
 	bool bLevelComplete;
 	eGameState GameState;
 	int PostLevelCountDown;
+	int NumFireworks;
+	int CurrentFirework;
+	int FireworkCountDown;
 public:
 	Game();
 
@@ -43,4 +46,6 @@ public:
 	void UpdateTimerAward();	
 	void OnGrabFlagPole();
 	void OnPlayerFlagDone();	
+
+	void UpdateFireworks();
 };

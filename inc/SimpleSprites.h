@@ -46,6 +46,8 @@ protected:
 	// Relative to flag pol PosY
 	int FlagY;	
 	bool bFlagTraveling;
+	int Points;
+
 public:
 	~FlagPoleSprite();
 	FlagPoleSprite(int X, int Y);

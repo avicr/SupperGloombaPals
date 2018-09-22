@@ -41,6 +41,7 @@ INIT_ANIMATION_RESOURCE(ExplosionAnimation)
 INIT_ANIMATION_RESOURCE(TurtleAnimation)
 INIT_ANIMATION_RESOURCE(StarAnimation)
 INIT_ANIMATION_RESOURCE(GoombaShrinkAnimation)
+INIT_ANIMATION_RESOURCE(FireworkAnimation)
 
 ResourceManager::ResourceManager()
 {

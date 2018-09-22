@@ -116,6 +116,7 @@ extern bool GRenderBlackout;
 extern SDL_Color BGColor;
 extern bool bWorldSmear;
 extern int StompPoints[];
+extern SDL_Point FireworkLocations[];
 
 extern SDL_Joystick *Joy;
 extern bool bRenderCollision;
@@ -141,10 +142,15 @@ extern Mix_Chunk* OneUpSound;
 extern Mix_Chunk* FireBallSound;
 extern Mix_Chunk* KickSound;
 extern Mix_Chunk* PipeSound;
+extern Mix_Chunk* FlagPoleSound;
+extern Mix_Chunk* FireworkSound;
+
 extern Mix_Music *BGMusic;
 extern Mix_Music *UndergroundMusic;
 extern Mix_Music *StarmanMusic;
 extern Mix_Music *DieMusic;
+extern Mix_Music *WinMusic;
+
 
 extern float RenderScale;
 
@@ -161,6 +167,7 @@ extern float RenderScale;
 #define CHANNEL_FIRE_BALL 8
 #define CHANNEL_KICK 9
 #define CHANNEL_PIPE 10
+#define CHANNEL_FLAG_POLE 11
 
 #define SCREEN_WIDTH 1024
 #define SCREEN_HEIGHT 896

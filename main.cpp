@@ -13,6 +13,7 @@
 #include "inc/ItemSprite.h"
 #include "inc/Game.h"
 
+bool bDrawDeltaTime = false;
 Glyph FontShadowedWhite[128];
 SDL_Texture *BackBuffer;
 int WindowWidth;
@@ -44,6 +45,14 @@ TMXMap *TheMap;
 PlayerSprite* ThePlayer;
 Game* TheGame;
 int StompPoints[] = { 100, 200, 400, 500, 800, 1000, 2000, 4000, 5000, 8000 };
+SDL_Point FireworkLocations[] = { 
+	{ 426, 169 },
+	{ 266, 461 },
+    { 844, 265 },
+	{ 842, 559 },
+	{ 562, 270 },
+	{ 266, 461 },
+};
 
 SpriteList<Sprite*> SimpleSprites;
 SpriteList<EnemySprite*> EnemySprites;
@@ -65,10 +74,15 @@ Mix_Chunk* OneUpSound = NULL;
 Mix_Chunk* FireBallSound = NULL;
 Mix_Chunk* KickSound = NULL;
 Mix_Chunk* PipeSound = NULL;
+Mix_Chunk* FlagPoleSound = NULL;
+Mix_Chunk* FireworkSound = NULL;
+
 Mix_Music* BGMusic = NULL;
 Mix_Music* UndergroundMusic = NULL;
 Mix_Music* StarmanMusic = NULL;
 Mix_Music* DieMusic = NULL;
+Mix_Music* WinMusic = NULL;
+
 
 SDL_DisplayMode Desktop;
 int CachedWindowX = 0;
@@ -81,7 +95,7 @@ double RenderGrowthRate = 0.15;
 int GameLoop();
 void HandleCheatInput(SDL_Event& TheEvent);
 void Tick(double DeltaTime);
-void Render();
+void Render(double DeltaTime = 0);
 void PresentBackBuffer();
 void InitSDL();
 int DoTitleScreen();
@@ -385,10 +399,10 @@ int GameLoop()
 				DeltaTime = (double)((CurrentTime - StartTime) * 1000 / (double)SDL_GetPerformanceFrequency());
 			} while (DeltaTime * (double)0.001 < GTickDelay);
 			//SDL_SetWindowSize(GWindow, 1024 + DeltaWindow++, 960);
-
+			
 			Tick(0.0166667);
 
-			Render();
+			Render(DeltaTime * (double)0.001);			
 
 			//Handle events on queue
 			while (SDL_PollEvent(&TheEvent) != 0)
@@ -436,6 +450,12 @@ void HandleCheatInput(SDL_Event& TheEvent)
 	if (TheEvent.key.state == SDL_PRESSED && TheEvent.key.keysym.scancode == SDL_SCANCODE_1)
 	{
 		bRenderCollision = !bRenderCollision;
+	}
+
+	// Draw deltatime
+	if (TheEvent.key.state == SDL_PRESSED && TheEvent.key.keysym.scancode == SDL_SCANCODE_T)
+	{
+		bDrawDeltaTime = !bDrawDeltaTime;
 	}
 
 	if (TheEvent.key.state == SDL_PRESSED && TheEvent.key.keysym.scancode == SDL_SCANCODE_MINUS)
@@ -589,7 +609,7 @@ void Tick(double DeltaTime)
 	}
 }
 
-void Render()
+void Render(double DeltaTime)
 {	
 	// Clear to ground color
 	if (bDrawUgly)
@@ -611,6 +631,11 @@ void Render()
 		TheMap->Render(GRenderer, 0, 0, 1024 / RenderScale, 960 / RenderScale);
 		ThePlayer->DrawHUD();
 				
+		if (bDrawDeltaTime)
+		{
+			DrawBitmapText(to_string(DeltaTime), 0, 0, 16, 16, GRenderer, FontShadowedWhite, 1, 1, false);
+		}
+			
 		PresentBackBuffer();
 	}	
 }
@@ -703,12 +728,15 @@ void InitSDL()
 			FireBallSound = Mix_LoadWAV("resource/sounds/fireball.wav");
 			KickSound = Mix_LoadWAV("resource/sounds/kick.wav");
 			PipeSound = Mix_LoadWAV("resource/sounds/pipe.wav");
+			FlagPoleSound = Mix_LoadWAV("resource/sounds/flagpole.wav");
+			FireworkSound = Mix_LoadWAV("resource/sounds/firework.wav");
 			
 			BGMusic = Mix_LoadMUS("resource/sounds/bgmusic.wav");
 			UndergroundMusic = Mix_LoadMUS("resource/sounds/underground.wav");
 			StarmanMusic = Mix_LoadMUS("resource/sounds/starman.wav");
 			DieMusic = Mix_LoadMUS("resource/sounds/die.wav");
-
+			WinMusic = Mix_LoadMUS("resource/sounds/stage_clear.wav");
+			
 			Mix_VolumeChunk(JumpSound, VOLUME_NORMAL);
 			Mix_VolumeChunk(BumpSound, VOLUME_NORMAL);
 			Mix_VolumeChunk(StompSound, VOLUME_NORMAL);
@@ -720,6 +748,7 @@ void InitSDL()
 			Mix_VolumeChunk(FireBallSound, VOLUME_NORMAL);
 			Mix_VolumeChunk(KickSound, VOLUME_NORMAL);
 			Mix_VolumeChunk(PipeSound, VOLUME_NORMAL);
+			Mix_VolumeChunk(FlagPoleSound, VOLUME_NORMAL);
 			Mix_VolumeMusic(VOLUME_NORMAL);
 			
 			//Mix_Volume(-1, 0);
@@ -784,11 +813,14 @@ void CleanUp()
 	Mix_FreeChunk(KickSound);
 	Mix_FreeChunk(FireBallSound);
 	Mix_FreeChunk(PipeSound);
+	Mix_FreeChunk(FlagPoleSound);
+	Mix_FreeChunk(FireworkSound);
 
 	Mix_FreeMusic(BGMusic);
 	Mix_FreeMusic(UndergroundMusic);
 	Mix_FreeMusic(StarmanMusic);
 	Mix_FreeMusic(DieMusic);
+	Mix_FreeMusic(WinMusic);
 
 	SDL_DestroyRenderer(GRenderer);
 	SDL_DestroyWindow(GWindow);

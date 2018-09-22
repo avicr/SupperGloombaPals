@@ -76,7 +76,7 @@ void Sprite::TickAnimation(double DeltaTime)
 		}
 		else
 		{
-			AnimData.CountDown--;
+			AnimData.CountDown -= 1 * AnimData.PlayRate;
 		}
 
 		if (AnimData.CountDown <= 0)
@@ -145,6 +145,7 @@ void Sprite::UpdateAnimationData()
 	Frame *CurFrame = AnimData.Anim->GetFrame(AnimData.CurrentFrameIndex);
 	if (CurFrame)
 	{
+		AnimData.PlayRate = 1;
 		AnimData.CountDown = CurFrame->GetFrameTime();
 		Texture = CurFrame->GetTexture();
 	}

@@ -101,6 +101,7 @@ void Game::HandleControl(ControlTrigger* Control)
 void Game::OnLevelComplete()
 {
 	GameState = STATE_TIMER_AWARD;
+	ActiveCheckpointControl.WarpID = 0;
 }
 
 bool Game::IsLevelComplete()
@@ -114,11 +115,15 @@ void Game::Tick()
 	{
 		UpdateTimerAward();
 	}
+	else if (GameState == STATE_FIREWORKS)
+	{
+		UpdateFireworks();
+	}
 	else if(GameState == STATE_POST_LEVEL)
 	{
 		PostLevelCountDown--;
 
-		if (PostLevelCountDown <= 0)
+		if (!Mix_PlayingMusic() && PostLevelCountDown <= 0)
 		{
 			bLevelComplete = true;
 		}
@@ -131,8 +136,8 @@ void Game::UpdateTimerAward()
 	{
 		//bLevelComplete = true;
 		SDL_Point FlagPosition = TheMap->GetPlayerFlagPosition();
-		SimpleSprites.push_back(new PlayerFlagSprite(FlagPosition.x, FlagPosition.y));
-		GameState = STATE_FLAG;
+		SimpleSprites.push_back(new PlayerFlagSprite(FlagPosition.x, FlagPosition.y));		
+		GameState = STATE_FLAG;		
 	}	
 }
 
@@ -145,6 +150,28 @@ eGameState Game::GetGameState()
 void Game::OnGrabFlagPole()
 {
 	GameState = STATE_RIDING_FLAG_POLE;
+	Mix_HaltMusic();
+	Mix_PlayChannel(CHANNEL_FLAG_POLE, FlagPoleSound, 0);
+
+	// See how many fireworks we need
+	char TempChar[10];
+	itoa((int)TheMap->GetSecondsLeft(), TempChar, 10);
+	char LastDigit = TempChar[strlen(TempChar) - 1];
+	NumFireworks = 0;
+	CurrentFirework = 0;
+	FireworkCountDown = 0;
+	if (LastDigit == '1')
+	{
+		NumFireworks = 1;
+	}
+	else if (LastDigit == '3')
+	{
+		NumFireworks = 3;
+	}
+	else if (LastDigit == '6')
+	{
+		NumFireworks = 6;
+	}
 }
 
 void Game::OnPlayerFlagDone()
@@ -153,6 +180,34 @@ void Game::OnPlayerFlagDone()
 	{
 
 	}*/
-	GameState = STATE_POST_LEVEL;	
+	GameState = STATE_FIREWORKS;	
 }
 
+void Game::UpdateFireworks()
+{
+	if (FireworkCountDown == 0)
+	{
+		if (CurrentFirework < NumFireworks)
+		{
+			Sprite* Explosion = new Sprite(GResourceManager->ExplosionTexture->Texture);
+
+			Explosion->SetPosition(FireworkLocations[CurrentFirework].x + TheMap->GetScrollX(), FireworkLocations[CurrentFirework].y + TheMap->GetScrollY());
+			Explosion->SetWidth(64);
+			Explosion->SetHeight(64);
+			Explosion->PlayAnimation(GResourceManager->FireworkAnimation, false);			
+			SimpleSprites.push_back(Explosion);
+
+			Mix_PlayChannel(CHANNEL_BUMP, FireworkSound, 0);
+			FireworkCountDown = 36;
+			CurrentFirework++;
+		}
+		else
+		{
+			GameState = STATE_POST_LEVEL;
+		}
+	}
+	else
+	{
+		FireworkCountDown--;
+	}
+}

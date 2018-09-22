@@ -287,6 +287,27 @@ public:
 	}
 	END_DECLARE_ANIMATION_RESOURCE(ExplosionAnimation)
 
+	BEGIN_DECLARE_ANIMATION_RESORCE(FireworkAnimation)
+	{
+		bUseAbsoluteFrameCount = true;
+
+		int SpriteWidth = 64;
+		int SpriteHeight = 64;
+		SDL_Rect SrcRect;
+
+		for (int i = 0; i < 3; i++)
+		{			
+			SrcRect = { i * SpriteWidth, 0, SpriteWidth, SpriteHeight };
+
+			Frames.push_back(new Frame(ResourceManager::ExplosionTexture->Texture, SrcRect, 6));
+		}
+
+		SrcRect = { SpriteWidth, 0, SpriteWidth, SpriteHeight };
+
+		Frames.push_back(new Frame(ResourceManager::ExplosionTexture->Texture, SrcRect, 6));
+	}
+	END_DECLARE_ANIMATION_RESOURCE(FireworkAnimation)
+
 	BEGIN_DECLARE_ANIMATION_RESORCE(TurtleAnimation)
 	{
 		bUseAbsoluteFrameCount = true;

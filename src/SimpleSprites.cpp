@@ -357,6 +357,23 @@ void FlagPoleSprite::Interact(PlayerSprite* Player)
 {
 	if (!bFlagTraveling)
 	{
+		double PlayerTranslatedY = ThePlayer->GetScreenSpaceCollisionRect().y + ThePlayer->GetScreenSpaceCollisionRect().h;
+		PlayerTranslatedY -= (Rect.y + CollisionRect.y) - TheMap->GetScrollY();
+		float GrabPercent = 1 - PlayerTranslatedY / Rect.h;
+
+		GrabPercent *= 100;
+
+		GrabPercent = 8 * (GrabPercent / 100);
+		/*if (GrabPercent < 0)
+		{
+			GrabPercent = 0;
+		}
+		else if (GrabPercent > 8)
+		{
+			GrabPercent = 8;
+		}*/
+
+		Points = StompPoints[(int)round(GrabPercent)];
 		bFlagTraveling = true;
 		Player->GrabFlagPole(this);
 	}
@@ -364,9 +381,19 @@ void FlagPoleSprite::Interact(PlayerSprite* Player)
 
 void FlagPoleSprite::Render(SDL_Renderer* Renderer)
 {
-	Sprite::Render(Renderer);	
-	SDL_Rect DstRect = { PosX - 32 - TheMap->GetScrollX(), PosY - TheMap->GetScrollY() + FlagY, 64, 64 };
-	SDL_RenderCopy(Renderer, GResourceManager->FlagTexture->Texture, NULL, &DstRect);
+	if (TheMap->InMapWindow(PosX, PosY))
+	{
+		Sprite::Render(Renderer);
+		SDL_Rect DstRect = { PosX - 32 - TheMap->GetScrollX(), PosY - TheMap->GetScrollY() + FlagY, 64, 64 };
+		SDL_RenderCopy(Renderer, GResourceManager->FlagTexture->Texture, NULL, &DstRect);
+
+		if (bFlagTraveling)
+		{
+			char TempChar[10];
+			itoa(Points, TempChar, 10);
+			DrawBitmapText(TempChar, (PosX + 48) - TheMap->GetScrollX(), Rect.h - FlagY - TheMap->GetScrollY() + 102, 24, 24, Renderer, FontShadowedWhite, 0.75, 1, false);
+		}
+	}
 }
 
 FlagPoleSprite::~FlagPoleSprite()

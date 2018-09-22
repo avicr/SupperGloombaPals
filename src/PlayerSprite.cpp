@@ -44,7 +44,8 @@ void PlayerSprite::Tick(double DeltaTime)
 		if (JumpOffPoleCountDown == 0)
 		{
 			bExitingLevel = true;
-
+			Flip = SDL_FLIP_NONE;
+			Mix_PlayMusic(WinMusic, 0);
 			VelocityX = MAX_WALK_SPEED;
 		}
 
@@ -1624,8 +1625,11 @@ void PlayerSprite::DrawHUD()
 	}
 	DrawBitmapText(TempString, 97 + i * (GlyphSpace * 32), 60, 32, 32, GRenderer, FontShadowedWhite, GlyphSpace, 1.25, false);
 		
-	// Draw coins
-	// Draw the time string	
+	// Draw coins	
+	SDL_Rect SrcRect = { 0, 0, 64, 64 };
+	SDL_Rect DstRect = { 350, 60, 32, 32 };
+
+	SDL_RenderCopy(GRenderer, GResourceManager->CoinEffectTexture->Texture, &SrcRect, &DstRect);
 	itoa(Coins, TempString, 10);
 	DrawBitmapText("X", 389, 60, 32, 32, GRenderer, FontShadowedWhite, GlyphSpace, 1.25, false);
 	NumZeros = 2 - strlen(TempString);
@@ -1659,7 +1663,8 @@ void PlayerSprite::DrawHUD()
 }
 
 void PlayerSprite::BeginLevel()
-{
+{		
+	SetAnimationPlayRate(0);
 	bExitedLevel = false;
 	EndOfLevelCountdown = 0;
 	JumpOffPoleCountDown = 0;
@@ -1738,7 +1743,7 @@ void PlayerSprite::BeginDie()
 	SetTexture(GResourceManager->PlayerGoombaDeadTexture->Texture);		
 	VelocityX = 0;
 	VelocityY = 0;
-	DyingCount = PLAYER_DYING_COUNT;
+	DyingCount = PLAYER_DYING_COUNT;	
 	Lives--;
 }
 
@@ -1747,10 +1752,11 @@ void PlayerSprite::GrabFlagPole(FlagPoleSprite* FlagPole)
 	VelocityX = 0;
 	bRidingFlagPole = true;
 	VelocityY = 8;
-	PosX = FlagPole->GetPosX() - 32;	
+	PosX = FlagPole->GetPosX() - 16;	
 	Rect.x = PosX;	
 	ExitLevelX = FlagPole->GetPosX() + 6 * 64;
-	TheGame->OnGrabFlagPole();
+	Flip = SDL_FLIP_NONE;
+	TheGame->OnGrabFlagPole();	
 }
 
 void PlayerSprite::UpdateFlagPoleAnimation()
@@ -1773,11 +1779,12 @@ void PlayerSprite::UpdateFlagPoleAnimation()
 
 void PlayerSprite::OnFlagFinished()
 {
-	PosX += 64;
+	Flip = SDL_FLIP_HORIZONTAL;
+	PosX += 40;
 	JumpOffPoleCountDown = 24;
 	Rect.x = PosX;	
 	VelocityX = WALKING_ACCELERATION;
-	bRidingFlagPole = false;
+	bRidingFlagPole = false;	
 }
 
 bool PlayerSprite::HasExitedLevel()
