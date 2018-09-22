@@ -1,0 +1,6 @@
+tile         64
+pixel        4
+s   pixel    0.25
+ss  pixel    0.015625
+sss pixel    0.0009765625
+

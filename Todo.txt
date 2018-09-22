@@ -1,0 +1,20 @@
+*always subtract 26 from warp exit scroll y
+
+point sprite should draw above all other simple sprites but below enemies
+koopa come back to life
+koopa goes to shell when bricked?
+hidden blocks should not reappear on level retry
+play hurry up timer music
+show time up message
+block should be correct color when bumped underground
+castle
+
+Add fire destroyable tile that leaves behind collision
+Add fade transition for BG colors to control?
+Add smooth scroll to position for control?
+Add scroll velocity and individual scroll direction lock flags
+add variable for player render layer
+
+62 frames flag travel
+1 frame mario on left
+24 on right side
