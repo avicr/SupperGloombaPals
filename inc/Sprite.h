@@ -76,6 +76,9 @@ public:
 	virtual void Interact(class PlayerSprite *OtherSprite) {};
 	virtual void Interact(class ItemSprite *OtherSprite) {};
 	virtual SDL_Rect GetScreenSpaceCollisionRect();	
+
+	// Returns the collision rect with width and height set to multiples of 64
+	virtual SDL_Rect GetScreenSpaceRect();
 	virtual SDL_Rect GetScreenSpaceCustomRect();
 	virtual SDL_Rect GetMapSpaceCollisionRect();
 	void SetTexture(SDL_Texture* Texture);

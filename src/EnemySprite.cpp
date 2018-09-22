@@ -39,7 +39,7 @@ bool GoombaEnemySprite::Interact(EnemySprite* Enemy)
 	if (!bPendingDelete && !Enemy->WasBricked())
 	{
 		VelocityX *= -1;
-		PosX += VelocityX;
+		//PosX += VelocityX;
 		SetFlip(VelocityX < 0 ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
 	}
 

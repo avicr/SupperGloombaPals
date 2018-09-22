@@ -75,7 +75,7 @@ public:
 	void GrabFlagPole(class FlagPoleSprite* FlagPole);
 	void UpdateFlagPoleAnimation();
 	void OnFlagFinished();
-	bool HasExitedLevel();
+	bool HasExitedLevel();	
 
 	//virtual SDL_Rect GetScreenSpaceCustomRect();
 

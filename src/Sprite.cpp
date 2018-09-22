@@ -439,3 +439,8 @@ bool Sprite::IsOnGround()
 
 	return TheMap->CheckCollision(ScreenSpaceColRect, true);
 }
+
+SDL_Rect Sprite::GetScreenSpaceRect()
+{
+	return{ (int)(Rect.x - TheMap->GetScrollX()), (int)(Rect.y - TheMap->GetScrollY()), Rect.w, Rect.h };
+}
