@@ -394,7 +394,7 @@ void PlayerSprite::Tick(double DeltaTime)
 		}
 
 	}
-	bool bOriginalCheck = ((GetMapSpaceCollisionRect().x >= TheMap->GetScrollX()) || (VelocityY >= 0 && !bBumpedHead)) && !bCollided && bCollidedDuringFinalCheck;
+	bool bOriginalCheck = ((GetMapSpaceCollisionRect().x >= TheMap->GetScrollX()) || (VelocityY >= 0 && !bBumpedHead)) && bCollidedDuringFinalCheck;
 	bool bNewCheck = Rect.y % 64 == 0  && GetMapSpaceCollisionRect().x >= TheMap->GetScrollX() && !bCollided && bCollidedDuringFinalCheck;
 	if (bOriginalCheck)
 	{
@@ -1027,7 +1027,7 @@ bool PlayerSprite::HandleVerticalMovement()
 				{					
 					TheMap->HandleCollision(HitTiles[i].Location.x, HitTiles[i].Location.y, PowerUpState != POWER_NONE);
 					// Move player out of the block tile
-					if (!bCollided)
+					//if (!bCollided)
 					{
 						PosY += 1;						
 					}					
