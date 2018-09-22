@@ -2,6 +2,7 @@
 #include "../inc/TMXMap.h"
 #include "../inc/PlayerSprite.h"
 #include "../inc/EnemySprite.h"
+#include "../inc/Game.h"
 #include "../inc/SpriteList.h"
 
 CoinEffectSprite::CoinEffectSprite(int X, int Y)
@@ -376,4 +377,33 @@ FlagPoleSprite::~FlagPoleSprite()
 bool FlagPoleSprite::IsDone()
 {
 	return FlagTravelCountDown == 0;
+}
+
+PlayerFlagSprite::PlayerFlagSprite(int X, int Y)
+{
+	RenderLayer = RENDER_LAYER_BEHIND_BG;
+	Sprite(GResourceManager->PlayerFlagTexture->Texture);
+	SetTexture(GResourceManager->PlayerFlagTexture->Texture);
+	SetPosition(X, Y);
+	SetWidth(64);
+	SetHeight(64);
+	DestY = Y - 128;
+}
+
+void PlayerFlagSprite::Tick(double DeltaTime)
+{
+	//Sprite::Tick(DeltaTime);
+
+	if (PosY > DestY)
+	{
+		PosY -= 5;
+
+		if (PosY <= DestY)
+		{
+			PosY = DestY;
+			TheGame->OnPlayerFlagDone();
+		}
+	}
+
+	Rect.y = PosY;
 }

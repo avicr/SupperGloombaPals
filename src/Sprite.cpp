@@ -11,6 +11,7 @@ Sprite::Sprite() :
 
 Sprite::Sprite(SDL_Texture *InTexture)
 {
+	RenderLayer = RENDER_LAYER_TOP;
 	bDrawScreenSpace = false;
 	bDeleteWhenNotVisible = true;
 	CollisionRenderColor.a = 128;

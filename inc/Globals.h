@@ -70,6 +70,7 @@ enum eDirection
 #define DYING_COUNT 16
 #define PLAYER_DYING_COUNT 220
 #define STOMP_COOL_DOWN 8
+#define IN_CASTLE_FRAMES 100
 
 #define PLAYER_SCROLL_START 312
 

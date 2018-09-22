@@ -121,7 +121,7 @@ enum eTileMetaType
 	TILE_ONE_UP,
 	TILE_PIPE_ENTRANCE,
 	TILE_PIPE_EXIT,
-	TILE_RESERVED,
+	TILE_PLAYER_FLAG,
 	TILE_COIN,
 	TILE_BREAKABLE,	
 	TILE_UGLY,
@@ -133,6 +133,7 @@ enum eTileMetaType
 	TILE_MAGIC_MUSHROOM,
 	TILE_DESTROY_WITH_FIRE,
 	TILE_DESTROY_WITH_FIRE_OR_BUMP,
+	TILE_FLAG_POLE,
 	TILE_NONE = 255
 };
 
@@ -319,6 +320,9 @@ protected:
 	double ScrollX;
 	double ScrollY;
 
+	int PlayerFlagX;
+	int PlayerFlagY;
+
 	// If the player is below this, kill them.  In Pixels	
 	int KillY;
 	int MaxScrollY;
@@ -399,6 +403,8 @@ public:
 	int GetWidth() { return Width * TilePixelWidth; }
 	int GetHeight() { return Height * TilePixelHeight; }
 	bool IsDestroyableByFireTile(int ID);
+	double TradeTimeForPoints(int Amount);
+	SDL_Point GetPlayerFlagPosition() { return{ PlayerFlagX, PlayerFlagY }; }
 
 	SDL_Rect GetVisibleWindow();
 

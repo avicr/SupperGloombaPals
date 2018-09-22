@@ -11,7 +11,7 @@ class SpriteList : public vector <T>
 public:
 	void Tick(double DeltaTime);
 	void CheckCollision();
-	void Render(SDL_Renderer *Renderer);
+	void Render(SDL_Renderer *Renderer, eRenderLayer RenderLayer);
 	void DeleteAll();
 	void DeletePendingActors();
 };
@@ -43,14 +43,18 @@ void SpriteList<T>::DeletePendingActors()
 }
 
 template<class T>
-void SpriteList<T>::Render(SDL_Renderer *Renderer)
+void SpriteList<T>::Render(SDL_Renderer *Renderer, eRenderLayer RenderLayer)
 {
 	for (int i = size() - 1; i >= 0; i--)
 	{
-		(*this)[i]->Render(Renderer);
-		/*SDL_Rect CollisionRect = Mexicans[i]->GetScreenSpaceCollisionRect();
-		SDL_SetRenderDrawColor(GRenderer, 255, 0, 0, 255);
-		SDL_RenderDrawRect(GRenderer, &CollisionRect);*/
+		if ((*this)[i]->GetRenderLayer() == RenderLayer)
+		{
+			(*this)[i]->Render(Renderer);
+
+			/*SDL_Rect CollisionRect = Mexicans[i]->GetScreenSpaceCollisionRect();
+			SDL_SetRenderDrawColor(GRenderer, 255, 0, 0, 255);
+			SDL_RenderDrawRect(GRenderer, &CollisionRect);*/
+		}
 	}
 }
 

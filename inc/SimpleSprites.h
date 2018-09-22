@@ -54,3 +54,12 @@ public:
 	virtual void Interact(class PlayerSprite* Player);
 	virtual bool IsDone();
 };
+
+class PlayerFlagSprite : public Sprite
+{
+	int DestY;
+
+public:
+	PlayerFlagSprite(int X, int Y);
+	void Tick(double DeltaTime);
+};

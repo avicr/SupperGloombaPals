@@ -4,6 +4,7 @@
 ItemSprite::ItemSprite(int X, int Y, bool bDoGrowAnimation)
 {	
 	ItemType = ITEM_NONE;
+	RenderLayer = RENDER_LAYER_BEHIND_FG;
 	bGrowing = bDoGrowAnimation;
 
 	// If we are growing, set our Y to one tile lower than where we want to be

@@ -226,10 +226,7 @@ bool DoPreLevel()
 
 	SDL_Event TheEvent;
 	
-	ThePlayer->BeginLevel();
-	ThePlayer->SetPosition(432, 396);
-	ThePlayer->SetWidth(48);
-	ThePlayer->SetHeight(48);	
+	ThePlayer->BeginLevel();	
 
 	while (!bDone && !bUserQuit)
 	{	
@@ -266,10 +263,14 @@ bool DoPreLevel()
 		SDL_SetRenderDrawColor(GRenderer, 0, 0, 0, 255);
 		SDL_RenderClear(GRenderer);
 		DrawBitmapText((string)"WORLD " + TheMap->GetWorldName(), 400, 288, 32, 32, GRenderer, FontShadowedWhite, GlyphSpace, 1.65, false);
-		SDL_Rect SrcRect = { 0, 0, 1024, 73 };
-		SDL_Rect DstRect = { 0, 32, 1024, 73 };
+		SDL_Rect SrcRect = { 0, 0, 64, 64 };
+		SDL_Rect DstRect = { 432, 370, 48, 48 };
+		/*ThePlayer->SetPosition(432, 396);
+		ThePlayer->SetWidth(48);
+		ThePlayer->SetHeight(48);*/
+		//ThePlayer->Render(GRenderer);		
 
-		ThePlayer->Render(GRenderer);		
+		SDL_RenderCopy(GRenderer, GResourceManager->PlayerGoombaTexture->Texture, &SrcRect, &DstRect);
 		
 		char Temp[10];
 		itoa(ThePlayer->GetLives(), Temp, 10);
@@ -584,6 +585,7 @@ void Tick(double DeltaTime)
 			ItemSprites.Tick(DeltaTime);
 		}
 		ThePlayer->Tick(DeltaTime);
+		TheGame->Tick();
 	}
 }
 
@@ -605,8 +607,7 @@ void Render()
 		{
 			SDL_SetRenderDrawColor(GRenderer, BGColor.r, BGColor.g, BGColor.b, BGColor.a);
 			SDL_RenderClear(GRenderer);
-		}				
-		
+		}						
 		TheMap->Render(GRenderer, 0, 0, 1024 / RenderScale, 960 / RenderScale);
 		ThePlayer->DrawHUD();
 				
@@ -722,7 +723,7 @@ void InitSDL()
 			Mix_VolumeMusic(VOLUME_NORMAL);
 			
 			//Mix_Volume(-1, 0);
-			Mix_VolumeMusic(0);
+			//Mix_VolumeMusic(0);
 		}
 
 #ifdef FULLSCREEN_1920_1080

@@ -1,6 +1,7 @@
 #include "../inc/Globals.h"
 #include "../inc/TMXMap.h"
 #include "../inc/Game.h"
+#include "../inc/SimpleSprites.h"
 #include "../inc/SpriteList.h"
 
 char* LevelNames[8] = 
@@ -17,6 +18,8 @@ char* LevelNames[8] =
 
 Game::Game()
 {
+	PostLevelCountDown = IN_CASTLE_FRAMES;
+	GameState = STATE_PRE_LEVEL;
 	CurrentLevel = 0;
 	bLevelComplete = false;
 }
@@ -33,7 +36,9 @@ void Game::EndGame()
 
 void Game::StartLevel()
 {	
+	PostLevelCountDown = IN_CASTLE_FRAMES;
 	bLevelComplete = false;
+	GameState = STATE_LEVEL_PLAY;
 	ThePlayer->BeginLevel();	
 	TheMap->StartLevel();
 
@@ -66,6 +71,7 @@ void Game::EnforceWarpControls(WarpExit ControlWarp)
 // Called to clearn up the map and stuff
 void Game::EndLevel()
 {		
+	GameState = STATE_TIMER_AWARD;
 	SimpleSprites.clear();
 	EnemySprites.clear();
 	ItemSprites.clear();
@@ -94,10 +100,59 @@ void Game::HandleControl(ControlTrigger* Control)
 
 void Game::OnLevelComplete()
 {
-	bLevelComplete = true;
+	GameState = STATE_TIMER_AWARD;
 }
 
 bool Game::IsLevelComplete()
 {
 	return bLevelComplete;
 }
+
+void Game::Tick()
+{
+	if (GameState == STATE_TIMER_AWARD)
+	{
+		UpdateTimerAward();
+	}
+	else if(GameState == STATE_POST_LEVEL)
+	{
+		PostLevelCountDown--;
+
+		if (PostLevelCountDown <= 0)
+		{
+			bLevelComplete = true;
+		}
+	}
+}
+
+void Game::UpdateTimerAward()
+{
+	if (TheMap->TradeTimeForPoints(1) <= 0)
+	{
+		//bLevelComplete = true;
+		SDL_Point FlagPosition = TheMap->GetPlayerFlagPosition();
+		SimpleSprites.push_back(new PlayerFlagSprite(FlagPosition.x, FlagPosition.y));
+		GameState = STATE_FLAG;
+	}	
+}
+
+eGameState Game::GetGameState()
+{
+	return GameState;
+}
+
+
+void Game::OnGrabFlagPole()
+{
+	GameState = STATE_RIDING_FLAG_POLE;
+}
+
+void Game::OnPlayerFlagDone()
+{
+	/*if (FireWorks)
+	{
+
+	}*/
+	GameState = STATE_POST_LEVEL;	
+}
+

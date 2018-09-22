@@ -11,6 +11,12 @@ int oldy;
 
 void PlayerSprite::Tick(double DeltaTime)
 {	
+	// Don't do anything if the level isn't playing
+	if (TheGame->GetGameState() > STATE_RIDING_FLAG_POLE)
+	{
+		return;
+	}
+
 	oldx = PosX;
 	oldy = PosY;
 
@@ -1695,7 +1701,7 @@ void PlayerSprite::BeginLevel()
 		CollisionRect = { 5, 32, 54, 96 };
 		SetWidth(64);
 		SetHeight(128);		
-		PlayAnimation(GResourceManager->GoombaGrowAnimation, false);
+		PlayAnimation(GResourceManager->PlayerGoombaTallAnimation, false);
 	}
 	else
 	{
@@ -1744,6 +1750,7 @@ void PlayerSprite::GrabFlagPole(FlagPoleSprite* FlagPole)
 	PosX = FlagPole->GetPosX() - 32;	
 	Rect.x = PosX;	
 	ExitLevelX = FlagPole->GetPosX() + 6 * 64;
+	TheGame->OnGrabFlagPole();
 }
 
 void PlayerSprite::UpdateFlagPoleAnimation()

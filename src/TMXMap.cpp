@@ -3,6 +3,7 @@
 #include "../inc/SpriteList.h"
 #include "../inc/EnemySpawnPoint.h"
 #include "../inc/EmptyBlockSprite.h"
+#include "../inc/Game.h"
 #include "../inc/SimpleSprites.h"
 #include "../inc/PlayerSprite.h"
 #include "../inc/ItemSprite.h"
@@ -210,8 +211,17 @@ void TMXMap::LoadObjects(TiXmlElement* ObjectElement)
 		// HACK
 		int TileId = GID - MetaTileGID;
 	
+		// Player flag
+		if (TileId == TILE_PLAYER_FLAG)
+		{
+			ObjElem->QueryIntAttribute("x", &PlayerFlagX);
+			ObjElem->QueryIntAttribute("y", &PlayerFlagY);
+
+			PlayerFlagY -= 64;
+		}
+
 		// Flag pole
-		if (TileId == 18)
+		if (TileId == TILE_FLAG_POLE)
 		{
 			int X;
 			int Y;
@@ -242,7 +252,7 @@ void TMXMap::LoadObjects(TiXmlElement* ObjectElement)
 		}
 
 		// Spawn points
-		if (TileId == 11 || TileId == 12)
+		if (TileId == TILE_SPAWN_GOOMBA || TileId == TILE_SPAWN_TURTLE)
 		{
 			int X;
 			int Y;
@@ -518,12 +528,14 @@ void TMXMap::LoadExit(TiXmlElement* ObjectElement)
 
 void TMXMap::Render(SDL_Renderer* Renderer, int ScreenX, int ScreenY, int SourceWidth, int SourceHeight)
 {
+	SimpleSprites.Render(GRenderer, RENDER_LAYER_BEHIND_BG);
+
 	for (int i = 0; i < Layers.size(); i++)
 	{
 		// Render the item sprites just before the foreground layer
 		if (Layers[i] == ForegroundLayer)
 		{
-			ItemSprites.Render(GRenderer);
+			ItemSprites.Render(GRenderer, RENDER_LAYER_BEHIND_FG);
 
 			if (bPlayingLevel && ThePlayer->IsWarping())
 			{				
@@ -605,8 +617,8 @@ void TMXMap::Render(SDL_Renderer* Renderer, int ScreenX, int ScreenY, int Source
 
 	if (bPlayingLevel)
 	{
-		SimpleSprites.Render(GRenderer);
-		EnemySprites.Render(GRenderer);
+		SimpleSprites.Render(GRenderer, RENDER_LAYER_TOP);
+		EnemySprites.Render(GRenderer, RENDER_LAYER_TOP);
 
 		if (!ThePlayer->IsWarping())
 		{
@@ -798,7 +810,7 @@ TMXMap::TMXMap()
 	KillY = -1;
 	bPlayingLevel = false;
 	WorldName = "1-1";
-	SecondsLeft = 300;
+	SecondsLeft = 30;
 	bRenderCollision = false;
 	ScrollX = 0;
 	ScrollY = 26;
@@ -1214,7 +1226,7 @@ void TMXMap::Tick(double DeltaTime)
 		}
 	}
 
-	if (!ThePlayer->IsDying())
+	if (!ThePlayer->IsDying() && TheGame->GetGameState() == STATE_LEVEL_PLAY)
 	{
 		SecondsLeft -= DeltaTime;
 	}
@@ -1309,4 +1321,18 @@ SDL_Rect TMXMap::GetVisibleWindow()
 bool TMXMap::IsDestroyableByFireTile(int ID)
 {
 	return ID == TILE_DESTROY_WITH_FIRE || ID == TILE_DESTROY_WITH_FIRE_OR_BUMP;
+}
+
+double TMXMap::TradeTimeForPoints(int Amount)
+{
+	SecondsLeft -= Amount;
+	if (SecondsLeft < 0)
+	{
+		SecondsLeft = 0;
+	}
+	else
+	{
+		ThePlayer->AddScore(Amount * 50);
+	}
+	return SecondsLeft;
 }

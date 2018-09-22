@@ -13,6 +13,14 @@
 
 using namespace std;
 
+enum eRenderLayer
+{
+	RENDER_LAYER_BEHIND_BG = 0,
+	RENDER_LAYER_BEHIND_FG,
+	RENDER_LAYER_TOP
+
+};
+
 enum eMovingFlags
 {
 	MOVING_NONE  = 0,
@@ -51,6 +59,8 @@ protected:
 	// If true, do not adjust for the scroll offset when drawing
 	bool bDrawScreenSpace;
 	bool bDeleteWhenNotVisible;
+
+	eRenderLayer RenderLayer;
 public:
 	Sprite();
 	Sprite(SDL_Texture *InTexture);
@@ -93,6 +103,7 @@ public:
 	virtual void CheckCollisionWithSprites();
 	virtual bool IsOnGround();
 	virtual bool IsInteractable() { return !bPendingDelete; }
+	virtual eRenderLayer GetRenderLayer() { return RenderLayer; }
 };
 
 #endif
