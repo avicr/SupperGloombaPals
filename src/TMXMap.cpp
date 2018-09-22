@@ -629,7 +629,8 @@ void TMXMap::Render(SDL_Renderer* Renderer, int ScreenX, int ScreenY, int Source
 
 void TMXMap::RenderLayer(const TMXLayer* Layer, SDL_Renderer* Renderer, int ScreenX, int ScreenY, int SourceWidth, int SourceHeight)
 {		
-	
+	ScrollX = ceil(ScrollX);
+	ScrollY = ceil(ScrollY);
 	int TileOffsetX = (int)ceil(ScrollX) % TilePixelWidth;
 	int TileOffsetY = (int)ceil(ScrollY) % TilePixelHeight;
 
