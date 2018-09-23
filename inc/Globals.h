@@ -29,6 +29,7 @@ enum eDirection
 };
 
 #define TEXTURE_PATH "resource/textures/"
+#define LEVEL_PATH "resource/Tilemaps/"
 
 //#ifdef _WIN32
 #define JOY_Y_AXIS 1
@@ -38,7 +39,7 @@ enum eDirection
 #define JOYSTICK_DEAD_ZONE 8000
 
 // TODO: Have a separate despawn distance
-#define SPAWN_DISTANCE 70
+#define SPAWN_DISTANCE 80 //70e
 
 #define MIN_WALKING_VELOCITY 0.296875
 #define WALKING_ACCELERATION 0.1484375
@@ -117,6 +118,7 @@ extern SDL_Color BGColor;
 extern bool bWorldSmear;
 extern int StompPoints[];
 extern SDL_Point FireworkLocations[];
+extern struct LevelInfo Levels[];
 
 extern SDL_Joystick *Joy;
 extern bool bRenderCollision;

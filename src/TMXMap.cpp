@@ -225,13 +225,11 @@ void TMXMap::LoadObjects(TiXmlElement* ObjectElement)
 		{
 			int X;
 			int Y;
+			bool bIsSecretExit = false;
 
 			ObjElem->QueryIntAttribute("x", &X);
 			ObjElem->QueryIntAttribute("y", &Y);
-
-			int EnemyType = 0;
-
-			// Find the ENEMY_ID property if available...		
+		
 			TiXmlElement* PropElem = ObjElem->FirstChildElement("properties");
 
 			if (PropElem)
@@ -241,14 +239,14 @@ void TMXMap::LoadObjects(TiXmlElement* ObjectElement)
 
 			while (PropElem)
 			{
-				if (strcmp(PropElem->Attribute("name"), "ENEMY_ID") == 0)
+				if (strcmp(PropElem->Attribute("name"), "secretexit") == 0)
 				{
-					PropElem->QueryIntAttribute("value", &EnemyType);
+					PropElem->QueryBoolAttribute("value", &bIsSecretExit);
 				}
 				PropElem = PropElem->NextSiblingElement();
 			}
 
-			SimpleSprites.push_back(new FlagPoleSprite(X, Y));
+			SimpleSprites.push_back(new FlagPoleSprite(X, Y, bIsSecretExit));
 		}
 
 		// Spawn points
@@ -390,6 +388,13 @@ void TMXMap::LoadControl(TiXmlElement* ControlElement)
 		{
 			PropElem->QueryBoolAttribute("value", &NewControl->bResetWhenPlayerLeaves);
 		}
+		else if (strcmp(PropElem->Attribute("name"), "specialevent") == 0)
+		{
+			int SpecialEvent = 0;
+			PropElem->QueryIntAttribute("value", &SpecialEvent);
+
+			NewControl->SpecialEvent = (eSpecialEvent) SpecialEvent;
+		}
 		
 		PropElem = PropElem->NextSiblingElement();
 	}	
@@ -481,9 +486,13 @@ void TMXMap::LoadExit(TiXmlElement* ObjectElement)
 			PropElem->QueryIntAttribute("value", &BirckTileSet);
 			NewExit.BrickTilesetID = (eBrickBreakTilesetID) BirckTileSet;
 		}
-		else if (strcmp(PropElem->Attribute("name"), "nopositionchange") == 0)
+		else if (strcmp(PropElem->Attribute("name"), "positionchangex") == 0)
 		{			
-			PropElem->QueryBoolAttribute("value", &NewExit.bNoPositionChange);			
+			PropElem->QueryBoolAttribute("value", &NewExit.bChangePositionX);			
+		}
+		else if (strcmp(PropElem->Attribute("name"), "positionchangey") == 0)
+		{
+			PropElem->QueryBoolAttribute("value", &NewExit.bChangePositionY);
 		}
 		else if (strcmp(PropElem->Attribute("name"), "killy") == 0)
 		{
@@ -534,7 +543,7 @@ void TMXMap::LoadExit(TiXmlElement* ObjectElement)
 
 void TMXMap::Render(SDL_Renderer* Renderer, int ScreenX, int ScreenY, int SourceWidth, int SourceHeight)
 {
-	SimpleSprites.Render(GRenderer, RENDER_LAYER_BEHIND_BG);
+	SimpleSprites.Render(GRenderer, RENDER_LAYER_BEHIND_BG); 
 
 	for (int i = 0; i < Layers.size(); i++)
 	{
@@ -786,9 +795,13 @@ void TMXMap::EnforceWarpControls(WarpExit Warp)
 	// TODO:
 	// Smooth scroll
 	// TODO:
-	if (!Warp.bNoPositionChange)
+	if (Warp.bChangePositionX)
 	{
 		ScrollX = Warp.PosX;
+	}
+
+	if (Warp.bChangePositionY)
+	{
 		ScrollY = Warp.PosY;
 	}
 
@@ -866,7 +879,7 @@ void TMXMap::StartLevel()
 void TMXMap::EndLevel()
 {
 	bLockScrollX = false;
-	bLockScrollY = false;
+	bLockScrollY = true;
 	bPlayingLevel = false;
 	ScrollX = 0;
 	ScrollY = 0;
@@ -938,6 +951,7 @@ bool TMXMap::CheckCollision(SDL_Rect Rect, vector<TileInfo>& HitTileLocs, bool b
 
 			HitTileLocs.push_back({ {x, y,}, GetMetaTileType(x, y), ForegroundLayer->TileData[y][x] });
 
+			
 			if (!bCollided)
 			{
 				bCollided = IsCollidableTile(CollisionLayer->TileData[y][x] - MetaTileGID, x, y);
@@ -1014,7 +1028,7 @@ bool TMXMap::IsCollidableTile(int MetaTileID, int TileX, int TileY, SDL_Point Te
 bool TMXMap::IsHiddenBlockTile(int ID)
 {	
 
-	if (ID == TILE_COIN_BLOCK || ID == TILE_POWER_UP || ID == TILE_ONE_UP || ID == TILE_UGLY || ID == TILE_MULTI_COIN_BLOCK || ID == TILE_STAR || ID == TILE_MAGIC_MUSHROOM)
+	if (ID == TILE_COIN_BLOCK || ID == TILE_POWER_UP || ID == TILE_ONE_UP || ID == TILE_UGLY || ID == TILE_MULTI_COIN_BLOCK || ID == TILE_STAR || ID == TILE_MAGIC_MUSHROOM || ID == TILE_BREAK_ON_TOUCH)
 	{
 		return true;
 	}
@@ -1025,7 +1039,7 @@ bool TMXMap::IsHiddenBlockTile(int ID)
 bool TMXMap::IsBreakableBlockTile(int ID)
 {
 
-	if (ID == TILE_BREAKABLE || ID == TILE_DESTROY_WITH_FIRE_OR_BUMP)
+	if (ID == TILE_BREAKABLE || ID == TILE_DESTROY_WITH_FIRE_OR_BUMP || ID == TILE_BREAK_ON_TOUCH)
 	{
 		return true;
 	}
@@ -1100,7 +1114,22 @@ void TMXMap::HandleCollision(int TileX, int TileY, bool bCanBreakBricks)
 
 		Sprite* NewBlock = NULL;
 
-		if (MetaTileType == TILE_MULTI_COIN_BLOCK)
+		if (MetaTileType == TILE_BREAK_ON_TOUCH)
+		{
+			int SpawnX = TileX * 64;
+			int SpawnY = TileY * 64;
+			SimpleSprites.push_back(new BrickBreakSprite(SpawnX, SpawnY - 32, -4));
+			SimpleSprites.push_back(new BrickBreakSprite(SpawnX + 32, SpawnY - 32, 4));
+			SimpleSprites.push_back(new BrickBreakSprite(SpawnX, SpawnY + 32, -4));
+			SimpleSprites.push_back(new BrickBreakSprite(SpawnX + 32, SpawnY + 32, 4));
+
+			Mix_PlayChannel(CHANNEL_BREAK_BRICK, BreakBrickSound, 0);			
+			Sprite* NewBlock = new EmptyBlockSprite(TileX * 64, TileY * 64 - 64, NULL, true, 0, TileX, TileY, ITEM_NONE);
+
+			SetMetaLayerTile(TileX, TileY, TILE_NONE);
+			SetForegroundTile(TileX, TileY, -1);
+		}
+		else if (MetaTileType == TILE_MULTI_COIN_BLOCK)
 		{
 			if (ForegroundLayer->TileData[TileY][TileX] != TILE_NONE)
 			{
@@ -1128,8 +1157,15 @@ void TMXMap::HandleCollision(int TileX, int TileY, bool bCanBreakBricks)
 
 					// TODO: Get the appropriate brick tile number from the map
 					if (TileToReplace == -1)
-					{
-						TileToReplace = 30;
+					{												
+						if (BrickTilesetID == 1)
+						{
+							TileToReplace = 54;
+						}
+						else
+						{
+							TileToReplace = 33;
+						}
 					}
 					TheMap->SetForegroundTile(TileX, TileY, TILE_NONE);
 					NewBlock = new EmptyBlockSprite(TileX * 64, TileY * 64 - 64, GetBrickBounceAnimForBrickTileset() , true, TileToReplace, TileX, TileY, ItemTypeToSpawn);

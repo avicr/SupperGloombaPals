@@ -55,7 +55,7 @@ BigMushroomItemSprite::BigMushroomItemSprite(int X, int Y, bool bDoGrowAnimation
 	ItemType = ITEM_MUSHROOM;
 
 	CollisionRect = { 8, 0, 50, 50 };
-	VelocityX = 4.1;
+	VelocityX = 3.1;
 	
 }
 
@@ -68,7 +68,7 @@ OneUpMushroomSprite::OneUpMushroomSprite(int X, int Y, bool bDoGrowAnimation)
 	ItemType = ITEM_ONE_UP;
 
 	CollisionRect = { 8, 0, 50, 50 };
-	VelocityX = 4.1;
+	VelocityX = 3.1;
 
 }
 

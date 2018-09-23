@@ -1,5 +1,15 @@
 #pragma once
 
+struct LevelInfo
+{
+	string FileName;
+	string DisplayName;
+	int NextLevel;
+	int NextSecretLevel;
+
+	//vector<Experiences> TheExperiences;
+};
+
 enum eGameState
 {
 	STATE_PRE_LEVEL = 0,
@@ -14,13 +24,16 @@ enum eGameState
 class Game
 {
 	struct ControlTrigger ActiveCheckpointControl;
-	int CurrentLevel;
+	int CurrentLevel;	
 	bool bLevelComplete;
 	eGameState GameState;
 	int PostLevelCountDown;
 	int NumFireworks;
 	int CurrentFirework;
-	int FireworkCountDown;
+	int FireworkCountDown;	
+	Mix_Music* CurrentMusic;
+	bool bSecretExit;
+
 public:
 	Game();
 
@@ -44,8 +57,13 @@ public:
 
 	eGameState GetGameState();
 	void UpdateTimerAward();	
-	void OnGrabFlagPole();
+	void OnGrabFlagPole(bool bSecret);
 	void OnPlayerFlagDone();	
 
 	void UpdateFireworks();
+	void CancelEndLevel();
+
+	string GetLevelName();
+
+	Mix_Music* GetMusic();
 };

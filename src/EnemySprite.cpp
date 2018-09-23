@@ -93,7 +93,7 @@ void GoombaEnemySprite::GetFired()
 
 SDL_Rect EnemySprite::GetScreenSpaceCustomRect()
 {
-	return{ (int)PosX - (int)TheMap->GetScrollX(), (int)PosY - (int)TheMap->GetScrollY(), Rect.w, Rect.h - 1};
+	return{ (int)PosX - (int)TheMap->GetScrollX(), ((int)PosY + Rect.h - 64)- (int)TheMap->GetScrollY(), Rect.w, 63};
 }
 
 GoombaEnemySprite::GoombaEnemySprite(EnemySpawnPoint* Spawner) :
@@ -306,5 +306,14 @@ void TurtleEnemySprite::HandleTileCollision(vector<TileInfo> CollisionTiles)
 		{
 			TheMap->HandleCollision(CollisionTiles[i].Location.x, CollisionTiles[i].Location.y, true);
 		}
+	}
+}
+
+void TurtleEnemySprite::OnInteractedWith(EnemySprite* Other)
+{
+	if (TurtleState == TURTLE_STATE_WALK)
+	{
+		VelocityX *= -1;
+		SetFlip(VelocityX < 0 ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
 	}
 }

@@ -4,18 +4,6 @@
 #include "../inc/SimpleSprites.h"
 #include "../inc/SpriteList.h"
 
-char* LevelNames[8] = 
-{
-	"Resource/TileMaps/Level1_1_64x64.tmx",
-	"Resource/TileMaps/Level1_1_64x64.tmx",
-	"Resource/TileMaps/Level1_1_64x64.tmx",
-	"Resource/TileMaps/Level1_1_64x64.tmx",
-	"Resource/TileMaps/Level1_1_64x64.tmx",
-	"Resource/TileMaps/Level1_1_64x64.tmx",
-	"Resource/TileMaps/Level1_1_64x64.tmx",
-	"Resource/TileMaps/Level1_1_64x64.tmx"
-};
-
 Game::Game()
 {
 	PostLevelCountDown = IN_CASTLE_FRAMES;
@@ -26,7 +14,7 @@ Game::Game()
 
 void Game::LoadCurrentLevel()
 {
-	TheMap->ReadMap(LevelNames[CurrentLevel]);
+	TheMap->ReadMap(Levels[CurrentLevel].FileName.c_str());
 }
 
 void Game::EndGame()
@@ -36,6 +24,7 @@ void Game::EndGame()
 
 void Game::StartLevel()
 {	
+	bSecretExit = false;
 	PostLevelCountDown = IN_CASTLE_FRAMES;
 	bLevelComplete = false;
 	GameState = STATE_LEVEL_PLAY;
@@ -65,10 +54,15 @@ void Game::EnforceWarpControls(WarpExit ControlWarp)
 {	
 	BGColor = ControlWarp.ExitBGColor;
 	TheMap->EnforceWarpControls(ControlWarp);
-	Mix_PlayMusic(GetMusicFromID(ControlWarp.MusicChange), -1);
+
+	if (ControlWarp.MusicChange != 0)
+	{
+		CurrentMusic = GetMusicFromID(ControlWarp.MusicChange);
+		Mix_PlayMusic(CurrentMusic, -1);
+	}
 }
 
-// Called to clearn up the map and stuff
+// Called to clean up the map and stuff
 void Game::EndLevel()
 {		
 	GameState = STATE_TIMER_AWARD;
@@ -121,13 +115,31 @@ void Game::Tick()
 	}
 	else if(GameState == STATE_POST_LEVEL)
 	{
-		PostLevelCountDown--;
+		PostLevelCountDown--;		
 
 		if (!Mix_PlayingMusic() && PostLevelCountDown <= 0)
 		{
+			if (bSecretExit)
+			{
+				CurrentLevel = Levels[CurrentLevel].NextSecretLevel;
+			}
+			else
+			{
+				CurrentLevel = Levels[CurrentLevel].NextLevel;
+			}
+
+			if (CurrentLevel == -1)
+			{
+				exit(1);
+			}
 			bLevelComplete = true;
 		}
 	}
+}
+
+string Game::GetLevelName()
+{
+	return Levels[CurrentLevel].DisplayName;
 }
 
 void Game::UpdateTimerAward()
@@ -147,8 +159,9 @@ eGameState Game::GetGameState()
 }
 
 
-void Game::OnGrabFlagPole()
+void Game::OnGrabFlagPole(bool bSecret)
 {
+	bSecretExit = bSecret;
 	GameState = STATE_RIDING_FLAG_POLE;
 	Mix_HaltMusic();
 	Mix_PlayChannel(CHANNEL_FLAG_POLE, FlagPoleSound, 0);
@@ -210,4 +223,18 @@ void Game::UpdateFireworks()
 	{
 		FireworkCountDown--;
 	}
+}
+
+void Game::CancelEndLevel()
+{
+	PostLevelCountDown = IN_CASTLE_FRAMES;
+	bLevelComplete = false;
+	GameState = STATE_LEVEL_PLAY;
+	ThePlayer->BeginLevel();
+}
+
+Mix_Music* Game::GetMusic()
+{
+
+	return CurrentMusic;
 }

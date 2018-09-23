@@ -1,11 +1,11 @@
 *always subtract 26 from warp exit scroll y
 
-skid sound
 point sprite should draw above all other simple sprites but below enemies
 play hurry up timer music
 show time up message
 hidden blocks should not reappear on level retry
-block should be correct color when bumped underground
+piranha plant
+red turtle
 koopa come back to life
 koopa goes to shell when bricked?
 

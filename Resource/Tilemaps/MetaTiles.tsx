@@ -28,7 +28,7 @@
  <tile id="11" type="ENEMY_SPAWN"/>
  <tile id="12" type="ENEMY_SPAWN">
   <properties>
-   <property name="ENEMY_ID" type="int" value="1"/>
+   <property name="ENEMY_ID" type="int" value="0"/>
   </properties>
  </tile>
  <tile id="13" type="ITEM">
@@ -36,7 +36,11 @@
    <property name="item" type="int" value="3"/>
   </properties>
  </tile>
- <tile id="14" type="CONTROL"/>
+ <tile id="14" type="CONTROL">
+  <properties>
+   <property name="specialevent" type="int" value="0"/>
+  </properties>
+ </tile>
  <tile id="15" type="ITEM">
   <properties>
    <property name="item" type="int" value="4"/>

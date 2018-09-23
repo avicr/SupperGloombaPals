@@ -330,17 +330,27 @@ void PointSprite::Render(SDL_Renderer* Renderer)
 	DrawBitmapText(PointString, PosX, PosY, 24, 24, GRenderer, FontShadowedWhite, 0.75, 1, false);
 }
 
-FlagPoleSprite::FlagPoleSprite(int X, int Y)
+FlagPoleSprite::FlagPoleSprite(int X, int Y, bool bSecretExit)
 	: Sprite(GResourceManager->FlagPoleTexture->Texture)
 {
+	if (bIsSecretExit)
+	{
+		FlagTexture = GResourceManager->SecretFlagTexture->Texture;
+		SetTexture(GResourceManager->SecretFlagPoleTexture->Texture);
+	}
+	else
+	{
+		FlagTexture = GResourceManager->FlagTexture->Texture;
+	}
 	bFlagTraveling = false;
 	FlagTravelCountDown = 63;
 	bDeleteWhenNotVisible = false;
+	bIsSecretExit = bSecretExit;
 	SetPosition(X, Y - 608);
 	FlagY = 30;
 	CollisionRect = { 4, 24, 56, 584 };
 	SetWidth(64);
-	SetHeight(608);
+	SetHeight(608);	
 }
 
 void FlagPoleSprite::Tick(double DeltaTime)
@@ -395,13 +405,13 @@ void FlagPoleSprite::Render(SDL_Renderer* Renderer)
 	{
 		Sprite::Render(Renderer);
 		SDL_Rect DstRect = { PosX - 32 - TheMap->GetScrollX(), PosY - TheMap->GetScrollY() + FlagY, 64, 64 };
-		SDL_RenderCopy(Renderer, GResourceManager->FlagTexture->Texture, NULL, &DstRect);
+		SDL_RenderCopy(Renderer, FlagTexture, NULL, &DstRect);
 
 		if (bFlagTraveling)
 		{
 			char TempChar[10];
 			itoa(Points, TempChar, 10);
-			DrawBitmapText(TempChar, (PosX + 48) - TheMap->GetScrollX(), Rect.h - FlagY - TheMap->GetScrollY() + 102, 24, 24, Renderer, FontShadowedWhite, 0.75, 1, false);
+			DrawBitmapText(TempChar, (PosX + 48) - TheMap->GetScrollX(), Rect.h - (FlagY - TheMap->GetScrollY()) - 128, 24, 24, Renderer, FontShadowedWhite, 0.75, 1, false);
 		}
 	}
 }

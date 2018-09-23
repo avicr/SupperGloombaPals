@@ -54,6 +54,13 @@ SDL_Point FireworkLocations[] = {
 	{ 266, 461 },
 };
 
+LevelInfo Levels[] = {
+	{ LEVEL_PATH + (string)"Level1_1_64x64.tmx", "1-1", 1, 4 },
+	{ LEVEL_PATH + (string)"Level2.tmx", "1-1", 2, 5 },
+	{ LEVEL_PATH + (string)"Level1_1_64x64.tmx", "1-1", -1, -1 },
+	{ LEVEL_PATH + (string)"Level2.tmx", "1-1", -1, -1 },
+};
+
 SpriteList<Sprite*> SimpleSprites;
 SpriteList<EnemySprite*> EnemySprites;
 SpriteList<ItemSprite*> ItemSprites;
@@ -752,7 +759,7 @@ void InitSDL()
 			Mix_VolumeMusic(VOLUME_NORMAL);
 			
 			//Mix_Volume(-1, 0);
-			Mix_VolumeMusic(0);
+			//Mix_VolumeMusic(0);
 		}
 
 #ifdef FULLSCREEN_1920_1080
@@ -996,6 +1003,9 @@ Mix_Music* GetMusicFromID(int ID)
 	Mix_Music* Music = NULL;
 	switch (ID)
 	{
+	case 0:
+		Music = NULL;
+		break;
 	case 1:
 		Music = BGMusic;
 		break;

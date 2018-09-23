@@ -88,7 +88,9 @@ public:
 	DECLARE_TEXTURE_RESOURCE(TurtleShellTexture, "turtleshell.bmp")
 	DECLARE_TEXTURE_RESOURCE(StarTexture, "star.bmp");
 	DECLARE_TEXTURE_RESOURCE(FlagPoleTexture, "flagpole.bmp");
+	DECLARE_TEXTURE_RESOURCE(SecretFlagPoleTexture, "secretflagpole.bmp");
 	DECLARE_TEXTURE_RESOURCE(FlagTexture, "flag.bmp");
+	DECLARE_TEXTURE_RESOURCE(SecretFlagTexture, "secretflag.bmp");
 	DECLARE_TEXTURE_RESOURCE(PlayerFlagTexture, "playerflag.bmp");
 
 	

@@ -367,7 +367,7 @@ void PlayerSprite::Tick(double DeltaTime)
 	VerticalScrollDelta -= PosY;
 
 	bool bScrollingDown = VelocityY > 0 && Rect.y + Rect.h - TheMap->GetScrollY() > 816;
-	bool bScrollingUp = VelocityY < 0 && Rect.y - TheMap->GetScrollY() < 250;
+	bool bScrollingUp = VelocityY < 0 && Rect.y - TheMap->GetScrollY() < 50;
 
 	if (bScrollingDown || bScrollingUp)
 	{
@@ -453,8 +453,7 @@ void PlayerSprite::UpdateStarAnimation()
 	{
 		SetColorModForAllTextures({ 0, 0, 0 });
 		// TODO: Get the bg music from the map and play it
-		Mix_PlayMusic(BGMusic, -1);
-			
+		Mix_PlayMusic(TheGame->GetMusic(), 1);			
 		
 	}
 	else if (StarCountdown % 15 == 0)
@@ -1007,6 +1006,10 @@ bool PlayerSprite::HandleVerticalMovement()
 
 		for (int i = 0; i < HitTiles.size(); i++)
 		{									
+			if (HitTiles[i].MetaTileType == TILE_BREAK_ON_TOUCH)
+			{
+				TheMap->HandleCollision(HitTiles[i].Location.x, HitTiles[i].Location.y, PowerUpState != POWER_NONE);
+			}
 			// Check to see if we bumped any special blocks
 			if (VelocityY < 0)
 			{								
@@ -1338,6 +1341,11 @@ void PlayerSprite::CheckControlCollision()
 			if (!Controls[i]->bTriggered)
 			{
 				Controls[i]->bTriggered = true;
+
+				if (Controls[i]->SpecialEvent == SPECIAL_EVENT_CANCEL_CASTLE)
+				{
+					TheGame->CancelEndLevel();
+				}
 
 				int WarpIndex = TheMap->GetWarpIndex(Controls[i]->WarpID);
 
@@ -1677,6 +1685,8 @@ void PlayerSprite::BeginLevel()
 	bExitedLevel = false;
 	EndOfLevelCountdown = 0;
 	JumpOffPoleCountDown = 0;
+	VelocityY = 0;
+	VelocityX = 0;
 	bExitingLevel = false;
 	bRidingFlagPole = false;
 	EjectionDirection = DIRECTION_NONE;
@@ -1765,7 +1775,7 @@ void PlayerSprite::GrabFlagPole(FlagPoleSprite* FlagPole)
 	Rect.x = PosX;	
 	ExitLevelX = FlagPole->GetPosX() + 6 * 64;
 	Flip = SDL_FLIP_NONE;
-	TheGame->OnGrabFlagPole();	
+	TheGame->OnGrabFlagPole(FlagPole->IsSecretExit());
 }
 
 void PlayerSprite::UpdateFlagPoleAnimation()

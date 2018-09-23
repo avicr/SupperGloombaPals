@@ -48,14 +48,17 @@ protected:
 	int FlagY;	
 	bool bFlagTraveling;
 	int Points;
+	bool bIsSecretExit;
+	SDL_Texture* FlagTexture;
 
 public:
 	~FlagPoleSprite();
-	FlagPoleSprite(int X, int Y);
+	FlagPoleSprite(int X, int Y, bool bSecretExit);
 	virtual void Tick(double DeltaTime);
 	virtual void Render(SDL_Renderer* Renderer);
 	virtual void Interact(class PlayerSprite* Player);
 	virtual bool IsDone();
+	virtual bool IsSecretExit() { return bIsSecretExit; }
 };
 
 class PlayerFlagSprite : public Sprite

@@ -54,7 +54,7 @@ public:
 	virtual void Tick(double DeltaTime);
 	virtual bool IsInteractable();
 	virtual void HandleTileCollision(vector<TileInfo> CollisionTiles);
-
+	virtual void OnInteractedWith(EnemySprite* Other);
 protected:
 	eTurtleState TurtleState;
 	int StompCooldown;

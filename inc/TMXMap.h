@@ -10,6 +10,13 @@ using namespace std;
 #define MAX_TILE_OFFSET 4
 #define TILE_VELOCITY 0.72
 
+enum eSpecialEvent
+{
+	SPECIAL_EVENT_NONE = 0,
+	SPECIAL_EVENT_CANCEL_CASTLE,
+	//SPECIAL_EVENT_CANCEL_CASTEL
+};
+
 struct TileOffset
 {
 	float OffsetX = 0;
@@ -57,10 +64,11 @@ struct WarpExit
 	eWarpType WarpType = WARP_INSTANT; 
 	SDL_Color ExitBGColor = { 54, 129, 241, 255 };
 	bool bLockScrollX = false;
-	bool bLockScrollY = false;
+	bool bLockScrollY = true;	
 	int MaxScrollY = 0;
 	bool bNoScrollChange = false;
-	bool bNoPositionChange = false;
+	bool bChangePositionX = true;
+	bool bChangePositionY = true;
 	int MusicChange = 0;
 	int ScrollOffsetX = 0;
 	int ScrollOffsetY = 0;
@@ -108,6 +116,7 @@ struct ControlTrigger
 	bool bTriggered = false;
 	
 	bool bResetWhenPlayerLeaves = true;
+	eSpecialEvent SpecialEvent = SPECIAL_EVENT_NONE;
 };
 
 struct MultiCoinManager
@@ -143,6 +152,7 @@ enum eTileMetaType
 	TILE_DESTROY_WITH_FIRE,
 	TILE_DESTROY_WITH_FIRE_OR_BUMP,
 	TILE_FLAG_POLE,
+	TILE_BREAK_ON_TOUCH,
 	TILE_NONE = 255
 };
 
