@@ -55,10 +55,17 @@ SDL_Point FireworkLocations[] = {
 };
 
 LevelInfo Levels[] = {
-	{ LEVEL_PATH + (string)"Level1_1_64x64.tmx", "1-1", 1, 4 },
-	{ LEVEL_PATH + (string)"Level2.tmx", "1-1", 2, 5 },
-	{ LEVEL_PATH + (string)"Level1_1_64x64.tmx", "1-1", -1, -1 },
-	{ LEVEL_PATH + (string)"Level2.tmx", "1-1", -1, -1 },
+/*Level 1*/		   { LEVEL_PATH + (string)"Level1_1_64x64.tmx", "1-1", 1, 5 },	      
+/*Level 2*/		   { LEVEL_PATH + (string)"Level2.tmx"        , "1-1", 2, 6 },
+/*Level 3*/		   { LEVEL_PATH + (string)"Level1_1_64x64.tmx", "1-1", -1, -1 },
+/*Level 4*/		   { LEVEL_PATH + (string)"Level2.tmx"        , "1-1", -1, -1 },
+/*Level 5*/	 	   { LEVEL_PATH + (string)"Level1_1_64x64.tmx", "1-1", -1, -1 },
+/*Secret Level 1*/ { LEVEL_PATH + (string)"Level2.tmx"        , "1-1", -1, -1 },
+/*Secret Level 2*/ { LEVEL_PATH + (string)"Level1_1_64x64.tmx", "1-1", -1, -1 },
+/*Secret Level 3*/ { LEVEL_PATH + (string)"Level2.tmx"        , "1-1", -1, -1 },
+/*Secret Level 4*/ { LEVEL_PATH + (string)"Level1_1_64x64.tmx", "1-1", -1, -1 },
+/*Secret Level 5*/ { LEVEL_PATH + (string)"Level2.tmx"        , "1-1", -1, -1 },
+/*Level 11*/	   { LEVEL_PATH + (string)"Level1_1_64x64.tmx", "1-1", -1, -1 },
 };
 
 SpriteList<Sprite*> SimpleSprites;
