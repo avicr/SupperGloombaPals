@@ -333,7 +333,7 @@ void PointSprite::Render(SDL_Renderer* Renderer)
 FlagPoleSprite::FlagPoleSprite(int X, int Y, bool bSecretExit)
 	: Sprite(GResourceManager->FlagPoleTexture->Texture)
 {
-	if (bIsSecretExit)
+	if (bSecretExit)
 	{
 		FlagTexture = GResourceManager->SecretFlagTexture->Texture;
 		SetTexture(GResourceManager->SecretFlagPoleTexture->Texture);
@@ -453,4 +453,23 @@ void PlayerFlagSprite::Tick(double DeltaTime)
 	}
 
 	Rect.y = PosY;
+}
+
+
+EventSprite::EventSprite(string InCaption) :
+	Sprite()
+{
+	CountDown = 360;
+	Caption = InCaption;
+}
+
+void EventSprite::Render(SDL_Renderer* Renderer)
+{
+
+}
+
+void EventSprite::Tick(double DeltaTime)
+{
+	CountDown--;
+	CountDown
 }

@@ -69,3 +69,14 @@ public:
 	PlayerFlagSprite(int X, int Y);
 	void Tick(double DeltaTime);
 };
+
+class EventSprite : public Sprite
+{
+protected:
+	string Caption;	
+
+public:
+	EventSprite(string InCaption);
+	virtual void Render(SDL_Renderer* Renderer);
+	virtual void Tick(double DeltaTime);
+};

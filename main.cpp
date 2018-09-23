@@ -55,17 +55,52 @@ SDL_Point FireworkLocations[] = {
 };
 
 LevelInfo Levels[] = {
-/*Level 1*/		   { LEVEL_PATH + (string)"Level1_1_64x64.tmx", "1-1", 1, 5 },	      
-/*Level 2*/		   { LEVEL_PATH + (string)"Level2.tmx"        , "1-1", 2, 6 },
-/*Level 3*/		   { LEVEL_PATH + (string)"Level1_1_64x64.tmx", "1-1", -1, -1 },
-/*Level 4*/		   { LEVEL_PATH + (string)"Level2.tmx"        , "1-1", -1, -1 },
-/*Level 5*/	 	   { LEVEL_PATH + (string)"Level1_1_64x64.tmx", "1-1", -1, -1 },
-/*Secret Level 1*/ { LEVEL_PATH + (string)"Level2.tmx"        , "1-1", -1, -1 },
-/*Secret Level 2*/ { LEVEL_PATH + (string)"Level1_1_64x64.tmx", "1-1", -1, -1 },
-/*Secret Level 3*/ { LEVEL_PATH + (string)"Level2.tmx"        , "1-1", -1, -1 },
-/*Secret Level 4*/ { LEVEL_PATH + (string)"Level1_1_64x64.tmx", "1-1", -1, -1 },
-/*Secret Level 5*/ { LEVEL_PATH + (string)"Level2.tmx"        , "1-1", -1, -1 },
-/*Level 11*/	   { LEVEL_PATH + (string)"Level1_1_64x64.tmx", "1-1", -1, -1 },
+/*Level 1*/		   { LEVEL_PATH + (string)"Level1_1_64x64.tmx", "1-1", 2, 1 },	      
+/*Secret Level 1*/ { LEVEL_PATH + (string)"Level2.tmx"        , "1-1S", 2, 3 },
+/*Level 2*/		   { LEVEL_PATH + (string)"Level2.tmx"        , "1-2", 4, 3 },
+/*Secret Level 2*/ { LEVEL_PATH + (string)"Level1_1_64x64.tmx", "1-2S", 4, 5 },
+/*Level 3*/		   { LEVEL_PATH + (string)"Level1_1_64x64.tmx", "1-3", 6, 5 },
+/*Secret Level 3*/ { LEVEL_PATH + (string)"Level2.tmx"        , "1-3S", 6, 7 },
+/*Level 4*/		   { LEVEL_PATH + (string)"Level2.tmx"        , "1-4", 8, 7 },
+/*Secret Level 4*/ { LEVEL_PATH + (string)"Level1_1_64x64.tmx", "1-4S", 8, 9 },
+/*Level 5*/	 	   { LEVEL_PATH + (string)"Level1_1_64x64.tmx", "1-5", 10, 9 },
+/*Secret Level 5*/ { LEVEL_PATH + (string)"Level2.tmx"        , "1-5S", 10, 10 },
+/*Level 11*/	   { LEVEL_PATH + (string)"Level1_1_64x64.tmx", "1-6", -1, -1 },
+};
+
+// Look up table to make sure save file isn't being tampared with
+int SpecialEventKeys[] =
+{
+	0,
+	640
+};
+
+int NormalExitKeys[10] =
+{
+	8332,
+	59874,
+	512,
+	156,
+	999,
+	45812,
+	59999,
+	9123,
+	4441,
+	9781	
+};
+
+int SecretExitKeys[10] =
+{
+	31055,
+	1242,
+	8936,
+	73,
+	2115,
+	9784,
+	104,
+	8883,
+	2563,
+	1269
 };
 
 SpriteList<Sprite*> SimpleSprites;
@@ -290,7 +325,7 @@ bool DoPreLevel()
 		}
 		SDL_SetRenderDrawColor(GRenderer, 0, 0, 0, 255);
 		SDL_RenderClear(GRenderer);
-		DrawBitmapText((string)"WORLD " + TheMap->GetWorldName(), 400, 288, 32, 32, GRenderer, FontShadowedWhite, GlyphSpace, 1.65, false);
+		DrawBitmapText((string)"WORLD " + TheGame->GetWorldName(), 400, 288, 32, 32, GRenderer, FontShadowedWhite, GlyphSpace, 1.65, false);
 		SDL_Rect SrcRect = { 0, 0, 64, 64 };
 		SDL_Rect DstRect = { 432, 370, 48, 48 };
 		/*ThePlayer->SetPosition(432, 396);
@@ -1024,4 +1059,9 @@ Mix_Music* GetMusicFromID(int ID)
 		break;
 	}
 	return Music;
+}
+
+void SetUpEvents()
+{
+	Levels[0].SpecialEvents.push_back(SPECIAL_EVENT_CANCEL_CASTLE);
 }

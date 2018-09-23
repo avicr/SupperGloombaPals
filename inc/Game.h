@@ -1,5 +1,16 @@
 #pragma once
 
+struct SaveData
+{
+	int SpecialEvents[SPECIAL_EVENT_LAST + 1];
+	int NormalExits[10];
+	int SecretExits[10];
+
+	int GameJustFakeCrashed;
+	int BeatGame1;
+	int BeatGame2;
+};
+
 struct LevelInfo
 {
 	string FileName;
@@ -7,7 +18,7 @@ struct LevelInfo
 	int NextLevel;
 	int NextSecretLevel;
 
-	//vector<Experiences> TheExperiences;
+	vector<eSpecialEvent> SpecialEvents;
 };
 
 enum eGameState
@@ -23,6 +34,7 @@ enum eGameState
 
 class Game
 {
+	SaveData TheSaveData;
 	struct ControlTrigger ActiveCheckpointControl;
 	int CurrentLevel;	
 	bool bLevelComplete;
@@ -66,4 +78,12 @@ public:
 	string GetLevelName();
 
 	Mix_Music* GetMusic();
+
+	void HandleSpecialEvent(eSpecialEvent Event);
+	void WriteSaveFile();
+	void ReadSaveFile();
+
+	void DetermineCurrentLevel();
+	string GetWorldName();
+
 };

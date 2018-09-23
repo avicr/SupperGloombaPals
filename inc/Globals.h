@@ -120,6 +120,10 @@ extern int StompPoints[];
 extern SDL_Point FireworkLocations[];
 extern struct LevelInfo Levels[];
 
+extern int SpecialEventKeys[];
+extern int NormalExitKeys[];
+extern int SecretExitKeys[];
+
 extern SDL_Joystick *Joy;
 extern bool bRenderCollision;
 

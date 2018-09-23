@@ -1342,10 +1342,7 @@ void PlayerSprite::CheckControlCollision()
 			{
 				Controls[i]->bTriggered = true;
 
-				if (Controls[i]->SpecialEvent == SPECIAL_EVENT_CANCEL_CASTLE)
-				{
-					TheGame->CancelEndLevel();
-				}
+				TheGame->HandleSpecialEvent(Controls[i]->SpecialEvent);
 
 				int WarpIndex = TheMap->GetWarpIndex(Controls[i]->WarpID);
 

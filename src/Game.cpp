@@ -3,6 +3,8 @@
 #include "../inc/Game.h"
 #include "../inc/SimpleSprites.h"
 #include "../inc/SpriteList.h"
+#include <iostream>
+#include <fstream>
 
 Game::Game()
 {
@@ -10,6 +12,8 @@ Game::Game()
 	GameState = STATE_PRE_LEVEL;
 	CurrentLevel = 0;
 	bLevelComplete = false;
+
+	StartGame();
 }
 
 void Game::LoadCurrentLevel()
@@ -17,8 +21,14 @@ void Game::LoadCurrentLevel()
 	TheMap->ReadMap(Levels[CurrentLevel].FileName.c_str());
 }
 
-void Game::EndGame()
+void Game::StartGame()
 {
+	ReadSaveFile();
+	DetermineCurrentLevel();
+}
+
+void Game::EndGame()
+{	
 	ActiveCheckpointControl = ControlTrigger();
 }
 
@@ -71,6 +81,7 @@ void Game::EndLevel()
 	ItemSprites.clear();
 	delete TheMap;
 	TheMap = new TMXMap();
+	WriteSaveFile();
 }
 
 void Game::HandleControl(ControlTrigger* Control)
@@ -121,18 +132,21 @@ void Game::Tick()
 		{
 			if (bSecretExit)
 			{
+				TheSaveData.SecretExits[CurrentLevel] = SecretExitKeys[CurrentLevel];
 				CurrentLevel = Levels[CurrentLevel].NextSecretLevel;
 			}
 			else
 			{
+				TheSaveData.NormalExits[CurrentLevel] = NormalExitKeys[CurrentLevel];
 				CurrentLevel = Levels[CurrentLevel].NextLevel;
 			}
+			
+			bLevelComplete = true;
 
 			if (CurrentLevel == -1)
 			{
 				exit(1);
 			}
-			bLevelComplete = true;
 		}
 	}
 }
@@ -237,4 +251,121 @@ Mix_Music* Game::GetMusic()
 {
 
 	return CurrentMusic;
+}
+
+void Game::HandleSpecialEvent(eSpecialEvent Event)
+{	
+	if (Event == SPECIAL_EVENT_CANCEL_CASTLE)
+	{
+		CancelEndLevel();
+	}
+
+	// If this was an event, set the index to the key and save
+	if (Event != SPECIAL_EVENT_NONE)
+	{
+		TheSaveData.SpecialEvents[Event] = SpecialEventKeys[Event];
+		WriteSaveFile();
+	}
+}
+
+void Game::WriteSaveFile()
+{
+	ofstream SaveFile("rend.ext");
+
+	for (int i = 0; i < SPECIAL_EVENT_LAST; i++)
+	{
+		SaveFile << TheSaveData.SpecialEvents[i]<<endl;		
+	}
+
+	for (int i = 0; i < 10; i++)
+	{
+		SaveFile << TheSaveData.NormalExits[i] << endl;
+	}
+
+	for (int i = 0; i < 10; i++)
+	{
+		SaveFile << TheSaveData.SecretExits[i] << endl;
+	}
+}
+
+void Game::ReadSaveFile()
+{
+	ifstream SaveFile("rend.ext");
+
+	for (int i = 0; i < SPECIAL_EVENT_LAST; i++)
+	{
+		SaveFile >> TheSaveData.SpecialEvents[i];
+
+		// If we don't have the correct key for the event, set it to 0 to signify it hasn't happend
+		if (TheSaveData.SpecialEvents[i] != SpecialEventKeys[i])
+		{
+			TheSaveData.SpecialEvents[i] = 0;
+		}
+	}
+
+	for (int i = 0; i < 10; i++)
+	{
+		SaveFile >> TheSaveData.NormalExits[i];
+
+		// If we don't have the correct key for the event, set it to 0 to signify it hasn't happend
+		if (TheSaveData.NormalExits[i] != NormalExitKeys[i])
+		{
+			TheSaveData.NormalExits[i] = 0;
+		}
+	}
+
+	for (int i = 0; i < 10; i++)
+	{
+		SaveFile >> TheSaveData.SecretExits[i];
+
+		// If we don't have the correct key for the event, set it to 0 to signify it hasn't happend
+		if (TheSaveData.SecretExits[i] != SecretExitKeys[i])
+		{
+			TheSaveData.SecretExits[i] = 0;
+		}
+	}
+}
+
+void Game::DetermineCurrentLevel()
+{
+	int NormalIndex = 0;
+	int SecretIndex = 0;
+
+	// Find the higher level exit and use that one as our last compelted level
+	while (TheSaveData.NormalExits[NormalIndex] == 0 && NormalIndex < 10) NormalIndex++;
+	while (TheSaveData.SecretExits[SecretIndex] == 0 && SecretIndex < 10) SecretIndex++;
+
+	if (NormalIndex == 10 && SecretIndex == 10)
+	{
+		// TODO: Level select!
+	}
+	else if (NormalIndex > SecretIndex)
+	{
+		// If even, this is a normal level exit
+		if (NormalIndex % 2 == 0)
+		{
+			CurrentLevel = NormalIndex + 2;
+		}
+		else
+		{
+			CurrentLevel = NormalIndex + 1;
+		}
+	}
+	else 
+	{
+		// If even, this is a normal level exit
+		if (SecretIndex % 2 == 0)
+		{
+			CurrentLevel = SecretIndex + 1;
+		}
+		else
+		{
+			CurrentLevel = SecretIndex + 2;
+		}
+	}
+}
+
+string Game::GetWorldName()
+{
+	return Levels[CurrentLevel].DisplayName;
 }

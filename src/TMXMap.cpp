@@ -830,8 +830,7 @@ TMXMap::TMXMap()
 	BrickTilesetID = BRICK_TILESET_OVERWORLD;
 	MaxScrollY = 0;
 	KillY = -1;
-	bPlayingLevel = false;
-	WorldName = "1-1";
+	bPlayingLevel = false;	
 	SecondsLeft = 300;
 	bRenderCollision = false;
 	ScrollX = 0;

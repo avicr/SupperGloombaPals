@@ -328,7 +328,7 @@
     <property name="secretexit" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="150" gid="165" x="963.5" y="2238.81" width="296.5" height="201.62">
+  <object id="150" gid="165" x="751.5" y="2238.81" width="508.5" height="201.62">
    <properties>
     <property name="resetwhenplayerleaves" type="bool" value="true"/>
     <property name="warpid" type="int" value="6"/>
