@@ -1673,7 +1673,7 @@ void PlayerSprite::DrawHUD()
 
 void PlayerSprite::BeginLevel()
 {		
-	SetAnimationPlayRate(0);
+	SetAnimationPlayRate(1);
 	bExitedLevel = false;
 	EndOfLevelCountdown = 0;
 	JumpOffPoleCountDown = 0;
@@ -1715,7 +1715,7 @@ void PlayerSprite::BeginLevel()
 		CollisionRect = { 5, 32, 54, 96 };
 		SetWidth(64);
 		SetHeight(128);		
-		PlayAnimation(GResourceManager->PlayerGoombaTallAnimation, false);
+		PlayAnimation(GResourceManager->PlayerGoombaTallAnimation, true);
 	}
 	else
 	{

@@ -70,7 +70,9 @@ public:
 	DECLARE_TEXTURE_RESOURCE(PlayerGoombaDeadTexture, "goombadead.bmp")
 
 	DECLARE_TEXTURE_RESOURCE(EmptyBlockSpriteTexture, "EmptyBlockSprite.bmp")
+	DECLARE_TEXTURE_RESOURCE(EmptyBlockUSpriteTexture, "EmptyBlockSpriteU.bmp")
 	DECLARE_TEXTURE_RESOURCE(BrickBounceSpriteTexture, "BrickBounceSprite.bmp")
+	DECLARE_TEXTURE_RESOURCE(BrickBounceUSpriteTexture, "BrickBounceSpriteU.bmp")
 	DECLARE_TEXTURE_RESOURCE(EGoombaSpriteTexture, "egoomba.bmp")
 	DECLARE_TEXTURE_RESOURCE(EGoombaFlagTexture, "egoombasmash.bmp")	
 	DECLARE_TEXTURE_RESOURCE(CoinEffectTexture, "coineffect.bmp")
@@ -78,6 +80,7 @@ public:
 	DECLARE_TEXTURE_RESOURCE(OneUpMushroomTexture, "oneupmushroom.bmp")
 	DECLARE_TEXTURE_RESOURCE(MagicMushroomTexture, "magicmushroom.bmp")
 	DECLARE_TEXTURE_RESOURCE(BrickBreakTexture, "brickbreak.bmp")	
+	DECLARE_TEXTURE_RESOURCE(BrickBreakUTexture, "brickbreakU.bmp")
 	DECLARE_TEXTURE_RESOURCE(FlowerTexture, "flower.bmp")
 	DECLARE_TEXTURE_RESOURCE(FireTexture, "fire.bmp")
 	DECLARE_TEXTURE_RESOURCE(ExplosionTexture, "explosion.bmp")
@@ -87,6 +90,7 @@ public:
 	DECLARE_TEXTURE_RESOURCE(FlagPoleTexture, "flagpole.bmp");
 	DECLARE_TEXTURE_RESOURCE(FlagTexture, "flag.bmp");
 	DECLARE_TEXTURE_RESOURCE(PlayerFlagTexture, "playerflag.bmp");
+
 	
 	BEGIN_DECLARE_ANIMATION_RESORCE(GoombaGrowAnimation)
 	{
@@ -179,6 +183,20 @@ public:
 	}
 	END_DECLARE_ANIMATION_RESOURCE(BrickBreakAnimation)
 
+	BEGIN_DECLARE_ANIMATION_RESORCE(BrickBreakUAnimation)
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			int SpriteWidth = 64;
+			int SpriteHeight = 64;
+			SDL_Rect SrcRect = { i * SpriteWidth, 0, SpriteWidth, SpriteHeight };
+			bUseAbsoluteFrameCount = true;
+
+			Frames.push_back(new Frame(ResourceManager::BrickBreakUTexture->Texture, SrcRect, 3));
+		}
+	}
+	END_DECLARE_ANIMATION_RESOURCE(BrickBreakUAnimation)
+
 	BEGIN_DECLARE_ANIMATION_RESORCE(FlowerAnimation)
 	{
 		for (int i = 0; i < 4; i++)
@@ -245,6 +263,32 @@ public:
 		}
 	}
 	END_DECLARE_ANIMATION_RESOURCE(EmptyBlockSpriteAnimation)
+
+	BEGIN_DECLARE_ANIMATION_RESORCE(EmptyBlockUSpriteAnimation)
+	{
+		for (int i = 0; i < 16; i++)
+		{
+			int SpriteWidth = 64;
+			int SpriteHeight = 128;
+			SDL_Rect SrcRect = { i * SpriteWidth, 0, SpriteWidth, SpriteHeight };
+
+			Frames.push_back(new Frame(ResourceManager::EmptyBlockUSpriteTexture->Texture, SrcRect, 0));
+		}
+	}
+	END_DECLARE_ANIMATION_RESOURCE(EmptyBlockUSpriteAnimation)
+
+	BEGIN_DECLARE_ANIMATION_RESORCE(BrickBounceUSpriteAnimation)
+	{
+		for (int i = 0; i < 16; i++)
+		{
+			int SpriteWidth = 64;
+			int SpriteHeight = 128;
+			SDL_Rect SrcRect = { i * SpriteWidth, 0, SpriteWidth, SpriteHeight };
+
+			Frames.push_back(new Frame(ResourceManager::BrickBounceUSpriteTexture->Texture, SrcRect, 0));
+		}
+	}
+	END_DECLARE_ANIMATION_RESOURCE(BrickBounceUSpriteAnimation)
 
 	BEGIN_DECLARE_ANIMATION_RESORCE(BrickBounceSpriteAnimation)
 	{

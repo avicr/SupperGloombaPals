@@ -39,11 +39,18 @@ bool GoombaEnemySprite::Interact(EnemySprite* Enemy)
 	if (!bPendingDelete && !Enemy->WasBricked())
 	{
 		VelocityX *= -1;
+		Enemy->OnInteractedWith(this);
 		//PosX += VelocityX;
 		SetFlip(VelocityX < 0 ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
 	}
 
 	return true;
+}
+
+void GoombaEnemySprite::OnInteractedWith(EnemySprite* Other)
+{
+	VelocityX *= -1;
+	SetFlip(VelocityX < 0 ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
 }
 
 void GoombaEnemySprite::GetStomped()

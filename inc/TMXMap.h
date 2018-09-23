@@ -1,6 +1,7 @@
 #pragma once
 #include <SDL.h>
 #include "Globals.h"
+#include "Animation.h"
 #include "../tinyxml/tinyxml.h"
 #include <sstream>
 #include <vector>
@@ -43,6 +44,13 @@ enum eWarpType
 	WARP_CONTROL = 255
 };
 
+enum eBrickBreakTilesetID
+{
+	BRICK_TILESET_OVERWORLD = 0,
+	BRICK_TILESET_UNDERGROUND,
+	BRICK_TILESET_CASTLE
+};
+
 struct WarpExit
 {
 	eDirection ExitDirection = DIRECTION_UP;
@@ -60,6 +68,7 @@ struct WarpExit
 	int PosY = 0;
 	int Chance = 100;
 	int KillY = -1;
+	eBrickBreakTilesetID BrickTilesetID = BRICK_TILESET_OVERWORLD;
 };
 
 struct WarpEntrance
@@ -342,6 +351,9 @@ protected:
 	string WorldName;
 	double SecondsLeft;	
 
+	// Which type of brick stuff to spawn
+	eBrickBreakTilesetID BrickTilesetID;
+
 	vector<TMXTileset*> Tilesets;
 	vector<TMXLayer*> Layers;
 	TMXTileset* MetaTileset;
@@ -405,8 +417,11 @@ public:
 	bool IsDestroyableByFireTile(int ID);
 	double TradeTimeForPoints(int Amount);
 	SDL_Point GetPlayerFlagPosition() { return{ PlayerFlagX, PlayerFlagY }; }
+	eBrickBreakTilesetID GetBrickTilesetID() { return BrickTilesetID; }
+	AnimationResource* GetBrickBounceAnimForBrickTileset();
+	AnimationResource* GetEmptyBlockBounceAnimForBrickTileset();
 
-	SDL_Rect GetVisibleWindow();
+	SDL_Rect GetVisibleWindow();	
 
 	TMXMap();
 	~TMXMap();

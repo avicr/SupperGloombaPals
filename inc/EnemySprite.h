@@ -21,6 +21,7 @@ public:
 	virtual bool IsDying();
 	virtual bool WasBricked();
 	virtual bool IsStompable();
+	virtual void OnInteractedWith(EnemySprite* Other) {};
 protected:
 	bool bGotBricked;
 	EnemySpawnPoint* MySpawner;
@@ -38,6 +39,7 @@ public:
 	virtual void GetBricked(int TileX, int TileY);
 	virtual void GetFired();
 	virtual bool Interact(EnemySprite* Enemy);		
+	virtual void OnInteractedWith(EnemySprite* Other);
 };
 
 class TurtleEnemySprite : public GoombaEnemySprite

@@ -475,6 +475,12 @@ void TMXMap::LoadExit(TiXmlElement* ObjectElement)
 			PropElem->QueryIntAttribute("value", &DoNotScroll);
 			NewExit.bNoScrollChange = DoNotScroll;
 		}
+		else if (strcmp(PropElem->Attribute("name"), "bricktilesetid") == 0)
+		{
+			int BirckTileSet;
+			PropElem->QueryIntAttribute("value", &BirckTileSet);
+			NewExit.BrickTilesetID = (eBrickBreakTilesetID) BirckTileSet;
+		}
 		else if (strcmp(PropElem->Attribute("name"), "nopositionchange") == 0)
 		{			
 			PropElem->QueryBoolAttribute("value", &NewExit.bNoPositionChange);			
@@ -798,6 +804,7 @@ void TMXMap::EnforceWarpControls(WarpExit Warp)
 
 	KillY = Warp.KillY;
 	MaxScrollY = Warp.MaxScrollY;
+	BrickTilesetID = Warp.BrickTilesetID;
 }
 
 void TMXMap::ToggleRenderCollision()
@@ -807,6 +814,7 @@ void TMXMap::ToggleRenderCollision()
 
 TMXMap::TMXMap()
 {	
+	BrickTilesetID = BRICK_TILESET_OVERWORLD;
 	MaxScrollY = 0;
 	KillY = -1;
 	bPlayingLevel = false;
@@ -1083,6 +1091,13 @@ void TMXMap::HandleCollision(int TileX, int TileY, bool bCanBreakBricks)
 		}
 
 		int TileToReplace = 33;
+
+		// Use underground tiles
+		if (BrickTilesetID == 1)
+		{
+			TileToReplace = 57;
+		}
+
 		Sprite* NewBlock = NULL;
 
 		if (MetaTileType == TILE_MULTI_COIN_BLOCK)
@@ -1103,9 +1118,9 @@ void TMXMap::HandleCollision(int TileX, int TileY, bool bCanBreakBricks)
 				// If this block is empty, do the empty block thing
 				if (CoinManagers[ManagerIndex].CoinsRemaining <= 0)
 				{
-					TheMap->SetMetaLayerTile(TileX, TileY, TILE_COLLISION);
-					TheMap->SetForegroundTile(TileX, TileY, TILE_TRANSPARENT_COLLISION);
-					NewBlock = new EmptyBlockSprite(TileX * 64, TileY * 64 - 64, GResourceManager->EmptyBlockSpriteAnimation, true, TileToReplace, TileX, TileY, ItemTypeToSpawn);
+					SetMetaLayerTile(TileX, TileY, TILE_COLLISION);
+					SetForegroundTile(TileX, TileY, TILE_TRANSPARENT_COLLISION);
+					NewBlock = new EmptyBlockSprite(TileX * 64, TileY * 64 - 64, GetEmptyBlockBounceAnimForBrickTileset(), true, TileToReplace, TileX, TileY, ItemTypeToSpawn);
 				}
 				else
 				{
@@ -1117,16 +1132,16 @@ void TMXMap::HandleCollision(int TileX, int TileY, bool bCanBreakBricks)
 						TileToReplace = 30;
 					}
 					TheMap->SetForegroundTile(TileX, TileY, TILE_NONE);
-					NewBlock = new EmptyBlockSprite(TileX * 64, TileY * 64 - 64, GResourceManager->BrickBounceSpriteAnimation, true, TileToReplace, TileX, TileY, ItemTypeToSpawn);
+					NewBlock = new EmptyBlockSprite(TileX * 64, TileY * 64 - 64, GetBrickBounceAnimForBrickTileset() , true, TileToReplace, TileX, TileY, ItemTypeToSpawn);
 				}
 			}
 		}
 		else
 		{
 
-			TheMap->SetMetaLayerTile(TileX, TileY, TILE_COLLISION);
-			TheMap->SetForegroundTile(TileX, TileY, TILE_TRANSPARENT_COLLISION);
-			NewBlock = new EmptyBlockSprite(TileX * 64, TileY * 64 - 64, GResourceManager->EmptyBlockSpriteAnimation, true, TileToReplace, TileX, TileY, ItemTypeToSpawn);
+			SetMetaLayerTile(TileX, TileY, TILE_COLLISION);
+			SetForegroundTile(TileX, TileY, TILE_TRANSPARENT_COLLISION);
+			NewBlock = new EmptyBlockSprite(TileX * 64, TileY * 64 - 64, GetEmptyBlockBounceAnimForBrickTileset(), true, TileToReplace, TileX, TileY, ItemTypeToSpawn);
 		}
 
 		if (NewBlock)
@@ -1168,7 +1183,7 @@ void TMXMap::HandleCollision(int TileX, int TileY, bool bCanBreakBricks)
 		}
 		else
 		{			
-			Sprite* NewBlock = new EmptyBlockSprite(TileX * 64, TileY * 64 - 64, GResourceManager->BrickBounceSpriteAnimation, true, ForegroundLayer->TileData[TileY][TileX], TileX, TileY);
+			Sprite* NewBlock = new EmptyBlockSprite(TileX * 64, TileY * 64 - 64, GetBrickBounceAnimForBrickTileset(), true, ForegroundLayer->TileData[TileY][TileX], TileX, TileY);
 			SimpleSprites.push_back(NewBlock);			
 
 			SetForegroundTile(TileX, TileY, TILE_TRANSPARENT_COLLISION);
@@ -1337,4 +1352,36 @@ double TMXMap::TradeTimeForPoints(int Amount)
 		ThePlayer->AddScore(Amount * 50);
 	}
 	return SecondsLeft;
+}
+
+AnimationResource* TMXMap::GetBrickBounceAnimForBrickTileset()
+{
+
+
+	switch (BrickTilesetID)
+	{
+	case 1:
+		return GResourceManager->BrickBounceUSpriteAnimation;
+		break;
+	default:
+		return GResourceManager->BrickBounceSpriteAnimation;
+	}
+
+	return NULL;
+}
+
+AnimationResource* TMXMap::GetEmptyBlockBounceAnimForBrickTileset()
+{
+	
+
+	switch (BrickTilesetID)
+	{
+	case 1:
+		return GResourceManager->EmptyBlockUSpriteAnimation;
+		break;
+	default:
+		return GResourceManager->EmptyBlockSpriteAnimation;
+	}
+
+	return NULL;
 }

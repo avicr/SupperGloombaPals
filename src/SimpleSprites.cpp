@@ -35,6 +35,7 @@ void CoinEffectSprite::Tick(double DeltaTime)
 
 BrickBreakSprite::BrickBreakSprite(int X, int Y, double InVelocityX)
 {	
+	eBrickBreakTilesetID BrickTilesetID = TheMap->GetBrickTilesetID();
 	SetPosition(X, Y);
 	SetWidth(64);
 	SetHeight(64);
@@ -44,7 +45,16 @@ BrickBreakSprite::BrickBreakSprite(int X, int Y, double InVelocityX)
 
 	if (ThePlayer->GetTripLevel() == 0)
 	{
-		PlayAnimation(GResourceManager->BrickBreakAnimation);
+ 		eBrickBreakTilesetID BricktileSet = TheMap->GetBrickTilesetID();
+		
+		switch (BricktileSet)
+		{
+		case BRICK_TILESET_UNDERGROUND:
+				PlayAnimation(GResourceManager->BrickBreakUAnimation);
+				break;
+		default:
+			PlayAnimation(GResourceManager->BrickBreakAnimation);
+		}
 	}
 	else
 	{

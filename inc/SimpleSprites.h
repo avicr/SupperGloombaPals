@@ -1,5 +1,6 @@
 #pragma once
 #include "Sprite.h"
+#include "TMXMap.h"
 
 class CoinEffectSprite : public Sprite
 {
