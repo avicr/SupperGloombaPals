@@ -1,6 +1,7 @@
 #include <SDL.h>
 #include <SDL_mixer.h>
 #include <Cmath>
+#include <SDL_ttf.h>
 #include "SDL2_image-2.0.3\include\SDL_image.h"
 #include "inc/PlayerSprite.h"
 #include "inc/ResourceManager.h"
@@ -34,6 +35,8 @@ SDL_Color NextTripColor = { 0, 255, 0, 255 };
 SDL_Color PrevTripColor = { 0, 255, 0, 255 };
 SDL_Color TripColor = { 0, 255, 0, 255 };
 double BGColorLerp = 0;
+
+TTF_Font* MainFont;
 
 SDL_Window *GWindow;
 SDL_Renderer *GRenderer;
@@ -72,7 +75,15 @@ LevelInfo Levels[] = {
 int SpecialEventKeys[] =
 {
 	0,
-	640
+	640,
+	6400
+};
+
+string SpecialEventDescprtions[] =
+{
+	"None",
+	"Not just another clone...",
+	"That pipe used to work"
 };
 
 int NormalExitKeys[10] =
@@ -121,6 +132,7 @@ Mix_Chunk* PowerUpSound = NULL;
 Mix_Chunk* PowerUpGetSound = NULL;
 Mix_Chunk* OneUpSound = NULL;
 Mix_Chunk* FireBallSound = NULL;
+Mix_Chunk* EventSound = NULL;
 Mix_Chunk* KickSound = NULL;
 Mix_Chunk* PipeSound = NULL;
 Mix_Chunk* FlagPoleSound = NULL;
@@ -266,7 +278,7 @@ int DoTitleScreen()
 				bDone = true;
 			}
 		}
-		
+				
 		SDL_SetRenderDrawColor(GRenderer, BGColor.r, BGColor.g, BGColor.b, BGColor.a);
 		SDL_RenderClear(GRenderer);
 		TheMap->Render(GRenderer, 0, 0, 1024 / RenderScale, 960 / RenderScale);
@@ -446,7 +458,8 @@ int GameLoop()
 			{
 				CurrentTime = SDL_GetPerformanceCounter();
 				DeltaTime = (double)((CurrentTime - StartTime) * 1000 / (double)SDL_GetPerformanceFrequency());
-			} while (DeltaTime * (double)0.001 < GTickDelay);
+				DeltaTime *= (double)0.001;
+			} while (DeltaTime < GTickDelay && !TheGame->IsLevelComplete());
 			//SDL_SetWindowSize(GWindow, 1024 + DeltaWindow++, 960);
 			
 			Tick(0.0166667);
@@ -584,6 +597,11 @@ void HandleCheatInput(SDL_Event& TheEvent)
 		ItemSprites.push_back(FlowerSprite);
 	}
 
+	if (TheEvent.key.state == SDL_PRESSED && TheEvent.key.keysym.scancode == SDL_SCANCODE_E)
+	{
+		SimpleSprites.push_back(new EventSprite("This is an event!"));
+	}
+
 	// Spawn fire
 	if (TheEvent.key.state == SDL_PRESSED && TheEvent.key.keysym.scancode == SDL_SCANCODE_W)
 	{
@@ -671,21 +689,23 @@ void Render(double DeltaTime)
 		PresentBackBuffer();
 	}
 	else
-	{
+	{		
 		if (!bWorldSmear)
 		{
 			SDL_SetRenderDrawColor(GRenderer, BGColor.r, BGColor.g, BGColor.b, BGColor.a);
 			SDL_RenderClear(GRenderer);
 		}						
-		TheMap->Render(GRenderer, 0, 0, 1024 / RenderScale, 960 / RenderScale);
-		ThePlayer->DrawHUD();
+		TheMap->Render(GRenderer, 0, 0, 1024 / RenderScale, 960 / RenderScale);		
 				
 		if (bDrawDeltaTime)
 		{
 			DrawBitmapText(to_string(DeltaTime), 0, 0, 16, 16, GRenderer, FontShadowedWhite, 1, 1, false);
 		}
-			
-		PresentBackBuffer();
+	
+		ThePlayer->DrawHUD();
+
+		SimpleSprites.Render(GRenderer, RENDER_LAYER_ABOVE_ALL);
+		PresentBackBuffer();		
 	}	
 }
 
@@ -775,6 +795,7 @@ void InitSDL()
 			PowerUpGetSound = Mix_LoadWAV("resource/sounds/powerupget.wav");
 			OneUpSound = Mix_LoadWAV("resource/sounds/oneup.wav");
 			FireBallSound = Mix_LoadWAV("resource/sounds/fireball.wav");
+			EventSound = Mix_LoadWAV("resource/sounds/event.wav");
 			KickSound = Mix_LoadWAV("resource/sounds/kick.wav");
 			PipeSound = Mix_LoadWAV("resource/sounds/pipe.wav");
 			FlagPoleSound = Mix_LoadWAV("resource/sounds/flagpole.wav");
@@ -795,9 +816,11 @@ void InitSDL()
 			Mix_VolumeChunk(PowerUpGetSound, VOLUME_NORMAL);
 			Mix_VolumeChunk(OneUpSound, VOLUME_NORMAL);
 			Mix_VolumeChunk(FireBallSound, VOLUME_NORMAL);
+			Mix_VolumeChunk(EventSound, VOLUME_NORMAL + 16);
 			Mix_VolumeChunk(KickSound, VOLUME_NORMAL);
 			Mix_VolumeChunk(PipeSound, VOLUME_NORMAL);
 			Mix_VolumeChunk(FlagPoleSound, VOLUME_NORMAL);
+			Mix_VolumeChunk(FireworkSound, VOLUME_NORMAL);
 			Mix_VolumeMusic(VOLUME_NORMAL);
 			
 			//Mix_Volume(-1, 0);
@@ -826,9 +849,13 @@ void InitSDL()
 		
 		SDL_GetWindowPosition(GWindow, &CachedWindowX, &CachedWindowY);
 		//SDL_EventState(SDL_SYSWMEVENT, SDL_ENABLE);
-	}
 
-	LoadBitMapFont("letters_shadow.bmp", FontShadowedWhite);	
+		TTF_Init();
+		MainFont = TTF_OpenFont("resource/Heebo-Medium.ttf", 20);
+
+		LoadBitMapFont("letters_shadow.bmp", FontShadowedWhite);
+	}
+	
 }
 
 SDL_Renderer *GetRenderer()
@@ -861,6 +888,7 @@ void CleanUp()
 	Mix_FreeChunk(OneUpSound);
 	Mix_FreeChunk(KickSound);
 	Mix_FreeChunk(FireBallSound);
+	Mix_FreeChunk(EventSound);
 	Mix_FreeChunk(PipeSound);
 	Mix_FreeChunk(FlagPoleSound);
 	Mix_FreeChunk(FireworkSound);
@@ -910,6 +938,7 @@ void DoUgly()
 	Mix_VolumeChunk(SurpriseSound, 90);
 	Mix_Volume(CHANNEL_SURPRISE, 128);
 	Mix_PlayChannel(CHANNEL_SURPRISE, SurpriseSound, 0);
+	TTF_Quit();
 	bDrawUgly = true;
 }
 

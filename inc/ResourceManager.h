@@ -68,6 +68,7 @@ public:
 	DECLARE_TEXTURE_RESOURCE(GoombaGrowTexture, "playergrow.bmp")
 	DECLARE_TEXTURE_RESOURCE(GoombaDuckTexture, "goombaduck.bmp")
 	DECLARE_TEXTURE_RESOURCE(PlayerGoombaDeadTexture, "goombadead.bmp")
+	DECLARE_TEXTURE_RESOURCE(EventBoxTexture, "eventbox.bmp")
 
 	DECLARE_TEXTURE_RESOURCE(EmptyBlockSpriteTexture, "EmptyBlockSprite.bmp")
 	DECLARE_TEXTURE_RESOURCE(EmptyBlockUSpriteTexture, "EmptyBlockSpriteU.bmp")

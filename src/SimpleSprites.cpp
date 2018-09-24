@@ -457,19 +457,71 @@ void PlayerFlagSprite::Tick(double DeltaTime)
 
 
 EventSprite::EventSprite(string InCaption) :
-	Sprite()
+	Sprite(GResourceManager->EventBoxTexture->Texture)
 {
-	CountDown = 360;
+	PosX = -100;	
+	CountDown = 300;
 	Caption = InCaption;
+	RenderLayer = RENDER_LAYER_ABOVE_ALL;
+	SDL_Surface* FontSurface = TTF_RenderText_Solid(MainFont, InCaption.c_str(), { 200, 200, 200, 200 });
+	CaptionTexture = SDL_CreateTextureFromSurface(GRenderer, FontSurface);
+
+	Uint32 Format;
+	int Access, CaptionWidth, CaptionHeight;
+	SDL_QueryTexture(CaptionTexture, &Format, &Access, &CaptionWidth, &CaptionHeight);
+	CaptionRect = { 0, 0, CaptionWidth, CaptionHeight };
+		
+	SDL_FreeSurface(FontSurface);
+	bDrawScreenSpace = true;
+	Mix_PlayChannel(CHANNEL_EVENT, EventSound, 0);
+	BlendColor = { 255, 255, 255, 255 };
+	SDL_SetTextureBlendMode(Texture, SDL_BLENDMODE_BLEND);
+	SDL_SetTextureBlendMode(CaptionTexture, SDL_BLENDMODE_BLEND);
+	SDL_SetTextureAlphaMod(Texture, BlendColor.a);
+
+	Rect.x = PosX;
+	Rect.y = PosY;
 }
 
 void EventSprite::Render(SDL_Renderer* Renderer)
 {
-
+	Sprite::Render(Renderer);
+	SDL_Rect CaptionDstRect = { PosX + Rect.w / 2 - CaptionRect.w / 2, PosY + 8, CaptionRect.w, CaptionRect.h };
+	SDL_RenderCopy(Renderer, CaptionTexture, &CaptionRect, &CaptionDstRect);
+	
 }
 
 void EventSprite::Tick(double DeltaTime)
 {
 	CountDown--;
-	CountDown
+
+	if (PosX < 0)
+	{
+		PosX += 6;
+
+		if (PosX > 0)
+		{
+			PosX = 0;
+		}
+	}
+
+	if (CountDown <= 51)
+	{
+		SDL_SetTextureAlphaMod(Texture, BlendColor.a);
+		SDL_SetTextureAlphaMod(CaptionTexture, BlendColor.a);
+		BlendColor.a -= 5;
+	}
+
+	if (CountDown == 0)
+	{
+		Delete();
+	}
+
+	Rect.x = PosX;
+	Rect.y = PosY;
+}
+
+EventSprite::~EventSprite()
+{
+	SDL_DestroyTexture(CaptionTexture);
 }

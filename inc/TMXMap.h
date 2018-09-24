@@ -10,13 +10,6 @@ using namespace std;
 #define MAX_TILE_OFFSET 4
 #define TILE_VELOCITY 0.72
 
-enum eSpecialEvent
-{
-	SPECIAL_EVENT_NONE = 0,
-	SPECIAL_EVENT_CANCEL_CASTLE,
-	SPECIAL_EVENT_LAST
-};
-
 struct TileOffset
 {
 	float OffsetX = 0;
@@ -48,6 +41,7 @@ enum eWarpType
 	WARP_PIPE_DOWN,
 	WARP_PIPE_LEFT,
 	WARP_PIPE_RIGHT,
+	WARP_PIPE_SHOOT_UP,
 	WARP_CONTROL = 255
 };
 
@@ -116,7 +110,7 @@ struct ControlTrigger
 	bool bTriggered = false;
 	
 	bool bResetWhenPlayerLeaves = true;
-	eSpecialEvent SpecialEvent = SPECIAL_EVENT_NONE;
+	enum eSpecialEvent SpecialEvent = SPECIAL_EVENT_NONE;
 };
 
 struct MultiCoinManager

@@ -78,7 +78,7 @@ void Game::EndLevel()
 	GameState = STATE_TIMER_AWARD;
 	SimpleSprites.clear();
 	EnemySprites.clear();
-	ItemSprites.clear();
+	ItemSprites.clear();	
 	delete TheMap;
 	TheMap = new TMXMap();
 	WriteSaveFile();
@@ -199,6 +199,11 @@ void Game::OnGrabFlagPole(bool bSecret)
 	{
 		NumFireworks = 6;
 	}
+
+	if (bSecret)
+	{
+		SimpleSprites.push_back(new EventSprite("Secret exit found"));
+	}
 }
 
 void Game::OnPlayerFlagDone()
@@ -261,9 +266,10 @@ void Game::HandleSpecialEvent(eSpecialEvent Event)
 	}
 
 	// If this was an event, set the index to the key and save
-	if (Event != SPECIAL_EVENT_NONE)
+	if (Event != SPECIAL_EVENT_NONE && TheSaveData.SpecialEvents[Event] == 0)
 	{
-		TheSaveData.SpecialEvents[Event] = SpecialEventKeys[Event];
+		TheSaveData.SpecialEvents[Event] = SpecialEventKeys[Event];		
+		SimpleSprites.push_back(new EventSprite(SpecialEventDescprtions[Event]));
 		WriteSaveFile();
 	}
 }
@@ -332,14 +338,21 @@ void Game::DetermineCurrentLevel()
 	int SecretIndex = 0;
 
 	// Find the higher level exit and use that one as our last compelted level
-	while (TheSaveData.NormalExits[NormalIndex] == 0 && NormalIndex < 10) NormalIndex++;
-	while (TheSaveData.SecretExits[SecretIndex] == 0 && SecretIndex < 10) SecretIndex++;
+	while (TheSaveData.NormalExits[NormalIndex] == 0 && NormalIndex < 10)
+	{
+		NormalIndex++;		
+	}
 
-	if (NormalIndex == 10 && SecretIndex == 10)
+	while (TheSaveData.SecretExits[SecretIndex] == 0 && SecretIndex < 10)
+	{
+		SecretIndex++;
+	}
+
+ 	if (NormalIndex == 10 && SecretIndex == 10)
 	{
 		// TODO: Level select!
 	}
-	else if (NormalIndex > SecretIndex)
+	else if (NormalIndex > SecretIndex || SecretIndex == 10)
 	{
 		// If even, this is a normal level exit
 		if (NormalIndex % 2 == 0)
@@ -351,7 +364,7 @@ void Game::DetermineCurrentLevel()
 			CurrentLevel = NormalIndex + 1;
 		}
 	}
-	else 
+	else if (NormalIndex <= SecretIndex && NormalIndex == 10)
 	{
 		// If even, this is a normal level exit
 		if (SecretIndex % 2 == 0)
@@ -362,6 +375,10 @@ void Game::DetermineCurrentLevel()
 		{
 			CurrentLevel = SecretIndex + 2;
 		}
+	}
+	else if (NormalIndex == 10 && SecretIndex == 10)
+	{
+		CurrentLevel = 0;
 	}
 }
 

@@ -285,7 +285,7 @@ void PlayerSprite::Tick(double DeltaTime)
 				
 				if (PosX - TheMap->GetScrollX() > PLAYER_SCROLL_START && VelocityX > 0)
 				{
-					if (PosX - TheMap->GetScrollX() < 512 - 86)
+					if (Rect.x - TheMap->GetScrollX() < 512 - 86)
 					{
 						TheMap->AdjustScrollX(0.8);
 					}
@@ -1486,6 +1486,21 @@ void PlayerSprite::UpdateWarpExitSequence()
 	{
 		WarpSeq.bWarpExitComplete = true;
 	}
+	else if (WarpSeq.Exit.WarpType == WARP_PIPE_SHOOT_UP)
+	{
+		if (WarpSeq.FrameCount == 0)
+		{
+			PosY += -4;
+			VelocityY = -64;
+			Mix_PlayChannel(CHANNEL_BUMP, FireworkSound, 0);
+			TheGame->HandleSpecialEvent(SPECIAL_EVENT_PIPE_SHOOT);
+		}
+		else
+		{
+			WarpSeq.bWarpExitComplete = true;
+		}
+		
+	}
 	else if (WarpSeq.Exit.WarpType >= WARP_PIPE_UP && WarpSeq.Exit.WarpType <= WARP_PIPE_RIGHT)
 	{
 		SDL_Point StartDelta = { 0, 0 };
@@ -1510,7 +1525,7 @@ void PlayerSprite::UpdateWarpExitSequence()
 		{
 			DeltaPos.x = 2;
 			StartDelta.x = -64;
-		}
+		}		
 
 		if (WarpSeq.FrameCount == 0)
 		{
@@ -1553,7 +1568,11 @@ void PlayerSprite::UpdateWarpExitSequence()
 	if (WarpSeq.bWarpExitComplete)
 	{				
 		VelocityX = 0;
-		VelocityY = 0;		
+
+		if (WarpSeq.Exit.WarpType != WARP_PIPE_SHOOT_UP)
+		{
+			VelocityY = 0;
+		}
 		bWarping = false;
 	}
 }
@@ -1657,7 +1676,7 @@ void PlayerSprite::DrawHUD()
 
 	// Draw the world string
 	DrawBitmapText("WORLD", 578, 32, 32, 32, GRenderer, FontShadowedWhite, GlyphSpace, 1.25, false);
-	DrawBitmapText(TheMap->GetWorldName(), 602, 60, 32, 32, GRenderer, FontShadowedWhite, GlyphSpace, 1.25, false);
+	DrawBitmapText(TheGame->GetWorldName(), 602, 60, 32, 32, GRenderer, FontShadowedWhite, GlyphSpace, 1.25, false);
 
 	// Draw the time string	
 	itoa(TheMap->GetSecondsLeft(), TempString, 10);

@@ -74,9 +74,12 @@ class EventSprite : public Sprite
 {
 protected:
 	string Caption;	
-
+	SDL_Texture* CaptionTexture;
+	SDL_Rect CaptionRect;
+	SDL_Color BlendColor;
 public:
 	EventSprite(string InCaption);
+	~EventSprite();
 	virtual void Render(SDL_Renderer* Renderer);
 	virtual void Tick(double DeltaTime);
 };

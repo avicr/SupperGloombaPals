@@ -6,6 +6,7 @@
 
 #ifdef _WIN32
 #include <SDL.h>
+#include <SDL_ttf.h>
 #include <SDL_mixer.h>
 #else
 #include "SDL2/SDL.h"
@@ -26,6 +27,14 @@ enum eDirection
 	DIRECTION_LEFT,
 	DIRECTION_RIGHT,
 	DIRECTION_NONE = 255
+};
+
+enum eSpecialEvent
+{
+	SPECIAL_EVENT_NONE = 0,
+	SPECIAL_EVENT_CANCEL_CASTLE,
+	SPECIAL_EVENT_PIPE_SHOOT,
+	SPECIAL_EVENT_LAST
 };
 
 #define TEXTURE_PATH "resource/textures/"
@@ -123,6 +132,7 @@ extern struct LevelInfo Levels[];
 extern int SpecialEventKeys[];
 extern int NormalExitKeys[];
 extern int SecretExitKeys[];
+extern string SpecialEventDescprtions[];
 
 extern SDL_Joystick *Joy;
 extern bool bRenderCollision;
@@ -146,6 +156,7 @@ extern Mix_Chunk* PowerUpSound;
 extern Mix_Chunk* PowerUpGetSound;
 extern Mix_Chunk* OneUpSound;
 extern Mix_Chunk* FireBallSound;
+extern Mix_Chunk* EventSound;
 extern Mix_Chunk* KickSound;
 extern Mix_Chunk* PipeSound;
 extern Mix_Chunk* FlagPoleSound;
@@ -157,6 +168,7 @@ extern Mix_Music *StarmanMusic;
 extern Mix_Music *DieMusic;
 extern Mix_Music *WinMusic;
 
+extern TTF_Font * MainFont;
 
 extern float RenderScale;
 
@@ -174,6 +186,7 @@ extern float RenderScale;
 #define CHANNEL_KICK 9
 #define CHANNEL_PIPE 10
 #define CHANNEL_FLAG_POLE 11
+#define CHANNEL_EVENT 12
 
 #define SCREEN_WIDTH 1024
 #define SCREEN_HEIGHT 896
