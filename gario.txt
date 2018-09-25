@@ -1,0 +1,44 @@
+- Level 1
+-- Secret exit
+
+- Level 2
+-- Bricks break at flag pole
+-- Spawn through floor
+-- Warp window
+-- Red coins
+
+- Level 3
+-- Auto scroll level
+-- Underground area with ice blocks
+-- Plot device
+
+- Level 4
+-- Giant goomba attack
+-- Go inside bush
+-- Fake goomba scream one up
+
+- Level 5
+-- Mario 3 sun
+-- Red coins
+-- All other power ups replaced with enemies
+-- Hidden mushrooms
+
+- Level 1S
+-- Vertical scroll level
+-- Red coins
+
+- Level 2S
+-- Loading screen
+
+- Level 3S
+-- Pits are plugged
+-- Zelda reference
+-- Red coins
+
+- Level 4S
+-- Dario
+
+- Level 5S
+-- 2B
+-- Open world style
+-- Window expansion
