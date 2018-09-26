@@ -89,7 +89,7 @@ int SpecialEventKeys[] =
 string SpecialEventDescprtions[] =
 {
 	"None",
-	"Not just another clone...",
+	"Ground breaking!",
 	"That pipe used to work",
 	"There are no loading screens"
 };
