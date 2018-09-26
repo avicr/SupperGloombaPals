@@ -4,7 +4,6 @@
 - Level 2
 -- Bricks break at flag pole
 -- Spawn through floor
--- Warp window
 -- Red coins
 
 - Level 3
@@ -16,6 +15,7 @@
 -- Giant goomba attack
 -- Go inside bush
 -- Fake goomba scream one up
+-- Warp Window
 
 - Level 5
 -- Mario 3 sun
@@ -32,6 +32,7 @@
 
 - Level 3S
 -- Pits are plugged
+-- Thinking with portals
 -- Zelda reference
 -- Red coins
 

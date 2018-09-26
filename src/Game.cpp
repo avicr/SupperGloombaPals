@@ -394,7 +394,7 @@ void Game::DetermineCurrentLevel()
 		CurrentLevel = 0;
 	}
 
-	//CurrentLevel = 2;
+	CurrentLevel = 0;
 }
 
 string Game::GetWorldName()

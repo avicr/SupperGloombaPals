@@ -1181,7 +1181,8 @@ void TMXMap::HandleCollision(int TileX, int TileY, bool bCanBreakBricks)
 							TileToReplace = 33;
 						}
 					}
-					TheMap->SetForegroundTile(TileX, TileY, TILE_NONE);
+					//SetMetaLayerTile(TileX, TileY, TILE_COLLISION);
+					SetForegroundTile(TileX, TileY, TILE_TRANSPARENT_COLLISION);
 					NewBlock = new EmptyBlockSprite(TileX * 64, TileY * 64 - 64, GetBrickBounceAnimForBrickTileset() , true, TileToReplace, TileX, TileY, ItemTypeToSpawn);
 				}
 			}
