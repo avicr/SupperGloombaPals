@@ -17,6 +17,8 @@
 bool bDrawDeltaTime = false;
 Glyph FontShadowedWhite[128];
 SDL_Texture *BackBuffer;
+SDL_Texture* BackBuffer2;
+SDL_Texture* Texture2;
 int WindowWidth;
 int WindowHeight;
 bool bSwapSprites = false;
@@ -40,6 +42,10 @@ TTF_Font* MainFont;
 
 SDL_Window *GWindow;
 SDL_Renderer *GRenderer;
+
+SDL_Window *GWindow2;
+SDL_Renderer *GRenderer2;
+
 ResourceManager *GResourceManager;
 bool bSDLInitialized = false;
 Uint64 TickFreq;
@@ -61,11 +67,11 @@ LevelInfo Levels[] = {
 /*Level 1*/		   { LEVEL_PATH + (string)"Level1_1_64x64.tmx", "1-1", 2, 1 },	      
 /*Secret Level 1*/ { LEVEL_PATH + (string)"Level2.tmx"        , "1-1S", 2, 3 },
 /*Level 2*/		   { LEVEL_PATH + (string)"Level2.tmx"        , "1-2", 4, 3 },
-/*Secret Level 2*/ { LEVEL_PATH + (string)"Level1_1_64x64.tmx", "1-2S", 4, 5 },
+/*Secret Level 2*/ { LEVEL_PATH + (string)"Level2S.tmx"       , "1-2S", 4, 5 },
 /*Level 3*/		   { LEVEL_PATH + (string)"Level1_1_64x64.tmx", "1-3", 6, 5 },
-/*Secret Level 3*/ { LEVEL_PATH + (string)"Level2.tmx"        , "1-3S", 6, 7 },
+/*Secret Level 3*/ { LEVEL_PATH + (string)"Level3S.tmx"       , "1-3S", 6, 7 },
 /*Level 4*/		   { LEVEL_PATH + (string)"Level2.tmx"        , "1-4", 8, 7 },
-/*Secret Level 4*/ { LEVEL_PATH + (string)"Level1_1_64x64.tmx", "1-4S", 8, 9 },
+/*Secret Level 4*/ { LEVEL_PATH + (string)"Level1_1_64x64.tmx", "2-B", 8, 9 },
 /*Level 5*/	 	   { LEVEL_PATH + (string)"Level1_1_64x64.tmx", "1-5", 10, 9 },
 /*Secret Level 5*/ { LEVEL_PATH + (string)"Level2.tmx"        , "1-5S", 10, 10 },
 /*Level 11*/	   { LEVEL_PATH + (string)"Level1_1_64x64.tmx", "1-6", -1, -1 },
@@ -83,7 +89,8 @@ string SpecialEventDescprtions[] =
 {
 	"None",
 	"Not just another clone...",
-	"That pipe used to work"
+	"That pipe used to work",
+	"There are no loading screens"
 };
 
 int NormalExitKeys[10] =
@@ -158,6 +165,7 @@ void HandleCheatInput(SDL_Event& TheEvent);
 void Tick(double DeltaTime);
 void Render(double DeltaTime = 0);
 void PresentBackBuffer();
+void PresentBackBuffer2();
 void InitSDL();
 int DoTitleScreen();
 bool DoPreLevel();
@@ -301,7 +309,7 @@ bool DoPreLevel()
 
 	SDL_Event TheEvent;
 	
-	ThePlayer->BeginLevel();	
+	//ThePlayer->BeginLevel();	
 
 	while (!bDone && !bUserQuit)
 	{	
@@ -627,7 +635,6 @@ void HandleCheatInput(SDL_Event& TheEvent)
 		EnemySpawnPoint* NewBlock = new EnemySpawnPoint(ENEMY_TURTLE, (int)ThePlayer->GetPosX() / (int)64 * (int)64 + 512, (int)ThePlayer->GetPosY() / (int)64 * (int)64 + 64);
 		SimpleSprites.push_back(NewBlock);
 		NewBlock->SpawnEnemy();
-
 	}
 
 	// Warps
@@ -705,7 +712,24 @@ void Render(double DeltaTime)
 		ThePlayer->DrawHUD();
 
 		SimpleSprites.Render(GRenderer, RENDER_LAYER_ABOVE_ALL);
-		PresentBackBuffer();		
+		PresentBackBuffer();
+
+		SDL_SetRenderDrawColor(GRenderer2, BGColor.r, BGColor.g, BGColor.b, BGColor.a);
+		SDL_RenderClear(GRenderer2);
+
+		double CachedX = ThePlayer->GetPosX();
+		double CachedY = ThePlayer->GetPosY();
+
+		ThePlayer->SetPosition(CachedX - 195 * 64 + TheMap->GetScrollX(), CachedY - 30 * 64 + TheMap->GetScrollY());
+		ThePlayer->Render(GRenderer2, 2);		
+		ThePlayer->SetPosition(CachedX, CachedY);
+
+		SDL_RenderCopy(GRenderer2, Texture2, NULL, NULL);
+		SDL_Rect SrcRect = {0, 0, ThePlayer->GetWidth(), ThePlayer->GetHeight() };
+		SDL_Rect DstRect = { ThePlayer->GetPosX() - TheMap->GetScrollX(), ThePlayer->GetPosY() - TheMap->GetScrollY() - 448, SrcRect.w, SrcRect.h };
+		
+
+		PresentBackBuffer2();
 	}	
 }
 
@@ -772,6 +796,25 @@ void PresentBackBuffer()
 	SDL_SetRenderTarget(GRenderer, BackBuffer);
 }
 
+void PresentBackBuffer2()
+{
+	SDL_SetRenderTarget(GRenderer2, NULL);
+	SDL_Rect BackBufferRect = { 0, 0, 512, 512};
+#ifdef FULLSCREEN_1920_1080
+	SDL_Rect BackBufferDstRect = { 42, 0, 1836, 1080 };
+#else
+	//SDL_Rect BackBufferDstRect = { WindowWidth / 2 - 512, WindowHeight / 2 - SCREEN_HEIGHT / 2, 1024, SCREEN_HEIGHT };
+	SDL_Rect BackBufferDstRect = { 0, 0, 512, 512};
+#endif
+
+	DoTripStuff();
+
+	//SDL_RenderCopy(GRenderer, BackBuffer, &BackBufferRect, &BackBufferDstRect);
+	SDL_RenderCopyEx(GRenderer2, BackBuffer2, &BackBufferRect, &BackBufferDstRect, /*Angle = Angle + 0.02*/0, NULL, SDL_FLIP_NONE);
+	SDL_RenderPresent(GRenderer2);
+	SDL_SetRenderTarget(GRenderer2, BackBuffer2);
+}
+
 void InitSDL()
 {
 	if (!bSDLInitialized)
@@ -816,7 +859,7 @@ void InitSDL()
 			Mix_VolumeChunk(PowerUpGetSound, VOLUME_NORMAL);
 			Mix_VolumeChunk(OneUpSound, VOLUME_NORMAL);
 			Mix_VolumeChunk(FireBallSound, VOLUME_NORMAL);
-			Mix_VolumeChunk(EventSound, VOLUME_NORMAL + 16);
+			Mix_VolumeChunk(EventSound, VOLUME_NORMAL + 2);
 			Mix_VolumeChunk(KickSound, VOLUME_NORMAL);
 			Mix_VolumeChunk(PipeSound, VOLUME_NORMAL);
 			Mix_VolumeChunk(FlagPoleSound, VOLUME_NORMAL);
@@ -824,23 +867,39 @@ void InitSDL()
 			Mix_VolumeMusic(VOLUME_NORMAL);
 			
 			//Mix_Volume(-1, 0);
-			//Mix_VolumeMusic(0);
+			Mix_VolumeMusic(0);
 		}
 
 #ifdef FULLSCREEN_1920_1080
 		GWindow = SDL_CreateWindow("Supper Gloomba Pals", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1920, 1080, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP);
 #else
 		GWindow = SDL_CreateWindow("1-1", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, SCREEN_HEIGHT, SDL_WINDOW_OPENGL /*| SDL_WINDOW_FULLSCREEN_DESKTOP*/);
+
+		GWindow2 = SDL_CreateWindow("Test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 512, 512, SDL_WINDOW_OPENGL /*| SDL_WINDOW_FULLSCREEN_DESKTOP*/);
 #endif
+		SDL_HideWindow(GWindow2);
+		
 		Uint32 global_pixel_format = SDL_GetWindowPixelFormat(GWindow);
 		const char* temp = SDL_GetPixelFormatName(global_pixel_format);
 		printf(" SDL_Window created with pixel format %s\n", temp);
 
-		SDL_SetWindowResizable(GWindow, SDL_TRUE);
+		//SDL_SetWindowResizable(GWindow, SDL_TRUE);
 		SDL_GetWindowSize(GWindow, &WindowWidth, &WindowHeight);
 		GRenderer = SDL_CreateRenderer(GWindow, -1, 0);
 		BackBuffer = SDL_CreateTexture(GRenderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, 1024, 960);
+
+		GRenderer2 = SDL_CreateRenderer(GWindow2, -1, 0);
+		BackBuffer2 = SDL_CreateTexture(GRenderer2, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, 512, 512);
+
+		string FileName = "otherwindow.bmp";
+		SDL_Surface* Image = SDL_LoadBMP((TEXTURE_PATH + FileName).c_str());
+		
+		SDL_SetColorKey(Image, SDL_TRUE, SDL_MapRGB(Image->format, 0xFF, 0, 0xFF));
+		Texture2 = SDL_CreateTextureFromSurface(GRenderer2, Image);		
+		SDL_FreeSurface(Image);
+
 		SDL_SetRenderTarget(GRenderer, BackBuffer);
+		SDL_SetRenderTarget(GRenderer2, BackBuffer2);
 				
 		Mix_AllocateChannels(100);		
 		bSDLInitialized = true;
@@ -848,6 +907,8 @@ void InitSDL()
 		
 		
 		SDL_GetWindowPosition(GWindow, &CachedWindowX, &CachedWindowY);
+		SDL_SetWindowPosition(GWindow2, CachedWindowX + WindowWidth, CachedWindowY);
+
 		//SDL_EventState(SDL_SYSWMEVENT, SDL_ENABLE);
 
 		TTF_Init();
@@ -858,12 +919,17 @@ void InitSDL()
 	
 }
 
-SDL_Renderer *GetRenderer()
+SDL_Renderer *GetRenderer(int RendererNumber)
 {
 	if (GRenderer == NULL)
 	{
 		InitSDL();
 	}
+
+	if (RendererNumber == 2)
+	{
+		return GRenderer2;
+	}	
 
 	return GRenderer;
 }

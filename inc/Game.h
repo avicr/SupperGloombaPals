@@ -85,5 +85,6 @@ public:
 
 	void DetermineCurrentLevel();
 	string GetWorldName();
+	int GetCurrentLevelIndex();
 
 };

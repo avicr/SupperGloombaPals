@@ -61,7 +61,7 @@ public:
 	void IncreaseStompCounter(int Amount);
 	void SetColorModForAllTextures(SDL_Color ColorMod);
 	void TakeDamage();
-	virtual void Render(SDL_Renderer* Renderer);
+	virtual void Render(SDL_Renderer* Renderer, int ResourceNum = 0);
 	void UpdateDyingAnimation();
 	void DrawHUD();
 	void BeginLevel();
@@ -82,6 +82,7 @@ public:
 	PlayerSprite();
 
 protected:
+	bool bDrawHUD;
 	bool bExitedLevel;
 	int EndOfLevelCountdown;
 	int ExitLevelFailSafeCountdown;

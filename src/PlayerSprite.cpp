@@ -44,7 +44,7 @@ void PlayerSprite::Tick(double DeltaTime)
 		if (JumpOffPoleCountDown == 0)
 		{
 			bExitingLevel = true;
-			Flip = SDL_FLIP_NONE;
+			SetFlip(SDL_FLIP_NONE);
 			Mix_PlayMusic(WinMusic, 0);
 			VelocityX = MAX_WALK_SPEED;
 		}
@@ -873,6 +873,7 @@ void PlayerSprite::HandleJump()
 
 PlayerSprite::PlayerSprite()
 {
+	bDrawHUD = true;
 	bExitedLevel = false;
 	EndOfLevelCountdown = 0;
 	bExitingLevel = false;
@@ -1103,6 +1104,11 @@ void PlayerSprite::SetColorModForAllTextures(SDL_Color ColorMod)
 	SDL_SetTextureColorMod(GResourceManager->PlayerGoombaTallTexture->Texture, ColorMod.r, ColorMod.g, ColorMod.b);
 	SDL_SetTextureColorMod(GResourceManager->GoombaGrowTexture->Texture, ColorMod.r, ColorMod.g, ColorMod.b);
 	SDL_SetTextureColorMod(GResourceManager->GoombaDuckTexture->Texture, ColorMod.r, ColorMod.g, ColorMod.b);	
+
+	SDL_SetTextureColorMod(GResourceManager->PlayerGoombaTexture->Texture2, ColorMod.r, ColorMod.g, ColorMod.b);
+	SDL_SetTextureColorMod(GResourceManager->PlayerGoombaTallTexture->Texture2, ColorMod.r, ColorMod.g, ColorMod.b);
+	SDL_SetTextureColorMod(GResourceManager->GoombaGrowTexture->Texture2, ColorMod.r, ColorMod.g, ColorMod.b);
+	SDL_SetTextureColorMod(GResourceManager->GoombaDuckTexture->Texture2, ColorMod.r, ColorMod.g, ColorMod.b);
 }
 
 void PlayerSprite::Stomp(Sprite* Other)
@@ -1287,12 +1293,13 @@ void PlayerSprite::CheckWarpCollision()
 				StartWarpSequence(Warps[i].Entrances[j], Warps[i].Exits[0]);
 			}
 			// Right pipe
-			else if (bIsOnGround && Warps[i].Entrances[j].WarpType == WARP_PIPE_RIGHT && IsRightPressed(LastKeyboardState) && CollisionRect.x + CollisionRect.w + 1 >= WarpCollision.x && CollisionRect.y + CollisionRect.h >= WarpCollision.y && CollisionRect.y <= WarpCollision.y + WarpCollision.h)
+			// TODO: Add additional x check 
+			else if (bIsOnGround && (Warps[i].Entrances[j].WarpType == WARP_PIPE_RIGHT || Warps[i].Entrances[j].WarpType == WARP_PIPE_RIGHT_SECOND_WINDOW) && IsRightPressed(LastKeyboardState) && CollisionRect.x + CollisionRect.w + 1 >= WarpCollision.x && CollisionRect.y + CollisionRect.h >= WarpCollision.y && CollisionRect.y <= WarpCollision.y + WarpCollision.h)
 			{
 				StartWarpSequence(Warps[i].Entrances[j], Warps[i].Exits[0]);
 			}
 			// Left pipe
-			else if (bIsOnGround && Warps[i].Entrances[j].WarpType == WARP_PIPE_LEFT && IsLeftPressed(LastKeyboardState) && CollisionRect.x > WarpCollision.x && CollisionRect.x - 1 <= WarpCollision.x + WarpCollision.w && CollisionRect.y + CollisionRect.h >= WarpCollision.y && CollisionRect.y <= WarpCollision.y + WarpCollision.h)
+			else if (bIsOnGround && (Warps[i].Entrances[j].WarpType == WARP_PIPE_LEFT || Warps[i].Entrances[j].WarpType == WARP_PIPE_LEFT_FIRST_WINDOW) && IsLeftPressed(LastKeyboardState) && CollisionRect.x > WarpCollision.x && CollisionRect.x - 1 <= WarpCollision.x + WarpCollision.w && CollisionRect.y + CollisionRect.h >= WarpCollision.y && CollisionRect.y <= WarpCollision.y + WarpCollision.h)
 			{
 				StartWarpSequence(Warps[i].Entrances[j], Warps[i].Exits[0]);
 			}
@@ -1344,6 +1351,10 @@ void PlayerSprite::CheckControlCollision()
 
 				TheGame->HandleSpecialEvent(Controls[i]->SpecialEvent);
 
+				if (Controls[i]->SpecialEvent == SPECIAL_EVENT_LOADING_LEVEL)
+				{
+					bDrawHUD = true;				
+				}
 				int WarpIndex = TheMap->GetWarpIndex(Controls[i]->WarpID);
 
 				if (WarpIndex != -1)
@@ -1384,16 +1395,16 @@ void PlayerSprite::UpdateWarpSequence()
 		{
 			DeltaPos.y = 2;
 		}
-		else if (WarpSeq.Entrance.WarpType == WARP_PIPE_LEFT)
+		else if (WarpSeq.Entrance.WarpType == WARP_PIPE_LEFT || WarpSeq.Entrance.WarpType == WARP_PIPE_LEFT_FIRST_WINDOW)
 		{
 			DeltaPos.x = -2;
 		}
-		else if (WarpSeq.Entrance.WarpType == WARP_PIPE_RIGHT)
+		else if (WarpSeq.Entrance.WarpType == WARP_PIPE_RIGHT || WARP_PIPE_RIGHT_SECOND_WINDOW)
 		{
 			DeltaPos.x = 2;
 		}
 
-		if (WarpSeq.Entrance.WarpType >= WARP_PIPE_UP && WarpSeq.Entrance.WarpType <= WARP_PIPE_RIGHT)
+		if ((WarpSeq.Entrance.WarpType >= WARP_PIPE_UP && WarpSeq.Entrance.WarpType <= WARP_PIPE_RIGHT) || WarpSeq.Entrance.WarpType == WARP_PIPE_LEFT_FIRST_WINDOW || WarpSeq.Entrance.WarpType == WARP_PIPE_RIGHT_SECOND_WINDOW)
 		{
 			if (WarpSeq.FrameCount == 0)
 			{
@@ -1412,6 +1423,11 @@ void PlayerSprite::UpdateWarpSequence()
 					SetAnimationPlayRate(0.8);
 				}
 
+				// Fast forward a bit
+				if (WarpSeq.Entrance.WarpType == WARP_PIPE_RIGHT_SECOND_WINDOW)
+				{
+					WarpSeq.FrameCount = 58;
+				}
 				// TODO: If flag is set on the entrance, force duck
 				//Duck();
 			}
@@ -1501,7 +1517,7 @@ void PlayerSprite::UpdateWarpExitSequence()
 		}
 		
 	}
-	else if (WarpSeq.Exit.WarpType >= WARP_PIPE_UP && WarpSeq.Exit.WarpType <= WARP_PIPE_RIGHT)
+	else if (WarpSeq.Exit.WarpType >= WARP_PIPE_UP && WarpSeq.Exit.WarpType <= WARP_PIPE_RIGHT || WarpSeq.Exit.WarpType == WARP_PIPE_RIGHT_SECOND_WINDOW)
 	{
 		SDL_Point StartDelta = { 0, 0 };
 		SDL_Point DeltaPos = { 0, 0 };
@@ -1521,7 +1537,7 @@ void PlayerSprite::UpdateWarpExitSequence()
 			DeltaPos.x = -2;
 			StartDelta.x = 64;
 		}
-		else if (WarpSeq.Exit.WarpType == WARP_PIPE_RIGHT)
+		else if (WarpSeq.Exit.WarpType == WARP_PIPE_RIGHT || WarpSeq.Exit.WarpType == WARP_PIPE_RIGHT_SECOND_WINDOW)
 		{
 			DeltaPos.x = 2;
 			StartDelta.x = -64;
@@ -1542,6 +1558,20 @@ void PlayerSprite::UpdateWarpExitSequence()
 				SetFlip(SDL_FLIP_HORIZONTAL);
 				SetAnimationPlayRate(0.8);
 			}
+
+			if (WarpSeq.Exit.WarpType == WARP_PIPE_RIGHT_SECOND_WINDOW)
+			{
+				int WindowPosX;
+				int WindowPosY;
+				int WindowWidth;
+				int WindowHeight;
+
+				// Todo: Move the window to 0, 0 if there is not enough room
+				SDL_GetWindowPosition(GWindow, &WindowPosX, &WindowPosY);
+				SDL_GetWindowSize(GWindow, &WindowWidth, &WindowHeight);
+				SDL_SetWindowPosition(GWindow2, WindowPosX + WindowWidth - 1, WindowPosY);
+				SDL_ShowWindow(GWindow2);				
+			}
 		}
 		else if (WarpSeq.FrameCount <= 67)
 		{
@@ -1553,8 +1583,13 @@ void PlayerSprite::UpdateWarpExitSequence()
 			PosY += DeltaPos.y;
 		}
 		else
-		{			
+		{						
 			WarpSeq.bWarpExitComplete = true;
+			
+			if (WarpSeq.Exit.WarpType == WARP_PIPE_LEFT_FIRST_WINDOW)
+			{
+				SDL_HideWindow(GWindow2);
+			}
 		}
 	}
 		
@@ -1590,7 +1625,7 @@ void PlayerSprite::TakeDamage()
 	}
 }
 
-void PlayerSprite::Render(SDL_Renderer* Renderer)
+void PlayerSprite::Render(SDL_Renderer* Renderer, int ResourceNum)
 {	
 	if (bSpriteVisible)
 	{
@@ -1602,13 +1637,13 @@ void PlayerSprite::Render(SDL_Renderer* Renderer)
 			Rect.x = oldx;
 			Rect.y = oldy;
 			SetColorModForAllTextures(BGColor);
-			Sprite::Render(Renderer);
+			Sprite::Render(Renderer, ResourceNum);
 			SetColorModForAllTextures({ 255, 255, 255 });
 		}		
 
 		Rect.x = TempX;
 		Rect.y = TempY;
-		Sprite::Render(Renderer);
+		Sprite::Render(Renderer, ResourceNum);
 	}
 }
 
@@ -1643,6 +1678,10 @@ void PlayerSprite::UpdateDyingAnimation()
 
 void PlayerSprite::DrawHUD()
 {		
+	if (!bDrawHUD)
+	{
+		return;
+	}
 	// Draw score
 	char TempString[10];
 	itoa(Score, TempString, 10);
@@ -1696,8 +1735,10 @@ void PlayerSprite::DrawHUD()
 }
 
 void PlayerSprite::BeginLevel()
-{		
+{			
 	SetAnimationPlayRate(1);
+	RenderLayer = RENDER_LAYER_TOP;	
+	bDrawHUD = true;
 	bExitedLevel = false;
 	EndOfLevelCountdown = 0;
 	JumpOffPoleCountDown = 0;
@@ -1759,6 +1800,12 @@ void PlayerSprite::BeginLevel()
 	{
 		SetColorModForAllTextures({ 255, 128, 128 });
 	}
+
+	if (TheGame->GetCurrentLevelIndex() == 5)
+	{
+		RenderLayer = RENDER_LAYER_BEHIND_FG;
+		bDrawHUD = false;
+	}
 }
 
 bool PlayerSprite::IsDead()
@@ -1790,7 +1837,8 @@ void PlayerSprite::GrabFlagPole(FlagPoleSprite* FlagPole)
 	PosX = FlagPole->GetPosX() - 16;	
 	Rect.x = PosX;	
 	ExitLevelX = FlagPole->GetPosX() + 6 * 64;
-	Flip = SDL_FLIP_NONE;
+	SetFlip(SDL_FLIP_NONE);
+	RenderLayer = RENDER_LAYER_TOP;
 	TheGame->OnGrabFlagPole(FlagPole->IsSecretExit());
 }
 
@@ -1814,7 +1862,7 @@ void PlayerSprite::UpdateFlagPoleAnimation()
 
 void PlayerSprite::OnFlagFinished()
 {
-	Flip = SDL_FLIP_HORIZONTAL;
+	SetFlip(SDL_FLIP_HORIZONTAL);
 	PosX += 40;
 	JumpOffPoleCountDown = 24;
 	Rect.x = PosX;	

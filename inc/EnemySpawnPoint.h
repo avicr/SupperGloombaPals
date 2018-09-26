@@ -13,7 +13,7 @@ class EnemySpawnPoint : public Sprite
 public:	
 	EnemySpawnPoint(eEnemyType InEnemyType, int X, int Y);
 	virtual void Tick(double DeltaTime);
-	virtual void Render(SDL_Renderer* Renderer);
+	virtual void Render(SDL_Renderer* Renderer, int ResourceNum = 0);
 	virtual void SpawnEnemy();
 	virtual void OnEnemyDestroyed();
 

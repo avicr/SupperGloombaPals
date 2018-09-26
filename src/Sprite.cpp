@@ -6,11 +6,13 @@
 Sprite::Sprite() :
 	Sprite(NULL)
 {	
+	bForceDrawWhenNotInWindow = true;
 	bDeleteWhenNotVisible = true;
 }
 
 Sprite::Sprite(SDL_Texture *InTexture)
 {
+	bForceDrawWhenNotInWindow = true;
 	RenderLayer = RENDER_LAYER_TOP;
 	bDrawScreenSpace = false;
 	bDeleteWhenNotVisible = true;
@@ -148,6 +150,7 @@ void Sprite::UpdateAnimationData()
 		AnimData.PlayRate = 1;
 		AnimData.CountDown = CurFrame->GetFrameTime();
 		Texture = CurFrame->GetTexture();
+		Texture2 = CurFrame->GetTexture(2);
 	}
 }
 
@@ -164,7 +167,7 @@ void Sprite::SetTexture(SDL_Texture* InTexture)
 	}
 }
 
-void Sprite::SetPosition(int NewX, int NewY)
+void Sprite::SetPosition(double NewX, double NewY)
 {
 	PosX = NewX;
 	PosY = NewY;
@@ -182,9 +185,9 @@ void Sprite::SetHeight(int NewHeight)
 	Rect.h = NewHeight;	
 }
 
-void Sprite::Render(SDL_Renderer* Renderer)
+void Sprite::Render(SDL_Renderer* Renderer, int ResourceNum)
 {
-	if (!bDrawScreenSpace && !InMapWindow())
+	if (!bDrawScreenSpace && !InMapWindow() && !bForceDrawWhenNotInWindow)
 	{
 		return;
 	}
@@ -219,7 +222,15 @@ void Sprite::Render(SDL_Renderer* Renderer)
 			DstRect.w *= RenderScale;
 			DstRect.h *= RenderScale;
 			
-			SDL_RenderCopyEx(Renderer, Texture, &SrcRect, &DstRect, 0, NULL, Flip);
+			if (ResourceNum == 2)
+			{
+				SDL_RenderCopyEx(Renderer, Texture2, &SrcRect, &DstRect, 0, NULL, Flip);
+			}
+			else
+			{
+				SDL_RenderCopyEx(Renderer, Texture, &SrcRect, &DstRect, 0, NULL, Flip);
+			}
+			
 		}		
 	}
 	else if (Texture)
@@ -240,7 +251,14 @@ void Sprite::Render(SDL_Renderer* Renderer)
 		DstRect.w *= RenderScale;
 		DstRect.h *= RenderScale;
 		
-		SDL_RenderCopyEx(Renderer, Texture, &SrcRect, &DstRect, 0, NULL, Flip);
+		if (ResourceNum == 2)
+		{
+			SDL_RenderCopyEx(Renderer, Texture2, &SrcRect, &DstRect, 0, NULL, Flip);
+		}
+		else
+		{
+			SDL_RenderCopyEx(Renderer, Texture, &SrcRect, &DstRect, 0, NULL, Flip);
+		}
 	}
 
 	if (bRenderCollision)
@@ -443,4 +461,14 @@ bool Sprite::IsOnGround()
 SDL_Rect Sprite::GetScreenSpaceRect()
 {
 	return{ (int)(Rect.x - TheMap->GetScrollX()), (int)(Rect.y - TheMap->GetScrollY()), Rect.w, Rect.h };
+}
+
+SDL_Texture* Sprite::GetTexture(int ResourceNum)
+{
+	if (ResourceNum == 2)
+	{
+		return Texture2;
+	}
+
+	return Texture;
 }

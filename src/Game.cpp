@@ -337,52 +337,72 @@ void Game::DetermineCurrentLevel()
 	int NormalIndex = 0;
 	int SecretIndex = 0;
 
-	// Find the higher level exit and use that one as our last compelted level
-	while (TheSaveData.NormalExits[NormalIndex] == 0 && NormalIndex < 10)
+	int GreatestCompletedNormalExit = -1;
+	int GreatestCompletedSecretExit = -1;
+
+
+	for (NormalIndex; NormalIndex < 10; NormalIndex++)
 	{
-		NormalIndex++;		
+		if (TheSaveData.NormalExits[NormalIndex])
+		{
+			GreatestCompletedNormalExit = NormalIndex > GreatestCompletedNormalExit ? NormalIndex : NormalIndex;
+
+		}
 	}
 
-	while (TheSaveData.SecretExits[SecretIndex] == 0 && SecretIndex < 10)
+	for (SecretIndex; SecretIndex < 10; SecretIndex++)
 	{
-		SecretIndex++;
+		if (TheSaveData.SecretExits[SecretIndex])
+		{
+			GreatestCompletedSecretExit = SecretIndex > GreatestCompletedSecretExit ? SecretIndex : NormalIndex;
+
+		}
 	}
 
- 	if (NormalIndex == 10 && SecretIndex == 10)
-	{
-		// TODO: Level select!
-	}
-	else if (NormalIndex > SecretIndex || SecretIndex == 10)
+
+ //	if (TheSaveData.BeatGame1)
+	//{
+	//	// TODO: Level select!
+	//}
+	//else 
+	if (GreatestCompletedNormalExit > GreatestCompletedSecretExit)
 	{
 		// If even, this is a normal level exit
-		if (NormalIndex % 2 == 0)
+		if (GreatestCompletedNormalExit % 2 == 0)
 		{
-			CurrentLevel = NormalIndex + 2;
+			CurrentLevel = GreatestCompletedNormalExit + 2;
 		}
 		else
 		{
-			CurrentLevel = NormalIndex + 1;
+			CurrentLevel = GreatestCompletedNormalExit + 1;
 		}
 	}
-	else if (NormalIndex <= SecretIndex && NormalIndex == 10)
+	else if (GreatestCompletedNormalExit <= GreatestCompletedSecretExit)
 	{
 		// If even, this is a normal level exit
 		if (SecretIndex % 2 == 0)
 		{
-			CurrentLevel = SecretIndex + 1;
+			CurrentLevel = GreatestCompletedSecretExit + 1;
 		}
 		else
 		{
-			CurrentLevel = SecretIndex + 2;
+			CurrentLevel = GreatestCompletedSecretExit + 2;
 		}
 	}
-	else if (NormalIndex == 10 && SecretIndex == 10)
+	else if (GreatestCompletedSecretExit == -1 && GreatestCompletedNormalExit == -1)
 	{
 		CurrentLevel = 0;
 	}
+
+	CurrentLevel = 5;
 }
 
 string Game::GetWorldName()
 {
 	return Levels[CurrentLevel].DisplayName;
+}
+
+int Game::GetCurrentLevelIndex()
+{
+	return CurrentLevel;
 }

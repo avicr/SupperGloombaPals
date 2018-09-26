@@ -55,7 +55,7 @@ public:
 	~FlagPoleSprite();
 	FlagPoleSprite(int X, int Y, bool bSecretExit);
 	virtual void Tick(double DeltaTime);
-	virtual void Render(SDL_Renderer* Renderer);
+	virtual void Render(SDL_Renderer* Renderer, int ResourceNum = 0);
 	virtual void Interact(class PlayerSprite* Player);
 	virtual bool IsDone();
 	virtual bool IsSecretExit() { return bIsSecretExit; }

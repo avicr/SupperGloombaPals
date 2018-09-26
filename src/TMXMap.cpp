@@ -156,6 +156,21 @@ void TMXMap::ReadMap(const char* FileName)
 					NewAnimation.AddFrame(44, 8);
 
 					StandardTiles->TileAnimations.push_back(NewAnimation);
+
+					// G.
+					NewAnimation = TMXAnimation(66);
+					NewAnimation.AddFrame(66, 8);
+					NewAnimation.AddFrame(63, 40);
+					//NewAnimation.AddFrame(63, 40);
+					StandardTiles->TileAnimations.push_back(NewAnimation);
+
+					// ..
+					NewAnimation = TMXAnimation(65);
+					NewAnimation.AddFrame(56, 16);
+					NewAnimation.AddFrame(65, 16);
+					NewAnimation.AddFrame(64, 16);
+
+					StandardTiles->TileAnimations.push_back(NewAnimation);
 				}
 			}			
 		}
@@ -543,18 +558,18 @@ void TMXMap::LoadExit(TiXmlElement* ObjectElement)
 
 void TMXMap::Render(SDL_Renderer* Renderer, int ScreenX, int ScreenY, int SourceWidth, int SourceHeight)
 {
-	SimpleSprites.Render(GRenderer, RENDER_LAYER_BEHIND_BG); 
+	SimpleSprites.Render(Renderer, RENDER_LAYER_BEHIND_BG);
 
 	for (int i = 0; i < Layers.size(); i++)
 	{
 		// Render the item sprites just before the foreground layer
 		if (Layers[i] == ForegroundLayer)
 		{
-			ItemSprites.Render(GRenderer, RENDER_LAYER_BEHIND_FG);
+			ItemSprites.Render(Renderer, RENDER_LAYER_BEHIND_FG);
 
-			if (bPlayingLevel && ThePlayer->IsWarping())
+			if (bPlayingLevel && (ThePlayer->IsWarping() || ThePlayer->GetRenderLayer() == RENDER_LAYER_BEHIND_FG))
 			{				
-				ThePlayer->Render(GRenderer);
+				ThePlayer->Render(Renderer);
 			}
 		}
 		RenderLayer(Layers[i], Renderer, ScreenX, ScreenY, SourceWidth, SourceHeight);
@@ -632,12 +647,12 @@ void TMXMap::Render(SDL_Renderer* Renderer, int ScreenX, int ScreenY, int Source
 
 	if (bPlayingLevel)
 	{
-		SimpleSprites.Render(GRenderer, RENDER_LAYER_TOP);
-		EnemySprites.Render(GRenderer, RENDER_LAYER_TOP);
+		SimpleSprites.Render(Renderer, RENDER_LAYER_TOP);
+		EnemySprites.Render(Renderer, RENDER_LAYER_TOP);
 
-		if (!ThePlayer->IsWarping())
+		if (!ThePlayer->IsWarping() && ThePlayer->GetRenderLayer() == RENDER_LAYER_TOP)
 		{
-			ThePlayer->Render(GRenderer);
+			ThePlayer->Render(Renderer);
 		}
 	}
 }
@@ -806,7 +821,7 @@ void TMXMap::EnforceWarpControls(WarpExit Warp)
 	}
 
 	// No scroll change is redundent, just set offset to 0 on the tile
-	//if (!Warp.bNoScrollChange)
+	if (!Warp.bNoScrollChange)
 	{
 		ScrollX += Warp.ScrollOffsetX;
 		ScrollY += Warp.ScrollOffsetY;

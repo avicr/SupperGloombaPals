@@ -55,11 +55,11 @@ void EnemySpawnPoint::Tick(double DeltaTime)
 	}
 }
 
-void EnemySpawnPoint::Render(SDL_Renderer* Renderer)
+void EnemySpawnPoint::Render(SDL_Renderer* Renderer, int ResourceNum)
 {
 	if (bRenderCollision)
 	{
-		Sprite::Render(Renderer);
+		Sprite::Render(Renderer, ResourceNum);
 	}
 }
 

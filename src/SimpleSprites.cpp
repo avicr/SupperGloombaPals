@@ -399,7 +399,7 @@ void FlagPoleSprite::Interact(PlayerSprite* Player)
 	}
 }
 
-void FlagPoleSprite::Render(SDL_Renderer* Renderer)
+void FlagPoleSprite::Render(SDL_Renderer* Renderer, int ResourceNum)
 {
 	if (TheMap->InMapWindow(PosX, PosY))
 	{

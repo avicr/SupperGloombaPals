@@ -34,6 +34,7 @@ enum eSpecialEvent
 	SPECIAL_EVENT_NONE = 0,
 	SPECIAL_EVENT_CANCEL_CASTLE,
 	SPECIAL_EVENT_PIPE_SHOOT,
+	SPECIAL_EVENT_LOADING_LEVEL,
 	SPECIAL_EVENT_LAST
 };
 
@@ -119,6 +120,7 @@ Mix_Music* GetMusicFromID(int ID);
 extern const double GlyphSpace;
 extern class ResourceManager *GResourceManager;
 extern SDL_Window *GWindow;
+extern SDL_Window *GWindow2;
 extern SDL_Renderer * GRenderer;
 extern bool bSDLInitialized;
 extern double GTickDelay;
@@ -193,5 +195,5 @@ extern float RenderScale;
 
 #define UGLY_TIME 48
 
-SDL_Renderer *GetRenderer();
+SDL_Renderer *GetRenderer(int RendererNumber = 0);
 #endif

@@ -36,15 +36,16 @@ ResourceManager::ANIMATION_RESOURCE_##RESOURCE_NAME *ResourceManager::RESOURCE_N
 class Frame
 {
 protected:
-	SDL_Texture *Texture;
+	SDL_Texture* Texture;
+	SDL_Texture* Texture2;
 	SDL_Rect SrcRect;
 	double FrameTime;	
 
 public:
 	Frame();
-	Frame(SDL_Texture* InTexture, SDL_Rect InSrcRect, double InFrameTime);
+	Frame(TextureResource* InTexture, SDL_Rect InSrcRect, double InFrameTime);
 
-	SDL_Texture *GetTexture();
+	SDL_Texture *GetTexture(int ResourceNum = 0);
 	SDL_Rect GetSrcRect();
 	double GetFrameTime();
 	

@@ -1,4 +1,5 @@
 #include "../inc/Animation.h"
+#include "../inc/ResourceManager.h"
 
 Frame::Frame()
 {
@@ -10,8 +11,8 @@ Frame::Frame()
 	SrcRect.h = 0;
 }
 
-Frame::Frame(SDL_Texture* InTexture, SDL_Rect InSrcRect, double InFrameTime) :
-	Texture(InTexture), SrcRect(InSrcRect), FrameTime(InFrameTime)
+Frame::Frame(TextureResource* InTexture, SDL_Rect InSrcRect, double InFrameTime) :
+	Texture(InTexture->Texture), SrcRect(InSrcRect), FrameTime(InFrameTime), Texture2(InTexture->Texture2)
 {
 
 }
@@ -31,8 +32,13 @@ int AnimationResource::GetFrameCount()
 	return Frames.size();
 }
 
-SDL_Texture *Frame::GetTexture()
+SDL_Texture *Frame::GetTexture(int ResourceNum)
 {
+	if (ResourceNum == 2)
+	{
+		return Texture2;
+	}
+
 	return Texture;
 }
 

@@ -42,6 +42,8 @@ enum eWarpType
 	WARP_PIPE_LEFT,
 	WARP_PIPE_RIGHT,
 	WARP_PIPE_SHOOT_UP,
+	WARP_PIPE_RIGHT_SECOND_WINDOW,
+	WARP_PIPE_LEFT_FIRST_WINDOW,
 	WARP_CONTROL = 255
 };
 
@@ -250,8 +252,12 @@ struct TMXTileset
 		int TileID = GID - FirstGID;
 
 		// Check the animations 
-		for (int i = 0; i < TileAnimations.size() && TileAnimations[i].GetOriginalTileID() <= TileID; i++)
+		for (int i = 0; i < TileAnimations.size(); i++)
 		{
+			if (TileID == 65)
+			{
+				TileID = TileID;
+			}
 			if (TileAnimations[i].GetOriginalTileID() == TileID)
 			{
 				return TileAnimations[i].GetCurrentTileID();

@@ -43,6 +43,7 @@ protected:
 
 	// Pointer to the current frame in the animation
 	SDL_Texture* Texture;
+	SDL_Texture* Texture2;
 
 	AnimInfo AnimData;	
 
@@ -60,6 +61,9 @@ protected:
 	// If true, do not adjust for the scroll offset when drawing
 	bool bDrawScreenSpace;
 	bool bDeleteWhenNotVisible;
+
+	// Used for the window hack!
+	bool bForceDrawWhenNotInWindow;
 
 	eRenderLayer RenderLayer;
 public:
@@ -83,10 +87,12 @@ public:
 	virtual SDL_Rect GetScreenSpaceCustomRect();
 	virtual SDL_Rect GetMapSpaceCollisionRect();
 	void SetTexture(SDL_Texture* Texture);
-	void SetPosition(int NewX, int NewY);
+	void SetPosition(double NewX, double NewY);
 	void SetWidth(int NewWidth);
 	void SetHeight(int NewHeight);
-	virtual void Render(SDL_Renderer* Renderer);
+	virtual int GetWidth() { return Rect.w; }
+	virtual int GetHeight() { return Rect.h; }
+	virtual void Render(SDL_Renderer* Renderer, int ResourceNum = 0);
 	void RenderCollision(SDL_Renderer* Renderer);
 	void PlayAnimation(AnimationResource *Anim, bool bLoop = true);
 	void SetAnimationPlayRate(double Rate);
@@ -108,6 +114,7 @@ public:
 	virtual bool IsOnGround();
 	virtual bool IsInteractable() { return !bPendingDelete; }
 	virtual eRenderLayer GetRenderLayer() { return RenderLayer; }
+	virtual SDL_Texture* GetTexture(int ResourceNum = 0);
 };
 
 #endif
