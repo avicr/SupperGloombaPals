@@ -31,6 +31,7 @@ float WorldAngle = 0;
 float WorldAngleRate = 0.02;
 bool GRenderBlackout = false;
 bool bUserQuit = false;
+bool bShowWindow2 = false;
 const double GlyphSpace = 0.8;
 SDL_Color BGColor = { 54, 129, 241, 255 };
 SDL_Color NextTripColor = { 0, 255, 0, 255 };
@@ -43,8 +44,8 @@ TTF_Font* MainFont;
 SDL_Window *GWindow;
 SDL_Renderer *GRenderer;
 
-SDL_Window *GWindow2;
-SDL_Renderer *GRenderer2;
+SDL_Window *GWindow2 = NULL;
+SDL_Renderer *GRenderer2 = NULL;
 
 ResourceManager *GResourceManager;
 bool bSDLInitialized = false;
@@ -472,7 +473,7 @@ int GameLoop()
 			
 			Tick(0.0166667);
 
-			Render(DeltaTime * (double)0.001);			
+			Render(DeltaTime);
 
 			//Handle events on queue
 			while (SDL_PollEvent(&TheEvent) != 0)
@@ -714,22 +715,25 @@ void Render(double DeltaTime)
 		SimpleSprites.Render(GRenderer, RENDER_LAYER_ABOVE_ALL);
 		PresentBackBuffer();
 
-		SDL_SetRenderDrawColor(GRenderer2, BGColor.r, BGColor.g, BGColor.b, BGColor.a);
-		SDL_RenderClear(GRenderer2);
+		if (bShowWindow2)
+		{
+			SDL_SetRenderDrawColor(GRenderer2, BGColor.r, BGColor.g, BGColor.b, BGColor.a);
+			SDL_RenderClear(GRenderer2);
 
-		double CachedX = ThePlayer->GetPosX();
-		double CachedY = ThePlayer->GetPosY();
+			double CachedX = ThePlayer->GetPosX();
+			double CachedY = ThePlayer->GetPosY();
 
-		ThePlayer->SetPosition(CachedX - 195 * 64 + TheMap->GetScrollX(), CachedY - 30 * 64 + TheMap->GetScrollY());
-		ThePlayer->Render(GRenderer2, 2);		
-		ThePlayer->SetPosition(CachedX, CachedY);
+			ThePlayer->SetPosition(CachedX - 195 * 64 + TheMap->GetScrollX(), CachedY - 30 * 64 + TheMap->GetScrollY());
+			ThePlayer->Render(GRenderer2, 2);
+			ThePlayer->SetPosition(CachedX, CachedY);
 
-		SDL_RenderCopy(GRenderer2, Texture2, NULL, NULL);
-		SDL_Rect SrcRect = {0, 0, ThePlayer->GetWidth(), ThePlayer->GetHeight() };
-		SDL_Rect DstRect = { ThePlayer->GetPosX() - TheMap->GetScrollX(), ThePlayer->GetPosY() - TheMap->GetScrollY() - 448, SrcRect.w, SrcRect.h };
-		
+			SDL_RenderCopy(GRenderer2, Texture2, NULL, NULL);
+			SDL_Rect SrcRect = { 0, 0, ThePlayer->GetWidth(), ThePlayer->GetHeight() };
+			SDL_Rect DstRect = { ThePlayer->GetPosX() - TheMap->GetScrollX(), ThePlayer->GetPosY() - TheMap->GetScrollY() - 448, SrcRect.w, SrcRect.h };
 
-		PresentBackBuffer2();
+
+			PresentBackBuffer2();
+		}
 	}	
 }
 
@@ -867,18 +871,17 @@ void InitSDL()
 			Mix_VolumeMusic(VOLUME_NORMAL);
 			
 			//Mix_Volume(-1, 0);
-			Mix_VolumeMusic(0);
+			//Mix_VolumeMusic(0);
 		}
 
 #ifdef FULLSCREEN_1920_1080
 		GWindow = SDL_CreateWindow("Supper Gloomba Pals", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1920, 1080, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP);
 #else
 		GWindow = SDL_CreateWindow("1-1", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, SCREEN_HEIGHT, SDL_WINDOW_OPENGL /*| SDL_WINDOW_FULLSCREEN_DESKTOP*/);
-
-		GWindow2 = SDL_CreateWindow("Test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 512, 512, SDL_WINDOW_OPENGL /*| SDL_WINDOW_FULLSCREEN_DESKTOP*/);
-#endif
-		SDL_HideWindow(GWindow2);
 		
+#endif		
+		CreateWindow2();
+
 		Uint32 global_pixel_format = SDL_GetWindowPixelFormat(GWindow);
 		const char* temp = SDL_GetPixelFormatName(global_pixel_format);
 		printf(" SDL_Window created with pixel format %s\n", temp);
@@ -887,27 +890,15 @@ void InitSDL()
 		SDL_GetWindowSize(GWindow, &WindowWidth, &WindowHeight);
 		GRenderer = SDL_CreateRenderer(GWindow, -1, 0);
 		BackBuffer = SDL_CreateTexture(GRenderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, 1024, 960);
-
-		GRenderer2 = SDL_CreateRenderer(GWindow2, -1, 0);
-		BackBuffer2 = SDL_CreateTexture(GRenderer2, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, 512, 512);
-
-		string FileName = "otherwindow.bmp";
-		SDL_Surface* Image = SDL_LoadBMP((TEXTURE_PATH + FileName).c_str());
 		
-		SDL_SetColorKey(Image, SDL_TRUE, SDL_MapRGB(Image->format, 0xFF, 0, 0xFF));
-		Texture2 = SDL_CreateTextureFromSurface(GRenderer2, Image);		
-		SDL_FreeSurface(Image);
-
 		SDL_SetRenderTarget(GRenderer, BackBuffer);
-		SDL_SetRenderTarget(GRenderer2, BackBuffer2);
+		
 				
 		Mix_AllocateChannels(100);		
 		bSDLInitialized = true;
 		//SDL_ShowCursor(SDL_DISABLE);
-		
-		
-		SDL_GetWindowPosition(GWindow, &CachedWindowX, &CachedWindowY);
-		SDL_SetWindowPosition(GWindow2, CachedWindowX + WindowWidth, CachedWindowY);
+				
+		//SDL_GetWindowPosition(GWindow, &CachedWindowX, &CachedWindowY);		
 
 		//SDL_EventState(SDL_SYSWMEVENT, SDL_ENABLE);
 
@@ -967,6 +958,7 @@ void CleanUp()
 
 	SDL_DestroyRenderer(GRenderer);
 	SDL_DestroyWindow(GWindow);
+	DestroyWindow2();
 	SDL_Quit();
 }
 
@@ -1159,4 +1151,71 @@ Mix_Music* GetMusicFromID(int ID)
 void SetUpEvents()
 {
 	Levels[0].SpecialEvents.push_back(SPECIAL_EVENT_CANCEL_CASTLE);
+}
+
+void CreateWindow2()
+{
+	int Window1X;
+	int Window1Y;
+	int Window2X;
+	int Window2Y;
+	int Window1Width;
+	int Window1Height;
+	int Window2Width;
+	int Window2Height;	
+
+	GWindow2 = SDL_CreateWindow("Test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 512, 512, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
+	GRenderer2 = SDL_CreateRenderer(GWindow2, -1, 0);
+	BackBuffer2 = SDL_CreateTexture(GRenderer2, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, 512, 512);
+
+	SDL_GetWindowPosition(GWindow, &Window1X, &Window1Y);
+	
+	SDL_GetWindowSize(GWindow, &Window1Width, &Window1Height);
+	SDL_SetWindowPosition(GWindow2, Window1X + WindowWidth, Window1Y);
+
+	string FileName = "otherwindow.bmp";
+	SDL_Surface* Image = SDL_LoadBMP((TEXTURE_PATH + FileName).c_str());
+
+	SDL_SetColorKey(Image, SDL_TRUE, SDL_MapRGB(Image->format, 0xFF, 0, 0xFF));
+	Texture2 = SDL_CreateTextureFromSurface(GRenderer2, Image);
+	SDL_FreeSurface(Image);
+	SDL_SetRenderTarget(GRenderer2, BackBuffer2);
+}
+
+void DestroyWindow2()
+{
+	SDL_DestroyRenderer(GRenderer2);
+	SDL_DestroyWindow(GWindow2);
+	SDL_DestroyTexture(Texture2);
+
+	GWindow2 = NULL;
+	GRenderer2 = NULL;
+	Texture2 = NULL;
+}
+
+void ShowWindow2(bool bShow)
+{
+	if (bShow)
+	{
+		int Window1X;
+		int Window1Y;
+		int Window2X;
+		int Window2Y;
+		int Window1Width;
+		int Window1Height;
+		int Window2Width;
+		int Window2Height;
+
+		SDL_GetWindowPosition(GWindow, &Window1X, &Window1Y);
+
+		SDL_GetWindowSize(GWindow, &Window1Width, &Window1Height);
+		SDL_SetWindowPosition(GWindow2, Window1X + WindowWidth, Window1Y);
+		SDL_ShowWindow(GWindow2);
+	}
+	else
+	{
+		SDL_HideWindow(GWindow2);
+	}
+
+	bShowWindow2 = bShow;
 }

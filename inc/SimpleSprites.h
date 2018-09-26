@@ -37,7 +37,7 @@ public:
 	PointSprite(int X, int Y, string Value);
 	PointSprite(int X, int Y, int Value);
 	virtual void Tick(double DeltaTime);
-	virtual void Render(SDL_Renderer* Renderer);
+	virtual void Render(SDL_Renderer* Renderer, int ResourceNum = 0);
 };
 
 class FlagPoleSprite : public Sprite
@@ -80,6 +80,6 @@ protected:
 public:
 	EventSprite(string InCaption);
 	~EventSprite();
-	virtual void Render(SDL_Renderer* Renderer);
+	virtual void Render(SDL_Renderer* Renderer, int ResourceNum = 0);
 	virtual void Tick(double DeltaTime);
 };

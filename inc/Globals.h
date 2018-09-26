@@ -130,6 +130,7 @@ extern bool bWorldSmear;
 extern int StompPoints[];
 extern SDL_Point FireworkLocations[];
 extern struct LevelInfo Levels[];
+extern bool bShowWindow2;
 
 extern int SpecialEventKeys[];
 extern int NormalExitKeys[];
@@ -194,6 +195,10 @@ extern float RenderScale;
 #define SCREEN_HEIGHT 896
 
 #define UGLY_TIME 48
+
+void CreateWindow2();
+void DestroyWindow2();
+void ShowWindow2(bool bShow);
 
 SDL_Renderer *GetRenderer(int RendererNumber = 0);
 #endif

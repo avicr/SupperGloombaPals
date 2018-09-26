@@ -325,7 +325,7 @@ void PointSprite::Tick(double DeltaTime)
 	}
 }
 
-void PointSprite::Render(SDL_Renderer* Renderer)
+void PointSprite::Render(SDL_Renderer* Renderer, int ResourceNum)
 {	
 	DrawBitmapText(PointString, PosX, PosY, 24, 24, GRenderer, FontShadowedWhite, 0.75, 1, false);
 }
@@ -483,7 +483,7 @@ EventSprite::EventSprite(string InCaption) :
 	Rect.y = PosY;
 }
 
-void EventSprite::Render(SDL_Renderer* Renderer)
+void EventSprite::Render(SDL_Renderer* Renderer, int ResourceNum)
 {
 	Sprite::Render(Renderer);
 	SDL_Rect CaptionDstRect = { PosX + Rect.w / 2 - CaptionRect.w / 2, PosY + 8, CaptionRect.w, CaptionRect.h };

@@ -1294,12 +1294,12 @@ void PlayerSprite::CheckWarpCollision()
 			}
 			// Right pipe
 			// TODO: Add additional x check 
-			else if (bIsOnGround && (Warps[i].Entrances[j].WarpType == WARP_PIPE_RIGHT || Warps[i].Entrances[j].WarpType == WARP_PIPE_RIGHT_SECOND_WINDOW) && IsRightPressed(LastKeyboardState) && CollisionRect.x + CollisionRect.w + 1 >= WarpCollision.x && CollisionRect.y + CollisionRect.h >= WarpCollision.y && CollisionRect.y <= WarpCollision.y + WarpCollision.h)
+			else if (bIsOnGround && (Warps[i].Entrances[j].WarpType == WARP_PIPE_RIGHT || Warps[i].Entrances[j].WarpType == WARP_PIPE_RIGHT_SECOND_WINDOW) && IsRightPressed(LastKeyboardState) && CollisionRect.x <= WarpCollision.x + WarpCollision.w && CollisionRect.x + CollisionRect.w + 1 >= WarpCollision.x && CollisionRect.y + CollisionRect.h >= WarpCollision.y && CollisionRect.y <= WarpCollision.y + WarpCollision.h)
 			{
 				StartWarpSequence(Warps[i].Entrances[j], Warps[i].Exits[0]);
 			}
 			// Left pipe
-			else if (bIsOnGround && (Warps[i].Entrances[j].WarpType == WARP_PIPE_LEFT || Warps[i].Entrances[j].WarpType == WARP_PIPE_LEFT_FIRST_WINDOW) && IsLeftPressed(LastKeyboardState) && CollisionRect.x > WarpCollision.x && CollisionRect.x - 1 <= WarpCollision.x + WarpCollision.w && CollisionRect.y + CollisionRect.h >= WarpCollision.y && CollisionRect.y <= WarpCollision.y + WarpCollision.h)
+			else if (bIsOnGround && (Warps[i].Entrances[j].WarpType == WARP_PIPE_LEFT) && IsLeftPressed(LastKeyboardState) && CollisionRect.x > WarpCollision.x && CollisionRect.x - 1 <= WarpCollision.x + WarpCollision.w && CollisionRect.y + CollisionRect.h >= WarpCollision.y && CollisionRect.y <= WarpCollision.y + WarpCollision.h)
 			{
 				StartWarpSequence(Warps[i].Entrances[j], Warps[i].Exits[0]);
 			}
@@ -1316,6 +1316,46 @@ void PlayerSprite::CheckWarpCollision()
 				{
 					// TODO: Select the warp exit to use
 					StartWarpSequence(Warps[i].Entrances[j], Warps[i].Exits[0]);
+				}
+			}
+			else if (GWindow2 != NULL)
+			{
+				if (bIsOnGround && (Warps[i].Entrances[j].WarpType == WARP_PIPE_LEFT_FIRST_WINDOW) && IsLeftPressed(LastKeyboardState) && CollisionRect.x > WarpCollision.x && CollisionRect.x - 1 <= WarpCollision.x + WarpCollision.w && CollisionRect.y + CollisionRect.h >= WarpCollision.y && CollisionRect.y <= WarpCollision.y + WarpCollision.h)
+				{
+					int Window1X;
+					int Window1Y;
+					int Window2X;
+					int Window2Y;
+					int Window1Width;
+					int Window1Height;
+					int Window2Width;
+					int Window2Height;
+
+					SDL_GetWindowPosition(GWindow, &Window1X, &Window1Y);
+					SDL_GetWindowPosition(GWindow2, &Window2X, &Window2Y);
+					SDL_GetWindowSize(GWindow, &Window1Width, &Window1Height);				
+					SDL_GetWindowSize(GWindow2, &Window2Width, &Window2Height);
+
+					if (Window2X >= Window1X + Window1Width - 64 && Window2X <= Window1X + Window1Width + 16)
+					{
+						int ExitIndex = -1;
+
+						// Connected to the top pipe
+						if (Window2Y >= Window1Y - 16 && Window2Y <= Window1Y + 16)
+						{
+							ExitIndex = 0;
+						}
+						// Connected to bottom pipe
+						else if (Window2Y + Window2Height >= Window1Y + Window1Height - 16 && Window2Y + Window2Height <= Window1Y + Window1Height + 16)
+						{
+							ExitIndex = 1;
+						}
+
+						if (ExitIndex > -1)
+						{
+							StartWarpSequence(Warps[i].Entrances[j], Warps[i].Exits[ExitIndex]);
+						}
+					}
 				}
 			}
 		}
@@ -1424,10 +1464,10 @@ void PlayerSprite::UpdateWarpSequence()
 				}
 
 				// Fast forward a bit
-				if (WarpSeq.Entrance.WarpType == WARP_PIPE_RIGHT_SECOND_WINDOW)
+				/*if (WarpSeq.Entrance.WarpType == WARP_PIPE_RIGHT_SECOND_WINDOW)
 				{
 					WarpSeq.FrameCount = 58;
-				}
+				}*/
 				// TODO: If flag is set on the entrance, force duck
 				//Duck();
 			}
@@ -1435,7 +1475,7 @@ void PlayerSprite::UpdateWarpSequence()
 			{
 				PosX += DeltaPos.x;
 				PosY += DeltaPos.y;
-
+				
 				// Turn right and do animation				
 			}
 			else if (!WarpSeq.Entrance.bQuickTransition && WarpSeq.FrameCount <= 58)
@@ -1446,9 +1486,14 @@ void PlayerSprite::UpdateWarpSequence()
 				}
 				GRenderBlackout = true;
 			}
-			else if (WarpSeq.FrameCount > 58 || WarpSeq.Entrance.bQuickTransition)
+			else if (WarpSeq.FrameCount > 58 || (WarpSeq.Entrance.bQuickTransition && WarpSeq.Entrance.WarpType == WARP_INSTANT))
 			{				
 				WarpSeq.bWarpComplete = true;
+				
+				if (WarpSeq.Entrance.WarpType == WARP_PIPE_LEFT_FIRST_WINDOW)
+				{
+					ShowWindow2(false);
+				}
 			}
 		}		
 		else if (WarpSeq.Entrance.WarpType == WARP_INSTANT)
@@ -1559,18 +1604,9 @@ void PlayerSprite::UpdateWarpExitSequence()
 				SetAnimationPlayRate(0.8);
 			}
 
-			if (WarpSeq.Exit.WarpType == WARP_PIPE_RIGHT_SECOND_WINDOW)
+			if (WarpSeq.Entrance.WarpType == WARP_PIPE_RIGHT_SECOND_WINDOW)
 			{
-				int WindowPosX;
-				int WindowPosY;
-				int WindowWidth;
-				int WindowHeight;
-
-				// Todo: Move the window to 0, 0 if there is not enough room
-				SDL_GetWindowPosition(GWindow, &WindowPosX, &WindowPosY);
-				SDL_GetWindowSize(GWindow, &WindowWidth, &WindowHeight);
-				SDL_SetWindowPosition(GWindow2, WindowPosX + WindowWidth - 1, WindowPosY);
-				SDL_ShowWindow(GWindow2);				
+				ShowWindow2(true);
 			}
 		}
 		else if (WarpSeq.FrameCount <= 67)
@@ -1585,11 +1621,7 @@ void PlayerSprite::UpdateWarpExitSequence()
 		else
 		{						
 			WarpSeq.bWarpExitComplete = true;
-			
-			if (WarpSeq.Exit.WarpType == WARP_PIPE_LEFT_FIRST_WINDOW)
-			{
-				SDL_HideWindow(GWindow2);
-			}
+						
 		}
 	}
 		
