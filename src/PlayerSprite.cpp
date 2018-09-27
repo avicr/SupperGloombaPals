@@ -1005,9 +1005,9 @@ bool PlayerSprite::HandleVerticalMovement()
 			bCollided = false;
 		}
 
-		if (VelocityY > 128)
+		if (VelocityY > 100)
 		{
-			VelocityY = 128;
+			VelocityY = 100;
 		}
 
 		for (int i = 0; i < HitTiles.size(); i++)
