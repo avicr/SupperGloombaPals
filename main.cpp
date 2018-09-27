@@ -47,6 +47,9 @@ SDL_Renderer *GRenderer;
 SDL_Window *GWindow2 = NULL;
 SDL_Renderer *GRenderer2 = NULL;
 
+SDL_Window* UglyWindow;
+SDL_Renderer* UglyRenderer;
+
 ResourceManager *GResourceManager;
 bool bSDLInitialized = false;
 Uint64 TickFreq;
@@ -691,7 +694,7 @@ void Render(double DeltaTime)
 	if (bDrawUgly)
 	{		
 	}
-	if (GRenderBlackout)
+	else if (GRenderBlackout)
 	{
 		SDL_SetRenderDrawColor(GRenderer, 0, 0, 0, 255);
 		SDL_RenderClear(GRenderer);
@@ -1026,6 +1029,7 @@ void UndoUgly()
 
 	DrawUglyCount = UGLY_TIME;
 	bDrawUgly = false;
+	LoadBitMapFont("letters_shadow.bmp", FontShadowedWhite);
 }
 
 void LoadBitMapFont(string FileName, Glyph *Glyphs)
@@ -1061,6 +1065,11 @@ void LoadBitMapFont(string FileName, Glyph *Glyphs)
 void CopyGlyph(Glyph &TheGlyph, SDL_Texture *FontTexture, int TextureStartX)
 {
 	SDL_Rect SrcRect = { TextureStartX, 0, 16, 16 };
+
+	if (TheGlyph.Texture)
+	{
+		SDL_DestroyTexture(TheGlyph.Texture);
+	}
 	TheGlyph.Texture = SDL_CreateTexture(GRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 16, 16);
 
 	SDL_SetRenderTarget(GRenderer, TheGlyph.Texture);

@@ -1216,7 +1216,8 @@ void TMXMap::HandleCollision(int TileX, int TileY, bool bCanBreakBricks)
 				//ThePlayer->AddCoins(1);			
 			}
 		}		
-		else if (MetaTileType == TILE_UGLY)
+		
+		if (MetaTileType == TILE_UGLY)
 		{
 			DoUgly();
 		}
