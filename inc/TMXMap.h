@@ -62,6 +62,7 @@ struct WarpExit
 	bool bLockScrollX = false;
 	bool bLockScrollY = true;	
 	int MaxScrollY = 0;
+	int MaxScrollX = 0;
 	bool bNoScrollChange = false;
 	bool bChangePositionX = true;
 	bool bChangePositionY = true;
@@ -344,6 +345,8 @@ protected:
 
 	// If the player is below this, kill them.  In Pixels	
 	int KillY;
+
+	int MaxScrollX;
 	int MaxScrollY;
 
 	int TilePixelWidth;

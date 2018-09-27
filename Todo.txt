@@ -6,6 +6,7 @@ show time up message
 hidden blocks should not reappear on level retry
 piranha plant
 red turtle
+can fire off of flagpole
 koopa come back to life
 koopa goes to shell when bricked?
 

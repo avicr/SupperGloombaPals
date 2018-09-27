@@ -477,6 +477,10 @@ void TMXMap::LoadExit(TiXmlElement* ObjectElement)
 		{			
 			PropElem->QueryIntAttribute("value", &NewExit.MaxScrollY);			
 		}
+		else if (strcmp(PropElem->Attribute("name"), "maxscrollx") == 0)
+		{
+			PropElem->QueryIntAttribute("value", &NewExit.MaxScrollX);
+		}
 		else if (strcmp(PropElem->Attribute("name"), "musicchange") == 0)
 		{
 			PropElem->QueryIntAttribute("value", &NewExit.MusicChange);
@@ -781,6 +785,11 @@ void TMXMap::AdjustScrollX(double Amount)
 	if (!bLockScrollX)
 	{
 		ScrollX += Amount;
+
+		if (MaxScrollX != 0 && ScrollX > MaxScrollX)
+		{
+			ScrollX = MaxScrollX;
+		}
 	}
 }
 
@@ -831,6 +840,7 @@ void TMXMap::EnforceWarpControls(WarpExit Warp)
 	bLockScrollY = Warp.bLockScrollY;
 
 	KillY = Warp.KillY;
+	MaxScrollX = Warp.MaxScrollX;
 	MaxScrollY = Warp.MaxScrollY;
 	BrickTilesetID = Warp.BrickTilesetID;
 }
@@ -843,6 +853,7 @@ void TMXMap::ToggleRenderCollision()
 TMXMap::TMXMap()
 {	
 	BrickTilesetID = BRICK_TILESET_OVERWORLD;
+	MaxScrollX = 0;
 	MaxScrollY = 0;
 	KillY = -1;
 	bPlayingLevel = false;	
