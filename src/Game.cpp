@@ -12,6 +12,7 @@ Game::Game()
 	GameState = STATE_PRE_LEVEL;
 	CurrentLevel = 0;
 	bLevelComplete = false;
+	NumberOfTimesPortaled = 0;
 
 	StartGame();
 }
@@ -34,6 +35,7 @@ void Game::EndGame()
 
 void Game::StartLevel()
 {	
+	NumberOfTimesPortaled = 0;
 	bSecretExit = false;
 	PostLevelCountDown = IN_CASTLE_FRAMES;
 	bLevelComplete = false;
@@ -264,7 +266,17 @@ void Game::HandleSpecialEvent(eSpecialEvent Event)
 	{
 		CancelEndLevel();
 	}
+	else if (Event == SPECIAL_EVENT_PORTALS)
+	{		
+		ThePlayer->SetPosition(ThePlayer->GetPosX(), ThePlayer->GetPosY() - 64 * 16);
+		NumberOfTimesPortaled++;
 
+		// Don't count the event until we've warped 10 times
+		if (NumberOfTimesPortaled < 10)
+		{
+			return;
+		}
+	}
 	// If this was an event, set the index to the key and save
 	if (Event != SPECIAL_EVENT_NONE && TheSaveData.SpecialEvents[Event] == 0)
 	{

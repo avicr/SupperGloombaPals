@@ -45,6 +45,7 @@ class Game
 	int FireworkCountDown;	
 	Mix_Music* CurrentMusic;
 	bool bSecretExit;
+	int NumberOfTimesPortaled;
 
 public:
 	Game();

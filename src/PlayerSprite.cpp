@@ -1005,6 +1005,11 @@ bool PlayerSprite::HandleVerticalMovement()
 			bCollided = false;
 		}
 
+		if (VelocityY > 128)
+		{
+			VelocityY = 128;
+		}
+
 		for (int i = 0; i < HitTiles.size(); i++)
 		{									
 			if (HitTiles[i].MetaTileType == TILE_BREAK_ON_TOUCH)

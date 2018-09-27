@@ -91,7 +91,8 @@ string SpecialEventDescprtions[] =
 	"None",
 	"Ground breaking!",
 	"That pipe used to work",
-	"There are no loading screens"
+	"There are no loading screens",
+	"Now you're thinking with portals"
 };
 
 int NormalExitKeys[10] =
