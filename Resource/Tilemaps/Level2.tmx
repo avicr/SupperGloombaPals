@@ -731,78 +731,6 @@
     <property name="warpid" type="int" value="14"/>
    </properties>
   </object>
-  <object id="221" gid="195" x="21760" y="8512" width="64" height="64">
-   <properties>
-    <property name="quicktransition" type="int" value="1"/>
-    <property name="warpid" type="int" value="15"/>
-    <property name="warptype" type="int" value="0"/>
-   </properties>
-  </object>
-  <object id="235" gid="196" x="21760" y="7616" width="64" height="64">
-   <properties>
-    <property name="bgcolor" type="color" value="#ff000000"/>
-    <property name="bricktilesetid" type="int" value="1"/>
-    <property name="positionchangex" type="bool" value="false"/>
-    <property name="positionchangey" type="bool" value="false"/>
-    <property name="warpid" type="int" value="15"/>
-   </properties>
-  </object>
-  <object id="236" gid="195" x="21824" y="8512" width="64" height="64">
-   <properties>
-    <property name="quicktransition" type="int" value="1"/>
-    <property name="warpid" type="int" value="15"/>
-    <property name="warptype" type="int" value="0"/>
-   </properties>
-  </object>
-  <object id="237" gid="195" x="21888" y="8512" width="64" height="64">
-   <properties>
-    <property name="quicktransition" type="int" value="1"/>
-    <property name="warpid" type="int" value="15"/>
-    <property name="warptype" type="int" value="0"/>
-   </properties>
-  </object>
-  <object id="238" gid="195" x="21952" y="8512" width="64" height="64">
-   <properties>
-    <property name="quicktransition" type="int" value="1"/>
-    <property name="warpid" type="int" value="15"/>
-    <property name="warptype" type="int" value="0"/>
-   </properties>
-  </object>
-  <object id="239" gid="195" x="22016" y="8512" width="64" height="64">
-   <properties>
-    <property name="quicktransition" type="int" value="1"/>
-    <property name="warpid" type="int" value="15"/>
-    <property name="warptype" type="int" value="0"/>
-   </properties>
-  </object>
-  <object id="240" gid="195" x="22080" y="8512" width="64" height="64">
-   <properties>
-    <property name="quicktransition" type="int" value="1"/>
-    <property name="warpid" type="int" value="15"/>
-    <property name="warptype" type="int" value="0"/>
-   </properties>
-  </object>
-  <object id="241" gid="195" x="22144" y="8512" width="64" height="64">
-   <properties>
-    <property name="quicktransition" type="int" value="1"/>
-    <property name="warpid" type="int" value="15"/>
-    <property name="warptype" type="int" value="0"/>
-   </properties>
-  </object>
-  <object id="242" gid="195" x="21696" y="8512" width="64" height="64">
-   <properties>
-    <property name="quicktransition" type="int" value="1"/>
-    <property name="warpid" type="int" value="15"/>
-    <property name="warptype" type="int" value="0"/>
-   </properties>
-  </object>
-  <object id="243" gid="195" x="22208" y="8512" width="64" height="64">
-   <properties>
-    <property name="quicktransition" type="int" value="1"/>
-    <property name="warpid" type="int" value="15"/>
-    <property name="warptype" type="int" value="0"/>
-   </properties>
-  </object>
   <object id="244" gid="195" x="24670" y="8128" width="64" height="64">
    <properties>
     <property name="warpid" type="int" value="13"/>
@@ -827,6 +755,7 @@
   </object>
   <object id="248" gid="196" x="23232" y="7936" width="64" height="64">
    <properties>
+    <property name="bgcolor" type="color" value="#ff000000"/>
     <property name="exittype" type="int" value="1"/>
     <property name="killy" type="int" value="8512"/>
     <property name="locky" type="int" value="1"/>
