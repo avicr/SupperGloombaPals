@@ -155,6 +155,7 @@ extern Mix_Chunk* BumpSound;
 extern Mix_Chunk* StompSound;
 extern Mix_Chunk* BreakBrickSound;
 extern Mix_Chunk* CoinSound;
+extern Mix_Chunk* RedCoinSound;
 extern Mix_Chunk* SurpriseSound;
 extern Mix_Chunk* PowerUpSound;
 extern Mix_Chunk* PowerUpGetSound;

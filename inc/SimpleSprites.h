@@ -2,12 +2,20 @@
 #include "Sprite.h"
 #include "TMXMap.h"
 
+enum eCoinType
+{
+	COIN_NORMAL,
+	COIN_RED
+};
+
 class CoinEffectSprite : public Sprite
 {
 	int EndPosY;
+	eCoinType CoinType;
+	double FallVelocity;
 
 public:
-	CoinEffectSprite(int X, int Y);
+	CoinEffectSprite(int X, int Y, eCoinType InCoinType = COIN_NORMAL);
 	virtual void Tick(double DeltaTime);
 };
 

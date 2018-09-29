@@ -26,6 +26,7 @@ void Game::StartGame()
 {
 	ReadSaveFile();
 	DetermineCurrentLevel();
+	GatheredRedCoinLocations.clear();
 }
 
 void Game::EndGame()
@@ -109,6 +110,7 @@ void Game::OnLevelComplete()
 {
 	GameState = STATE_TIMER_AWARD;
 	ActiveCheckpointControl.WarpID = 0;
+	GatheredRedCoinLocations.clear();
 }
 
 bool Game::IsLevelComplete()
@@ -417,4 +419,9 @@ string Game::GetWorldName()
 int Game::GetCurrentLevelIndex()
 {
 	return CurrentLevel;
+}
+
+void Game::AddGatheredRedCoinLocation(SDL_Point RedCoinLocation)
+{
+	GatheredRedCoinLocations.push_back(RedCoinLocation);
 }

@@ -57,6 +57,7 @@ public:
 	void UpdateWarpExitSequence();
 	virtual void CheckCollisionWithSprites();
 	void AddCoins(int Amount);
+	void AddRedCoins(int Amount);
 	void AddScore(int Amount, int PointSpriteX = -1, int PointSpriteY = -1, bool bIsOneUp = false);
 	void IncreaseStompCounter(int Amount);
 	void SetColorModForAllTextures(SDL_Color ColorMod);
@@ -118,6 +119,7 @@ protected:
 	int DyingCount;
 	bool bDead;
 	eDirection EjectionDirection;
+	int NumRedCoins;
 	
 	void StopJumping();
 	bool HandleVerticalMovement();

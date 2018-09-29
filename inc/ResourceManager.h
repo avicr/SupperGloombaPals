@@ -48,6 +48,7 @@ public:
 	DECLARE_TEXTURE_RESOURCE(EGoombaSpriteTexture, "egoomba.bmp", false)
 	DECLARE_TEXTURE_RESOURCE(EGoombaFlagTexture, "egoombasmash.bmp", false)
 	DECLARE_TEXTURE_RESOURCE(CoinEffectTexture, "coineffect.bmp", false)
+	DECLARE_TEXTURE_RESOURCE(RedCoinEffectTexture, "redcoineffect.bmp", false)
 	DECLARE_TEXTURE_RESOURCE(BigMushroomTexture, "bigmushroom.bmp", false)
 	DECLARE_TEXTURE_RESOURCE(OneUpMushroomTexture, "oneupmushroom.bmp", false)
 	DECLARE_TEXTURE_RESOURCE(MagicMushroomTexture, "magicmushroom.bmp", false)
@@ -289,6 +290,20 @@ public:
 		}
 	}
 	END_DECLARE_ANIMATION_RESOURCE(CoinEffectAnimation)
+
+	BEGIN_DECLARE_ANIMATION_RESORCE(RedCoinEffectAnimation)
+	{		
+
+		for (int i = 0; i < 4; i++)
+		{
+			int SpriteWidth = 64;
+			int SpriteHeight = 64;
+			SDL_Rect SrcRect = { i * SpriteWidth, 0, SpriteWidth, SpriteHeight };
+
+			Frames.push_back(new Frame(ResourceManager::RedCoinEffectTexture, SrcRect, 0.05));
+		}
+	}
+	END_DECLARE_ANIMATION_RESOURCE(RedCoinEffectAnimation)
 
 	BEGIN_DECLARE_ANIMATION_RESORCE(ExplosionAnimation)
 	{

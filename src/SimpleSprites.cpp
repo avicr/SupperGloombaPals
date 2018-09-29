@@ -5,15 +5,29 @@
 #include "../inc/Game.h"
 #include "../inc/SpriteList.h"
 
-CoinEffectSprite::CoinEffectSprite(int X, int Y)
-{
-	EndPosY = Y - 74;
-	PlayAnimation(GResourceManager->CoinEffectAnimation);
+CoinEffectSprite::CoinEffectSprite(int X, int Y, eCoinType InCoinType)
+{	
+	CoinType = InCoinType;
+	CountDown = 0;
+	if (CoinType == COIN_RED)
+	{
+		PlayAnimation(GResourceManager->RedCoinEffectAnimation);
+		VelocityY = -17;
+		EndPosY = Y - 1500;
+		FallVelocity = BASE_FALL_VELOCITY / 2;
+		CountDown = 40;
+	}
+	else
+	{
+		EndPosY = Y - 74;
+		PlayAnimation(GResourceManager->CoinEffectAnimation);
+		VelocityY = -28;
+		FallVelocity = BASE_FALL_VELOCITY;
+	}
 	SetPosition(X, Y);
 	SetWidth(64);
 	SetHeight(64);
-
-	VelocityY = -28;
+	
 }
 
 void CoinEffectSprite::Tick(double DeltaTime)
@@ -23,13 +37,31 @@ void CoinEffectSprite::Tick(double DeltaTime)
 	PosY += VelocityY;
 	Rect.y = PosY;
 
-	VelocityY += BASE_FALL_VELOCITY;
+	VelocityY += FallVelocity;	
 
-	// Destroy the coin when we get back to the starting place
-	if (PosY >= EndPosY && VelocityY > 0)
+	if (CoinType == COIN_NORMAL)
 	{
-		bPendingDelete = true;
-		ThePlayer->AddScore(200, PosX, PosY);
+		// Destroy the coin when we get back to the starting place
+		if (PosY >= EndPosY && VelocityY > 0)
+		{
+			bPendingDelete = true;
+			ThePlayer->AddScore(200, PosX, PosY);
+		}
+	}
+	else
+	{
+		FallVelocity -= 0.05;
+		if (FallVelocity < 0)
+		{
+			FallVelocity = 0;
+			VelocityY = 0;
+		}
+		CountDown--;
+
+		if (CountDown <= 0)
+		{
+			bPendingDelete = true;
+		}
 	}
 }
 

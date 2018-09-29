@@ -46,6 +46,7 @@ class Game
 	Mix_Music* CurrentMusic;
 	bool bSecretExit;
 	int NumberOfTimesPortaled;
+	vector<SDL_Point> GatheredRedCoinLocations;
 
 public:
 	Game();
@@ -87,5 +88,6 @@ public:
 	void DetermineCurrentLevel();
 	string GetWorldName();
 	int GetCurrentLevelIndex();
+	void AddGatheredRedCoinLocation(SDL_Point RedCoinLocation);
 
 };

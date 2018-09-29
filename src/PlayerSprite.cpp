@@ -392,6 +392,19 @@ void PlayerSprite::Tick(double DeltaTime)
 				AddScore(200);
 			}
 		}
+		// TODO: Red coin
+		else if (TheMap->GetMetaTileType(HitTiles[i].Location.x, HitTiles[i].Location.y) == TILE_RED_COIN)
+		{
+			TheMap->SetForegroundTile(HitTiles[i].Location.x, HitTiles[i].Location.y, -1);
+			TheMap->SetMetaLayerTile(HitTiles[i].Location.x, HitTiles[i].Location.y, TILE_NONE);
+
+			// Prevent the coin from firing multiple times
+			if (!ThePlayer->IsChangingSize())
+			{
+				AddRedCoins(1);
+				AddScore(1000);
+			}
+		}
 
 	}
 	SDL_Rect ScreenSpaceColRect = GetScreenSpaceCustomRect();
@@ -873,6 +886,7 @@ void PlayerSprite::HandleJump()
 
 PlayerSprite::PlayerSprite()
 {
+	NumRedCoins = 0;
 	bDrawHUD = true;
 	bExitedLevel = false;
 	EndOfLevelCountdown = 0;
@@ -1083,6 +1097,18 @@ void PlayerSprite::AddCoins(int Amount)
 		Coins = Coins % 100;
 	}
 	Mix_PlayChannel(CHANNEL_COIN, CoinSound, 0);
+}
+
+void PlayerSprite::AddRedCoins(int Amount)
+{
+	NumRedCoins += Amount;
+
+	if (Coins >= 5)
+	{
+		// TODO: Add an event
+	}	
+
+	Mix_PlayChannel(CHANNEL_COIN, RedCoinSound, 0);
 }
 
 void PlayerSprite::AddScore(int Amount, int PointSpriteX, int PointSpriteY, bool bIsOneUp)
@@ -1734,9 +1760,21 @@ void PlayerSprite::DrawHUD()
 	}
 	DrawBitmapText(TempString, 97 + i * (GlyphSpace * 32), 60, 32, 32, GRenderer, FontShadowedWhite, GlyphSpace, 1.25, false);
 		
+	// Draw red coins
 	// Draw coins	
 	SDL_Rect SrcRect = { 0, 0, 64, 64 };
-	SDL_Rect DstRect = { 350, 60, 32, 32 };
+	SDL_Rect DstRect;
+
+	for (i = 0; i < NumRedCoins; i++)
+	{
+		DstRect = { 350 + i * 32, 30, 32, 32 };
+
+		SDL_RenderCopy(GRenderer, GResourceManager->RedCoinEffectTexture->Texture, &SrcRect, &DstRect);
+	}
+
+	// Draw coins	
+	SrcRect = { 0, 0, 64, 64 };
+	DstRect = { 350, 60, 32, 32 };
 
 	SDL_RenderCopy(GRenderer, GResourceManager->CoinEffectTexture->Texture, &SrcRect, &DstRect);
 	itoa(Coins, TempString, 10);
@@ -1774,6 +1812,7 @@ void PlayerSprite::DrawHUD()
 void PlayerSprite::BeginLevel()
 {			
 	SetAnimationPlayRate(1);
+	NumRedCoins = 0;
 	RenderLayer = RENDER_LAYER_TOP;	
 	bDrawHUD = true;
 	bExitedLevel = false;

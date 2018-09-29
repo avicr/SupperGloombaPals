@@ -139,6 +139,7 @@ Mix_Chunk* BumpSound = NULL;
 Mix_Chunk* StompSound = NULL;
 Mix_Chunk* BreakBrickSound = NULL;
 Mix_Chunk* CoinSound = NULL;
+Mix_Chunk* RedCoinSound = NULL;
 Mix_Chunk* SurpriseSound = NULL;
 Mix_Chunk* PowerUpSound = NULL;
 Mix_Chunk* PowerUpGetSound = NULL;
@@ -552,7 +553,7 @@ void HandleCheatInput(SDL_Event& TheEvent)
 
 	if (TheEvent.key.state == SDL_PRESSED && TheEvent.key.keysym.scancode == SDL_SCANCODE_4)
 	{
-		SimpleSprites.push_back(new CoinEffectSprite(ThePlayer->GetPosX(), ThePlayer->GetPosY() - 64));
+		SimpleSprites.push_back(new CoinEffectSprite(ThePlayer->GetPosX(), ThePlayer->GetPosY() - 64, COIN_RED));
 	}
 
 	if (TheEvent.key.state == SDL_PRESSED && TheEvent.key.keysym.scancode == SDL_SCANCODE_5)
@@ -841,6 +842,7 @@ void InitSDL()
 			StompSound = Mix_LoadWAV("resource/sounds/stomp.wav");
 			BreakBrickSound = Mix_LoadWAV("resource/sounds/breakbrick.wav");
 			CoinSound = Mix_LoadWAV("resource/sounds/coin.wav");
+			RedCoinSound = Mix_LoadWAV("resource/sounds/redcoin.wav");
 			SurpriseSound = Mix_LoadWAV("resource/sounds/surprisemod.wav");
 			PowerUpSound = Mix_LoadWAV("resource/sounds/powerup.wav");
 			PowerUpGetSound = Mix_LoadWAV("resource/sounds/powerupget.wav");
@@ -863,6 +865,7 @@ void InitSDL()
 			Mix_VolumeChunk(StompSound, VOLUME_NORMAL);
 			Mix_VolumeChunk(BreakBrickSound, VOLUME_NORMAL);
 			Mix_VolumeChunk(CoinSound, VOLUME_NORMAL);
+			Mix_VolumeChunk(RedCoinSound, VOLUME_NORMAL);
 			Mix_VolumeChunk(PowerUpSound, VOLUME_NORMAL);
 			Mix_VolumeChunk(PowerUpGetSound, VOLUME_NORMAL);
 			Mix_VolumeChunk(OneUpSound, VOLUME_NORMAL);
@@ -945,6 +948,7 @@ void CleanUp()
 	Mix_FreeChunk(StompSound);
 	Mix_FreeChunk(BreakBrickSound);
 	Mix_FreeChunk(CoinSound);
+	Mix_FreeChunk(RedCoinSound);
 	Mix_FreeChunk(SurpriseSound);	
 	Mix_FreeChunk(OneUpSound);
 	Mix_FreeChunk(KickSound);

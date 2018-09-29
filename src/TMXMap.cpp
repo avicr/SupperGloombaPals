@@ -1032,7 +1032,7 @@ bool TMXMap::IsCollidableTile(int MetaTileID, int TileX, int TileY, SDL_Point Te
 
 	int ForegroundTile = ForegroundLayer->TileData[TileY][TileX];
 
-	if (MetaTileID == TILE_COIN_BLOCK || MetaTileID == TILE_POWER_UP || MetaTileID == TILE_ONE_UP || MetaTileID == TILE_BREAKABLE || MetaTileID == TILE_MULTI_COIN_BLOCK || MetaTileID == TILE_STAR || MetaTileID == TILE_MAGIC_MUSHROOM || MetaTileID == TILE_DESTROY_WITH_FIRE ||
+	if (MetaTileID == TILE_RED_COIN_BLOCK  || MetaTileID == TILE_COIN_BLOCK || MetaTileID == TILE_POWER_UP || MetaTileID == TILE_ONE_UP || MetaTileID == TILE_BREAKABLE || MetaTileID == TILE_MULTI_COIN_BLOCK || MetaTileID == TILE_STAR || MetaTileID == TILE_MAGIC_MUSHROOM || MetaTileID == TILE_DESTROY_WITH_FIRE ||
 		MetaTileID == TILE_DESTROY_WITH_FIRE_OR_BUMP)
 	{
 		if (ForegroundTile != -1)
@@ -1053,7 +1053,7 @@ bool TMXMap::IsCollidableTile(int MetaTileID, int TileX, int TileY, SDL_Point Te
 bool TMXMap::IsHiddenBlockTile(int ID)
 {	
 
-	if (ID == TILE_COIN_BLOCK || ID == TILE_POWER_UP || ID == TILE_ONE_UP || ID == TILE_UGLY || ID == TILE_MULTI_COIN_BLOCK || ID == TILE_STAR || ID == TILE_MAGIC_MUSHROOM || ID == TILE_BREAK_ON_TOUCH)
+	if (ID == TILE_RED_COIN_BLOCK || ID == TILE_COIN_BLOCK || ID == TILE_POWER_UP || ID == TILE_ONE_UP || ID == TILE_UGLY || ID == TILE_MULTI_COIN_BLOCK || ID == TILE_STAR || ID == TILE_MAGIC_MUSHROOM || ID == TILE_BREAK_ON_TOUCH)
 	{
 		return true;
 	}
@@ -1075,7 +1075,7 @@ bool TMXMap::IsBreakableBlockTile(int ID)
 bool TMXMap::IsCoinTile(int ID)
 {
 
-	if (ID == TILE_COIN || ID == TILE_COIN_BLOCK || ID == TILE_MULTI_COIN_BLOCK)
+	if (ID == TILE_RED_COIN_BLOCK || ID == TILE_RED_COIN || ID == TILE_COIN || ID == TILE_COIN_BLOCK || ID == TILE_MULTI_COIN_BLOCK)
 	{
 		return true;
 	}
@@ -1210,9 +1210,15 @@ void TMXMap::HandleCollision(int TileX, int TileY, bool bCanBreakBricks)
 		{
 			SimpleSprites.push_back(NewBlock);
 
-			if (NewBlock && MetaTileType == TILE_COIN_BLOCK || MetaTileType == TILE_MULTI_COIN_BLOCK)
+			if (NewBlock && (MetaTileType == TILE_COIN_BLOCK || MetaTileType == TILE_MULTI_COIN_BLOCK))
 			{
 				SimpleSprites.push_back(new CoinEffectSprite(TileX * 64, TileY * 64));
+				//ThePlayer->AddCoins(1);			
+			}
+
+			if (NewBlock && MetaTileType == TILE_RED_COIN_BLOCK)
+			{
+				SimpleSprites.push_back(new CoinEffectSprite(TileX * 64, TileY * 64, COIN_RED));
 				//ThePlayer->AddCoins(1);			
 			}
 		}		
@@ -1267,6 +1273,15 @@ void TMXMap::HandleCollision(int TileX, int TileY, bool bCanBreakBricks)
 				ThePlayer->AddCoins(1);
 				ThePlayer->AddScore(200);
 			}
+			// TODO: Red coin
+			else if (MetaTileAbove == TILE_RED_COIN)
+			{
+				SimpleSprites.push_back(new CoinEffectSprite(TileX * 64, TileAboveY * 64));
+				TheMap->SetForegroundTile(TileX, TileAboveY, -1);
+				TheMap->SetMetaLayerTile(TileX, TileAboveY, TILE_NONE);
+				ThePlayer->AddCoins(1);
+				ThePlayer->AddScore(200);
+			}
 		}
 
 		Mix_PlayChannel(CHANNEL_BUMP, BumpSound, 0);
@@ -1275,8 +1290,16 @@ void TMXMap::HandleCollision(int TileX, int TileY, bool bCanBreakBricks)
 
 	if (IsCoinTile(MetaTileType))
 	{
-		ThePlayer->AddCoins(1);
-		ThePlayer->AddScore(200);
+		if (MetaTileType == TILE_RED_COIN_BLOCK || MetaTileType == TILE_RED_COIN)
+		{
+			ThePlayer->AddRedCoins(1);
+			ThePlayer->AddScore(1000);
+		}
+		else
+		{
+			ThePlayer->AddCoins(1);
+			ThePlayer->AddScore(200);
+		}
 	}
 	
 }
