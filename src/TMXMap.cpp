@@ -1273,14 +1273,13 @@ void TMXMap::HandleCollision(int TileX, int TileY, bool bCanBreakBricks)
 				ThePlayer->AddCoins(1);
 				ThePlayer->AddScore(200);
 			}
-			// TODO: Red coin
 			else if (MetaTileAbove == TILE_RED_COIN)
 			{
-				SimpleSprites.push_back(new CoinEffectSprite(TileX * 64, TileAboveY * 64));
+				SimpleSprites.push_back(new CoinEffectSprite(TileX * 64, TileAboveY * 64, COIN_RED));
 				TheMap->SetForegroundTile(TileX, TileAboveY, -1);
 				TheMap->SetMetaLayerTile(TileX, TileAboveY, TILE_NONE);
-				ThePlayer->AddCoins(1);
-				ThePlayer->AddScore(200);
+				ThePlayer->AddRedCoins(1);
+				ThePlayer->AddScore(1000);
 			}
 		}
 
