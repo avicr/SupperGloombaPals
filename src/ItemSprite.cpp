@@ -3,13 +3,14 @@
 
 ItemSprite::ItemSprite(int X, int Y, bool bDoGrowAnimation)
 {	
-	ItemType = ITEM_NONE;
-	RenderLayer = RENDER_LAYER_BEHIND_FG;
+	ItemType = ITEM_NONE;	
+	RenderLayer = RENDER_LAYER_TOP;
 	bGrowing = bDoGrowAnimation;
 
 	// If we are growing, set our Y to one tile lower than where we want to be
 	if (bGrowing)
 	{
+		RenderLayer = RENDER_LAYER_BEHIND_FG;
 		DestintationY = Y;
 		Y += 64;
 		VelocityY = -2;
@@ -131,6 +132,7 @@ void BigMushroomItemSprite::Tick(double DeltaTime)
 		{
 			PosY = DestintationY;
 			bGrowing = false;
+			RenderLayer = RENDER_LAYER_TOP;
 			VelocityY = 0;
 		}
 	}
@@ -163,6 +165,7 @@ void FlowerItemSprite::Tick(double DeltaTime)
 		{
 			PosY = DestintationY;
 			bGrowing = false;
+			RenderLayer = RENDER_LAYER_TOP;
 			VelocityY = 0;
 		}
 		Rect.x = PosX;// -TheMap->GetScrollX();
@@ -194,6 +197,7 @@ void StarItemSprite::Tick(double DeltaTime)
 		{
 			PosY = DestintationY;
 			bGrowing = false;
+			RenderLayer = RENDER_LAYER_TOP;
 			VelocityY = -10;
 			VelocityX = 3;
 		}				
@@ -356,6 +360,7 @@ void MagicMushroomItemSprite::Tick(double DeltaTime)
 		{
 			PosY = DestintationY;
 			bGrowing = false;
+			RenderLayer = RENDER_LAYER_TOP;
 			VelocityY = 0;
 		}
 	}

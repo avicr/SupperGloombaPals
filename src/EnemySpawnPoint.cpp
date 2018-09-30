@@ -90,7 +90,7 @@ void EnemySpawnPoint::SpawnEnemy()
 	else if (EnemyType == ENEMY_GIANT_GOOMBA)
 	{
 		EnemySprite* NewEnemy = new GiantGoomba(this);
-		NewEnemy->SetPosition(PosX + 340, PosY - GIANT_GOOMBA_SIZE + 64);
+		NewEnemy->SetPosition(PosX + 340, PosY - GIANT_GOOMBA_SIZE + 65);
 		EnemySprites.push_back(NewEnemy);
 	}
 }

@@ -76,6 +76,7 @@ protected:
 	double ScaleRate;
 	double DestinationX;
 	int ScaleCountDown;
+	int JumpCount;
 
 	void EnterState(eGiantGoombaState NewState);
 	void LeaveState(eGiantGoombaState PreviousState);

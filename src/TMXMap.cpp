@@ -757,8 +757,9 @@ void TMXMap::Render(SDL_Renderer* Renderer, int ScreenX, int ScreenY, int Source
 
 	if (bPlayingLevel)
 	{
+		ItemSprites.Render(Renderer, RENDER_LAYER_TOP);
 		SimpleSprites.Render(Renderer, RENDER_LAYER_TOP);
-		EnemySprites.Render(Renderer, RENDER_LAYER_TOP);
+		EnemySprites.Render(Renderer, RENDER_LAYER_TOP);		
 
 		if (!ThePlayer->IsWarping() && ThePlayer->GetRenderLayer() == RENDER_LAYER_TOP)
 		{

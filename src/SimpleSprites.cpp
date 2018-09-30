@@ -416,14 +416,6 @@ void FlagPoleSprite::Interact(PlayerSprite* Player)
 		GrabPercent *= 100;
 
 		GrabPercent = 8 * (GrabPercent / 100);
-		/*if (GrabPercent < 0)
-		{
-			GrabPercent = 0;
-		}
-		else if (GrabPercent > 8)
-		{
-			GrabPercent = 8;
-		}*/
 
 		Points = StompPoints[(int)round(GrabPercent)];
 		bFlagTraveling = true;

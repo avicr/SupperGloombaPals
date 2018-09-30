@@ -6,7 +6,7 @@
 #include "../inc/SpriteList.h"
 #include "../inc/TMXMap.h"
 
-#define MUSHROOM_COUNTDOWN 306
+#define MUSHROOM_COUNTDOWN 330
 
 EnemySprite::EnemySprite(EnemySpawnPoint* Spawner)
 {
@@ -335,7 +335,8 @@ GiantGoomba::GiantGoomba(EnemySpawnPoint* Spawner) :
 	SetTexture(Texture);	
 	SetWidth(GIANT_GOOMBA_SIZE);
 	SetHeight(GIANT_GOOMBA_SIZE);
-	DestinationX = Spawner->GetPosX() + 112;
+	DestinationX = Spawner->GetPosX() + 64;
+	JumpCount = 0;
 
 	EnterState(GIANT_STATE_WALK_TO_START);	
 
@@ -383,9 +384,10 @@ void GiantGoomba::Tick(double DeltaTime)
 	}
 	else if (CurrentState == GIANT_STATE_MUSHROOM)
 	{		
-		if (CountDown == MUSHROOM_COUNTDOWN - 30 || CountDown == MUSHROOM_COUNTDOWN - 80 || CountDown == MUSHROOM_COUNTDOWN - 135 || CountDown == MUSHROOM_COUNTDOWN - 150 ||
+		if (CountDown == MUSHROOM_COUNTDOWN - 30 || CountDown == MUSHROOM_COUNTDOWN - 120 || CountDown == MUSHROOM_COUNTDOWN - 135 || CountDown == MUSHROOM_COUNTDOWN - 150 ||
 			CountDown == MUSHROOM_COUNTDOWN - 160 || CountDown == MUSHROOM_COUNTDOWN - 133 || CountDown == MUSHROOM_COUNTDOWN - 138 || 
-			CountDown == MUSHROOM_COUNTDOWN - 140 || CountDown == MUSHROOM_COUNTDOWN - 144 || CountDown == MUSHROOM_COUNTDOWN - 150 || CountDown == MUSHROOM_COUNTDOWN - 155)
+			CountDown == MUSHROOM_COUNTDOWN - 140 || CountDown == MUSHROOM_COUNTDOWN - 144 || CountDown == MUSHROOM_COUNTDOWN - 150 || CountDown == MUSHROOM_COUNTDOWN - 155 || 
+			CountDown == MUSHROOM_COUNTDOWN - 157)
 		{
 			//double CurrentSize = 448 * Scale;			
 
@@ -394,8 +396,9 @@ void GiantGoomba::Tick(double DeltaTime)
 			NewMushroom->SetVelocityY(0.15);
 			ItemSprites.push_back(NewMushroom);			
 		}
-		else if (CountDown == MUSHROOM_COUNTDOWN - 200 || CountDown == MUSHROOM_COUNTDOWN - 240)
+		else if (CountDown == MUSHROOM_COUNTDOWN - 230 || CountDown == MUSHROOM_COUNTDOWN - 280)
 		{
+			JumpCount++;		
 			VelocityY = -20;
 			Mix_PlayChannel(CHANNEL_JUMP, JumpSound, 0);
 		}
@@ -434,7 +437,7 @@ void GiantGoomba::EnterState(eGiantGoombaState NewState)
 		VelocityX = -2;
 		DyingCount = 0;
 		CountDown = 120;
-		Scale = 0.2;
+		Scale = 0.12;
 		ScaleRate = 0.03;
 		ScaleTarget = Scale;
 		ScaleCountDown = 0;		
@@ -580,7 +583,7 @@ void GiantGoomba::UpdateScale()
 void GiantGoomba::Interact(ItemSprite* Item)
 {
 	Item->Delete();
-	ScaleTarget += 0.091;
+	ScaleTarget += 0.08;
 
 	if (ScaleTarget > 1)
 	{
@@ -636,10 +639,12 @@ void GiantGoomba::HandleMovement()
 			}
 		}
 
+		bool bIsInAir = !IsOnGround();
 
 		if (CurrentState == GIANT_STATE_MUSHROOM)
 		{
-			if (!IsOnGround())
+			
+			if (bIsInAir)
 			{
 				VelocityY += BASE_FALL_VELOCITY;				
 			}
@@ -656,15 +661,73 @@ void GiantGoomba::HandleMovement()
 					PosY += VelocityY > 0 ? 1 : -1;
 					CheckCollisionWithSprites();
 				}
-			}
+			}			
 		}
 		else
 		{
 			VelocityY = 0;
 		}
-
+		
 		Rect.x = PosX;// -TheMap->GetScrollX();
 		Rect.y = PosY;
+
+		// If we've landed, break bricks
+		if (CurrentState == GIANT_STATE_MUSHROOM && bIsInAir && IsOnGround())
+		{
+			bIsInAir = false;
+			Mix_PlayChannel(CHANNEL_FIRE_BALL, FireworkSound, 0);
+			Mix_PlayChannel(CHANNEL_BUMP, BumpSound, 0);
+			if (JumpCount == 1)
+			{
+				vector<TileInfo> Tiles;
+
+				if (TheMap->CheckCollision(NewRect, Tiles, true, true))
+				{
+					for (int i = 0; i < Tiles.size(); i++)
+					{
+						if (Tiles[i].MetaTileType == TILE_COIN)
+						{
+							TheMap->SetForegroundTile(Tiles[i].Location.x, Tiles[i].Location.y, -1);
+							TheMap->SetMetaLayerTile(Tiles[i].Location.x, Tiles[i].Location.y, TILE_NONE);
+
+							int SpawnX = Tiles[i].Location.x * 64;
+							int SpawnY = Tiles[i].Location.y * 64;
+							SimpleSprites.push_back(new BrickBreakSprite(SpawnX, SpawnY - 32, -4));
+							SimpleSprites.push_back(new BrickBreakSprite(SpawnX + 32, SpawnY - 32, 4));
+							SimpleSprites.push_back(new BrickBreakSprite(SpawnX, SpawnY + 32, -4));
+							SimpleSprites.push_back(new BrickBreakSprite(SpawnX + 32, SpawnY + 32, 4));
+
+							Mix_PlayChannel(CHANNEL_BREAK_BRICK, BreakBrickSound, 0);
+						}
+					}
+				}
+			}
+			else if (JumpCount == 2)
+			{
+				vector<TileInfo> Tiles;
+
+				if (TheMap->CheckCollision(NewRect, Tiles, true, true))
+				{
+					for (int i = 0; i < Tiles.size(); i++)
+					{
+						if (Tiles[i].MetaTileType == TILE_BREAK_ON_TOUCH)
+						{
+							TheMap->SetForegroundTile(Tiles[i].Location.x, Tiles[i].Location.y, -1);
+							TheMap->SetMetaLayerTile(Tiles[i].Location.x, Tiles[i].Location.y, TILE_NONE);
+
+							int SpawnX = Tiles[i].Location.x * 64;
+							int SpawnY = Tiles[i].Location.y * 64;
+							SimpleSprites.push_back(new BrickBreakSprite(SpawnX, SpawnY - 32, -4));
+							SimpleSprites.push_back(new BrickBreakSprite(SpawnX + 32, SpawnY - 32, 4));
+							SimpleSprites.push_back(new BrickBreakSprite(SpawnX, SpawnY + 32, -4));
+							SimpleSprites.push_back(new BrickBreakSprite(SpawnX + 32, SpawnY + 32, 4));
+
+							Mix_PlayChannel(CHANNEL_BREAK_BRICK, BreakBrickSound, 0);
+						}
+					}
+				}
+			}
+		}		
 	}
 	else if (bGotBricked)
 	{
