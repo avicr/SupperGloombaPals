@@ -57,7 +57,7 @@ public:
 	void UpdateWarpExitSequence();
 	virtual void CheckCollisionWithSprites();
 	void AddCoins(int Amount);
-	void AddRedCoins(int Amount);
+	void AddRedCoins(int Amount, int TileX, int TileY);
 	void AddScore(int Amount, int PointSpriteX = -1, int PointSpriteY = -1, bool bIsOneUp = false);
 	void IncreaseStompCounter(int Amount);
 	void SetColorModForAllTextures(SDL_Color ColorMod);
@@ -66,6 +66,7 @@ public:
 	void UpdateDyingAnimation();
 	void DrawHUD();
 	void BeginLevel();
+	void EndLevel();
 	int GetHeight() { return Rect.h; }
 	int GetLives() { return Lives; }
 	bool IsDead();

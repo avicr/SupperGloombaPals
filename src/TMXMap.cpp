@@ -13,6 +13,55 @@
 
 using namespace std;
 
+TMXLayer::TMXLayer(char *InName, int InWidth, int InHeight, const char* LayerData)
+{
+	stringstream ss(LayerData);
+	bool bIsCollisionLayer = false;
+
+	if (strcmp(InName, "Collision") == 0)
+	{
+		bIsCollisionLayer = true;
+	}
+
+	strcpy_s(Name, InName);
+	Width = InWidth;
+	Height = InHeight;
+
+	TileData = new int*[Height];
+	for (int y = 0; y < Height; y++)
+	{
+		TileData[y] = new int[Width];
+
+		for (int x = 0; x < Width; x++)
+		{
+
+			string substr;
+			getline(ss, substr, ',');
+			
+			// Subtract one so we can use 0 based index
+			TileData[y][x] = std::stoi(substr) - 1;
+						
+			if (bIsCollisionLayer)
+			{
+				if (TileData[y][x] - TheMap->GetMetaTileGID() == TILE_RED_COIN)
+				{
+					if (TheGame->HasRedCoinBeenGathered(x, y))
+					{
+						TileData[y][x] = TILE_COIN + TheMap->GetMetaTileGID();
+					}
+				}
+				else if (TileData[y][x] - TheMap->GetMetaTileGID() == TILE_RED_COIN_BLOCK)
+				{
+					if (TheGame->HasRedCoinBeenGathered(x, y))
+					{
+						TileData[y][x] = TILE_COIN_BLOCK + TheMap->GetMetaTileGID();
+					}
+				}
+			}
+		}
+	}
+}
+
 bool MultiCoinManager::Tick()
 {	
 	Timer++;
@@ -1278,7 +1327,7 @@ void TMXMap::HandleCollision(int TileX, int TileY, bool bCanBreakBricks)
 				SimpleSprites.push_back(new CoinEffectSprite(TileX * 64, TileAboveY * 64, COIN_RED));
 				TheMap->SetForegroundTile(TileX, TileAboveY, -1);
 				TheMap->SetMetaLayerTile(TileX, TileAboveY, TILE_NONE);
-				ThePlayer->AddRedCoins(1);
+				ThePlayer->AddRedCoins(1, TileX, TileAboveY);
 				ThePlayer->AddScore(1000);
 			}
 		}
@@ -1291,7 +1340,7 @@ void TMXMap::HandleCollision(int TileX, int TileY, bool bCanBreakBricks)
 	{
 		if (MetaTileType == TILE_RED_COIN_BLOCK || MetaTileType == TILE_RED_COIN)
 		{
-			ThePlayer->AddRedCoins(1);
+			ThePlayer->AddRedCoins(1, TileX, TileY);
 			ThePlayer->AddScore(1000);
 		}
 		else

@@ -86,7 +86,10 @@ int SpecialEventKeys[] =
 {
 	0,
 	640,
-	6400
+	6400,
+	583,
+	7983,
+	249
 };
 
 string SpecialEventDescprtions[] =
@@ -95,7 +98,8 @@ string SpecialEventDescprtions[] =
 	"Ground breaking!",
 	"That pipe used to work",
 	"There are no loading screens",
-	"Now you're thinking with portals"
+	"Now you're thinking with portals",
+	"Casual red coins"
 };
 
 int NormalExitKeys[10] =
@@ -230,6 +234,7 @@ int main(int argc, char **argv)
 
 	do
 	{
+		TheGame->StartGame();
 		if (!DoTitleScreen())
 		{
 			break;
@@ -507,7 +512,7 @@ int GameLoop()
 				}
 			}			
 		}
-		TheGame->EndLevel();
+		TheGame->EndLevel();		
 	}
 
 	if (ThePlayer->GetLives() <= 0)

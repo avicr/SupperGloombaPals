@@ -401,7 +401,7 @@ void PlayerSprite::Tick(double DeltaTime)
 			// Prevent the coin from firing multiple times
 			if (!ThePlayer->IsChangingSize())
 			{
-				AddRedCoins(1);
+				AddRedCoins(1, HitTiles[i].Location.x, HitTiles[i].Location.y);
 				AddScore(1000);
 			}
 		}
@@ -1099,16 +1099,12 @@ void PlayerSprite::AddCoins(int Amount)
 	Mix_PlayChannel(CHANNEL_COIN, CoinSound, 0);
 }
 
-void PlayerSprite::AddRedCoins(int Amount)
+void PlayerSprite::AddRedCoins(int Amount, int TileX, int TileY)
 {
-	NumRedCoins += Amount;
+	NumRedCoins += Amount;	
 
-	if (Coins >= 5)
-	{
-		// TODO: Add an event
-	}	
-
-	Mix_PlayChannel(CHANNEL_COIN, RedCoinSound, 0);
+	TheGame->AddGatheredRedCoinLocation({ TileX, TileY });
+	Mix_PlayChannel(CHANNEL_RED_COIN, RedCoinSound, 0);
 }
 
 void PlayerSprite::AddScore(int Amount, int PointSpriteX, int PointSpriteY, bool bIsOneUp)
@@ -1812,7 +1808,7 @@ void PlayerSprite::DrawHUD()
 void PlayerSprite::BeginLevel()
 {			
 	SetAnimationPlayRate(1);
-	NumRedCoins = 0;
+	NumRedCoins = TheGame->GetNumberOfRedCoinsFound();
 	RenderLayer = RENDER_LAYER_TOP;	
 	bDrawHUD = true;
 	bExitedLevel = false;
@@ -1882,6 +1878,11 @@ void PlayerSprite::BeginLevel()
 		RenderLayer = RENDER_LAYER_BEHIND_FG;
 		bDrawHUD = false;
 	}
+}
+
+void PlayerSprite::EndLevel()
+{
+	NumRedCoins = 0;
 }
 
 bool PlayerSprite::IsDead()

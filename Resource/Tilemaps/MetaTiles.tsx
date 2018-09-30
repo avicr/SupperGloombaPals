@@ -47,4 +47,6 @@
   </properties>
  </tile>
  <tile id="18" type="FLAG_POLE"/>
+ <tile id="20" type="RED_COIN"/>
+ <tile id="21" type="RED_COIN"/>
 </tileset>

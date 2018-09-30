@@ -12,9 +12,7 @@ Game::Game()
 	GameState = STATE_PRE_LEVEL;
 	CurrentLevel = 0;
 	bLevelComplete = false;
-	NumberOfTimesPortaled = 0;
-
-	StartGame();
+	NumberOfTimesPortaled = 0;	
 }
 
 void Game::LoadCurrentLevel()
@@ -53,9 +51,9 @@ void Game::StartLevel()
 	}
 
 	EnforceWarpControls(InitialWarp);
-
+	
 	ThePlayer->BeginLevel();
-	ThePlayer->SetPosition(InitialWarp.PosX, (InitialWarp.PosY - 1) - (ThePlayer->GetHeight() - 64));
+	ThePlayer->SetPosition(InitialWarp.PosX, (InitialWarp.PosY - 1) - (ThePlayer->GetHeight() - 64));	
 }
 
 //void Game::AdvanceLevel()
@@ -85,6 +83,7 @@ void Game::EndLevel()
 	delete TheMap;
 	TheMap = new TMXMap();
 	WriteSaveFile();
+	ThePlayer->EndLevel();
 }
 
 void Game::HandleControl(ControlTrigger* Control)
@@ -422,6 +421,27 @@ int Game::GetCurrentLevelIndex()
 }
 
 void Game::AddGatheredRedCoinLocation(SDL_Point RedCoinLocation)
-{
+{	
 	GatheredRedCoinLocations.push_back(RedCoinLocation);
+
+	if (GatheredRedCoinLocations.size() == 5)
+	{
+		if (CurrentLevel == 2)
+		{
+			HandleSpecialEvent(SPECIAL_EVENT_RED_COINS_2);
+		}
+	}
+}
+
+bool Game::HasRedCoinBeenGathered(int TileX, int TileY)
+{
+	for (int i = 0; i < GatheredRedCoinLocations.size(); i++)
+	{
+		if (GatheredRedCoinLocations[i].x == TileX && GatheredRedCoinLocations[i].y == TileY)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }

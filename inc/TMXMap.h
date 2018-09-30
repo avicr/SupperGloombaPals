@@ -174,30 +174,7 @@ struct TMXLayer
 
 	int** TileData = NULL;
 
-	TMXLayer(char *InName, int InWidth, int InHeight, const char* LayerData)
-	{
-		stringstream ss(LayerData);
-
-		strcpy_s(Name, InName);		
-		Width = InWidth;
-		Height = InHeight;
-
-		TileData = new int*[Height];
-		for (int y = 0; y < Height; y++)
-		{
-			TileData[y] = new int[Width];
-			
-			for (int x = 0; x < Width; x++)
-			{
-
-				string substr;
-				getline(ss, substr, ',');									
-				
-				// Subtract one so we can use 0 based index
-				TileData[y][x] = std::stoi(substr) - 1;			
-			}			
-		}		
-	}
+	TMXLayer(char *InName, int InWidth, int InHeight, const char* LayerData);
 	~TMXLayer()
 	{
 		if (TileData)
@@ -383,7 +360,9 @@ protected:
 	void LoadControl(TiXmlElement* ControlElement);
 	void ReleaseAssets();
 	
+
 public:
+	int GetMetaTileGID() { return MetaTileGID; }
 	void ReadMap(const char* FileName);
 	void Render(SDL_Renderer* Renderer, int ScreenX, int ScreenY, int SourceWidth, int SourceHeight);
 	void RenderLayer(const TMXLayer* Layer, SDL_Renderer* Renderer, int ScreenX, int ScreenY, int SourceWidth, int SourceHeight);
@@ -434,7 +413,7 @@ public:
 	SDL_Point GetPlayerFlagPosition() { return{ PlayerFlagX, PlayerFlagY }; }
 	eBrickBreakTilesetID GetBrickTilesetID() { return BrickTilesetID; }
 	AnimationResource* GetBrickBounceAnimForBrickTileset();
-	AnimationResource* GetEmptyBlockBounceAnimForBrickTileset();
+	AnimationResource* GetEmptyBlockBounceAnimForBrickTileset();	
 
 	SDL_Rect GetVisibleWindow();	
 

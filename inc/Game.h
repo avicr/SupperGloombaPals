@@ -58,7 +58,7 @@ public:
 
 	void StartLevel();	
 	void EndLevel();
-	void EnforceWarpControls(WarpExit ControlWarp);
+	void EnforceWarpControls(struct WarpExit ControlWarp);
 
 	void HandleControl(ControlTrigger* InControl);
 
@@ -89,5 +89,7 @@ public:
 	string GetWorldName();
 	int GetCurrentLevelIndex();
 	void AddGatheredRedCoinLocation(SDL_Point RedCoinLocation);
+	bool HasRedCoinBeenGathered(int TileX, int TileY);
+	int GetNumberOfRedCoinsFound() { return GatheredRedCoinLocations.size(); }
 
 };
