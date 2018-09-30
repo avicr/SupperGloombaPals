@@ -213,7 +213,7 @@
     <property name="musicchange" type="int" value="1"/>
     <property name="scrolloffsetx" type="int" value="-192"/>
     <property name="scrolloffsety" type="int" value="-740"/>
-    <property name="scrollvelocityx" type="int" value="5"/>
+    <property name="scrollvelocityx" type="int" value="3"/>
     <property name="scrollvelocityy" type="int" value="0"/>
    </properties>
   </object>

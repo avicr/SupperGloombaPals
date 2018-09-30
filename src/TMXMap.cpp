@@ -973,10 +973,11 @@ void TMXMap::ReleaseAssets()
 
 void TMXMap::StartLevel()
 {
-	ScrollVelocityX = 4;
+	ScrollVelocityX = 0;
 	ScrollVelocityY = 0;
-	bAutoScrollX = true;
+	bAutoScrollX = false;
 	bAutoScrollY = false;
+
 	bPlayingLevel = true;	
 }
 
