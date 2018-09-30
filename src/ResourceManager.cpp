@@ -32,6 +32,7 @@ INIT_TEXTURE_RESOURCE(FlagTexture)
 INIT_TEXTURE_RESOURCE(SecretFlagTexture)
 INIT_TEXTURE_RESOURCE(PlayerFlagTexture)
 INIT_TEXTURE_RESOURCE(EventBoxTexture)
+INIT_TEXTURE_RESOURCE(PlantTexture)
 
 INIT_ANIMATION_RESOURCE(PlayerGoombaAnimation)
 INIT_ANIMATION_RESOURCE(PlayerGoombaTallAnimation)
@@ -53,6 +54,7 @@ INIT_ANIMATION_RESOURCE(TurtleAnimation)
 INIT_ANIMATION_RESOURCE(StarAnimation)
 INIT_ANIMATION_RESOURCE(GoombaShrinkAnimation)
 INIT_ANIMATION_RESOURCE(FireworkAnimation)
+INIT_ANIMATION_RESOURCE(PlantAnimation)
 
 ResourceManager::ResourceManager()
 {

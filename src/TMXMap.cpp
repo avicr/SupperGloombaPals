@@ -676,6 +676,7 @@ void TMXMap::Render(SDL_Renderer* Renderer, int ScreenX, int ScreenY, int Source
 		if (Layers[i] == ForegroundLayer)
 		{
 			ItemSprites.Render(Renderer, RENDER_LAYER_BEHIND_FG);
+			EnemySprites.Render(Renderer, RENDER_LAYER_BEHIND_FG);
 
 			if (bPlayingLevel && (ThePlayer->IsWarping() || ThePlayer->GetRenderLayer() == RENDER_LAYER_BEHIND_FG))
 			{				

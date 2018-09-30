@@ -17,6 +17,14 @@ enum eGiantGoombaState
 	GIANT_STATE_CHASE
 };
 
+enum ePlantState
+{
+	PLANT_STATE_RETRACTED = 0,
+	PLANT_STATE_GOING_UP,
+	PLANT_STATE_EXTENDED,
+	PLANT_STATE_GOING_DOWN,	
+};
+
 class EnemySprite : public PhysicsSprite
 {
 public:
@@ -103,4 +111,20 @@ public:
 
 	virtual void GetStomped();
 	void UpdateScale();
+};
+
+class PlantEnemySprite : public EnemySprite
+{
+protected:
+	ePlantState CurrentState;
+
+	// TODO: Static counter so the plants can animate in sync
+	//static int AnimFrameCount;
+public:
+	PlantEnemySprite(EnemySpawnPoint* Spawner);
+
+	virtual void Tick(double DeltaTime);
+	void EnterState(ePlantState NewState);
+	void LeaveState(ePlantState PreviousState);
+	bool IsStompable() { return false; }
 };

@@ -638,8 +638,8 @@
   <object id="181" gid="202" x="16832" y="8256" width="64" height="64"/>
   <object id="182" gid="202" x="17024" y="8256" width="64" height="64"/>
   <object id="184" gid="202" x="17600" y="7744" width="64" height="64"/>
-  <object id="185" gid="202" x="17904" y="8000" width="64" height="64"/>
-  <object id="186" gid="202" x="17984" y="8000" width="64" height="64"/>
+  <object id="185" gid="202" x="17856" y="8000" width="64" height="64"/>
+  <object id="186" gid="202" x="17950" y="8000" width="64" height="64"/>
   <object id="187" gid="202" x="19200" y="8256" width="64" height="64"/>
   <object id="188" gid="202" x="19312" y="8256" width="64" height="64"/>
   <object id="189" gid="202" x="19427" y="8256" width="64" height="64"/>

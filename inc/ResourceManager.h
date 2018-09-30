@@ -47,6 +47,7 @@ public:
 	DECLARE_TEXTURE_RESOURCE(BrickBounceUSpriteTexture, "BrickBounceSpriteU.bmp", false)
 	DECLARE_TEXTURE_RESOURCE(EGoombaSpriteTexture, "egoomba.bmp", false)
 	DECLARE_TEXTURE_RESOURCE(EGoombaFlagTexture, "egoombasmash.bmp", false)
+	DECLARE_TEXTURE_RESOURCE(PlantTexture, "plant.bmp", false)
 	DECLARE_TEXTURE_RESOURCE(CoinEffectTexture, "coineffect.bmp", false)
 	DECLARE_TEXTURE_RESOURCE(RedCoinEffectTexture, "redcoineffect.bmp", false)
 	DECLARE_TEXTURE_RESOURCE(BigMushroomTexture, "bigmushroom.bmp", false)
@@ -355,6 +356,21 @@ public:
 		}
 	}
 	END_DECLARE_ANIMATION_RESOURCE(TurtleAnimation)
+
+	BEGIN_DECLARE_ANIMATION_RESORCE(PlantAnimation)
+	{
+		bUseAbsoluteFrameCount = true;
+
+		for (int i = 0; i < 2; i++)
+		{
+			int SpriteWidth = 64;
+			int SpriteHeight = 128;
+			SDL_Rect SrcRect = { i * SpriteWidth, 0, SpriteWidth, SpriteHeight };
+
+			Frames.push_back(new Frame(ResourceManager::PlantTexture, SrcRect, 8));
+		}
+	}
+	END_DECLARE_ANIMATION_RESOURCE(PlantAnimation)
 
 	BEGIN_DECLARE_ANIMATION_RESORCE(StarAnimation)
 	{

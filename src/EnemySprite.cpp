@@ -796,3 +796,86 @@ void GiantGoomba::GetBricked(int TileX, int TileY)
 	// TODO: If the player doesn't have a star, play the music
 	Mix_PlayMusic(BGMusic, -1);
 }
+
+PlantEnemySprite::PlantEnemySprite(EnemySpawnPoint* Spawner) :
+	EnemySprite(Spawner)
+{
+	Sprite::Sprite(GResourceManager->PlantTexture->Texture);
+
+	DyingCount = 0;
+	CollisionRect = { 10, 50, 48, 44 };
+	
+	RenderLayer = RENDER_LAYER_BEHIND_FG;
+	
+	PlayAnimation(GResourceManager->PlantAnimation);
+	EnterState(PLANT_STATE_RETRACTED);
+}
+
+void PlantEnemySprite::EnterState(ePlantState NewState)
+{
+
+	// Don't do anything if we're trying to go up and the player is too close
+	bool bPlayerTooClose = PosX - (ThePlayer->GetPosX() + ThePlayer->GetWidth()) <= 96 &&
+		                   ThePlayer->GetPosX() - (PosX + Rect.w) <= 96;
+
+	if (NewState == PLANT_STATE_GOING_UP && bPlayerTooClose)
+	{
+
+		return;
+	}
+
+	if (NewState > PLANT_STATE_GOING_DOWN)
+	{
+		NewState = PLANT_STATE_RETRACTED;
+	}
+
+	switch (NewState)
+	{
+	case PLANT_STATE_RETRACTED:
+		CountDown = 74;
+		VelocityY = 0;
+		break;
+
+	case PLANT_STATE_GOING_UP:
+		CountDown = 62;
+		VelocityY = -2;
+		break;
+
+	case PLANT_STATE_EXTENDED:
+		CountDown = 74;
+		VelocityY = 0;
+		break;
+
+	case PLANT_STATE_GOING_DOWN:
+		CountDown = 62;
+		VelocityY = 2;
+		break;
+
+	default:
+		break;
+	}
+	CurrentState = NewState;
+}
+void PlantEnemySprite::LeaveState(ePlantState PreviousState)
+{
+
+}
+
+void PlantEnemySprite::Tick(double DeltaTime)
+{
+	Sprite::Tick(DeltaTime);
+
+	PosX += VelocityX;
+	PosY += VelocityY;
+
+	Rect.x = PosX;
+	Rect.y = PosY;
+
+	CountDown--;
+
+	if (CountDown <= 0)
+	{
+		LeaveState(CurrentState);
+		EnterState((ePlantState)(CurrentState + 1));
+	}
+}
