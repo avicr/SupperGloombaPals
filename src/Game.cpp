@@ -87,7 +87,12 @@ void Game::EndLevel()
 }
 
 void Game::HandleControl(ControlTrigger* Control)
-{
+{	
+	if (Control->Event == EVENT_FREEZE_PLAYER)
+	{
+		ThePlayer->SetFrozen(true);
+	}
+
 	if (Control->bIsCheckPoint)
 	{
 		ActiveCheckpointControl = *Control;
@@ -409,7 +414,7 @@ void Game::DetermineCurrentLevel()
 		CurrentLevel = 0;
 	}
 
-	CurrentLevel = 4;
+	CurrentLevel = 6;
 }
 
 string Game::GetWorldName()

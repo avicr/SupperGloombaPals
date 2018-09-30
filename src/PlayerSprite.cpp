@@ -24,7 +24,7 @@ void PlayerSprite::Tick(double DeltaTime)
 	double VerticalScrollDelta = PosY;
 	// Skip physics tick!
 	Sprite::Tick(DeltaTime);	
-
+	
 	// We have entered the castle, wait a few frames
 	if (EndOfLevelCountdown && bExitingLevel)
 	{
@@ -119,6 +119,13 @@ void PlayerSprite::Tick(double DeltaTime)
 	{	
 		return;
 	}
+
+	// Launch if we stomped last frame
+	if (bStompedLastFrame)
+	{
+		Launch();
+	}
+	bStompedLastFrame = false;
 
 	bool bCollided = false;
 	bool bWasInAirLastFrame = bIsInAir;	
@@ -636,7 +643,8 @@ void PlayerSprite::HandleInput(double DeltaTime)
 {
 	MovingFlags = MOVING_NONE;
 
-	if (EndOfLevelCountdown)
+
+	if (EndOfLevelCountdown || bFrozen)
 	{
 		return;
 	}
@@ -1151,15 +1159,16 @@ void PlayerSprite::Stomp(Sprite* Other)
 	AddScore(StompPoints[StompCount], Other->GetPosX(), Other->GetPosY(), bIsOneUp);
 	IncreaseStompCounter(1);
 	Mix_PlayChannel(CHANNEL_STOMP, StompSound, 0);	
-	Launch();
+	bStompedLastFrame = true;
+	//Launch();
 }
 
 void PlayerSprite::Launch()
 {
 	if (IsOnGround())
 	{		
-		PosY--;
-		Rect.y--;
+		PosY-=2;
+		Rect.y-=2;
 	}
 
 	VelocityY = -16;
@@ -1809,6 +1818,8 @@ void PlayerSprite::DrawHUD()
 void PlayerSprite::BeginLevel()
 {			
 	SetAnimationPlayRate(1);
+	bStompedLastFrame = false;
+	bFrozen = false;
 	NumRedCoins = TheGame->GetNumberOfRedCoinsFound();
 	RenderLayer = RENDER_LAYER_TOP;	
 	bDrawHUD = true;

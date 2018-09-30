@@ -47,6 +47,12 @@ enum eWarpType
 	WARP_CONTROL = 255
 };
 
+enum eControlEvent
+{
+	EVENT_NONE = 0,
+	EVENT_FREEZE_PLAYER
+};
+
 enum eBrickBreakTilesetID
 {
 	BRICK_TILESET_OVERWORLD = 0,
@@ -113,6 +119,7 @@ struct ControlTrigger
 	int WarpID = 0;
 	int ID = -1;
 	bool bTriggered = false;
+	eControlEvent Event;
 	
 	bool bResetWhenPlayerLeaves = true;
 	enum eSpecialEvent SpecialEvent = SPECIAL_EVENT_NONE;
@@ -382,6 +389,12 @@ public:
 
 	double GetScrollX() { return ScrollX; }
 	double GetScrollY() { return ScrollY; }
+
+	void SetAutoScrollX(double InVelocityX, bool bKillWhenSquished = true)
+	{
+		ScrollVelocityX = InVelocityX; 
+		bAutoScrollX = bKillWhenSquished;
+	}
 	void ToggleRenderCollision();
 
 	eTileMetaType GetMetaTileType(int TileX, int TileY);
@@ -422,6 +435,7 @@ public:
 	AnimationResource* GetBrickBounceAnimForBrickTileset();
 	AnimationResource* GetEmptyBlockBounceAnimForBrickTileset();	
 	void OnPlayerDie();
+	double GetScrollVelocityX() { return ScrollVelocityX; }
 
 	SDL_Rect GetVisibleWindow();	
 	void AutoScroll();

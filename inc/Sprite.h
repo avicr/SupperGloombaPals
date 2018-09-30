@@ -81,6 +81,8 @@ public:
 	virtual void Interact(class PlayerSprite *OtherSprite) {};
 	virtual void Interact(class ItemSprite *OtherSprite) {};
 	virtual SDL_Rect GetScreenSpaceCollisionRect();	
+	virtual void SetVelocityX(double NewVelocityX) { VelocityX = NewVelocityX; }
+	virtual void SetVelocityY(double NewVelocityY) { VelocityY = NewVelocityY; }
 
 	// Returns the collision rect with width and height set to multiples of 64
 	virtual SDL_Rect GetScreenSpaceRect();
@@ -103,7 +105,7 @@ public:
 	virtual int GetScoreWorth() { return 0; }
 	double GetPosX() { return PosX; }
 	double GetPosY() { return PosY; }
-	bool InMapWindow(SDL_Point Offset = { 0, 0 });
+	virtual bool InMapWindow(SDL_Point Offset = { 0, 0 });
 	virtual void GetStomped();
 	virtual void GetKicked(PlayerSprite* Player);
 	virtual bool IsStompable();

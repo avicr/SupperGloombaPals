@@ -18,6 +18,10 @@ EnemySpawnPoint::EnemySpawnPoint(eEnemyType InEnemyType, int X, int Y)
 	{
 		SetTexture(GResourceManager->TurtleTexture->Texture);
 	}
+	if (EnemyType == ENEMY_GIANT_GOOMBA)
+	{
+		bCanSpawnWhileVisible = true;
+	}
 	SetWidth(64);
 	SetHeight(64);
 	SetPosition(X, Y);
@@ -81,6 +85,12 @@ void EnemySpawnPoint::SpawnEnemy()
 		NewEnemy->SetPosition(PosX, PosY - 64);
 		NewEnemy->SetWidth(64);
 		NewEnemy->SetHeight(128);
+		EnemySprites.push_back(NewEnemy);
+	}
+	else if (EnemyType == ENEMY_GIANT_GOOMBA)
+	{
+		EnemySprite* NewEnemy = new GiantGoomba(this);
+		NewEnemy->SetPosition(PosX + 340, PosY - GIANT_GOOMBA_SIZE + 64);
 		EnemySprites.push_back(NewEnemy);
 	}
 }

@@ -242,7 +242,7 @@ void Sprite::Render(SDL_Renderer* Renderer, int ResourceNum)
 			DstRect.x -= TheMap->GetScrollX();
 			DstRect.y -= TheMap->GetScrollY();
 		}
-
+		
 		DstRect.w *= Scale;
 		DstRect.h *= Scale;
 

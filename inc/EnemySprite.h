@@ -10,6 +10,13 @@ enum eTurtleState
 	TURTLE_STATE_SHELL_SLIDE = 2
 };
 
+enum eGiantGoombaState
+{
+	GIANT_STATE_WALK_TO_START = 0,
+	GIANT_STATE_MUSHROOM,
+	GIANT_STATE_CHASE
+};
+
 class EnemySprite : public PhysicsSprite
 {
 public:
@@ -59,4 +66,38 @@ protected:
 	eTurtleState TurtleState;
 	int StompCooldown;
 	int KillCount;
+};
+
+class GiantGoomba : public GoombaEnemySprite
+{
+protected:
+	eGiantGoombaState CurrentState;
+	double ScaleTarget;
+	double ScaleRate;
+	double DestinationX;
+	int ScaleCountDown;
+
+	void EnterState(eGiantGoombaState NewState);
+	void LeaveState(eGiantGoombaState PreviousState);
+
+	void LoadGiantTexture();	
+	virtual void Interact(ItemSprite* Item);
+	virtual bool Interact(EnemySprite* Enemy);
+
+	void OnInteractedWith(EnemySprite* Other) {}
+	void HandleMovement();
+	virtual void Interact(Sprite *OtherSprite);
+
+public:
+	GiantGoomba(EnemySpawnPoint* Spawner);
+	~GiantGoomba();
+
+	void Tick(double DeltaTime);
+	virtual SDL_Rect GetScreenSpaceCustomRect();
+	virtual void Render(SDL_Renderer* Renderer, int ResourceNum);
+	bool InMapWindow(SDL_Point Offset = { 0, 0 });
+	SDL_Rect GetScreenSpaceCollisionRect();
+
+	virtual void GetStomped();
+	void UpdateScale();
 };

@@ -78,12 +78,22 @@ public:
 	void UpdateFlagPoleAnimation();
 	void OnFlagFinished();
 	bool HasExitedLevel();	
+	void SetFrozen(bool bInFrozen) 
+	{
+		bFrozen = bInFrozen; 
+		if (bFrozen)
+		{
+			VelocityX = 0;
+		}
+	}
 
 	//virtual SDL_Rect GetScreenSpaceCustomRect();
 
 	PlayerSprite();
 
 protected:
+	bool bStompedLastFrame;
+	bool bFrozen;
 	bool bDrawHUD;
 	bool bExitedLevel;
 	int EndOfLevelCountdown;

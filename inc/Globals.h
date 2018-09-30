@@ -198,6 +198,8 @@ extern float RenderScale;
 #define SCREEN_WIDTH 1024
 #define SCREEN_HEIGHT 896
 
+#define GIANT_GOOMBA_SIZE 320
+
 #define UGLY_TIME 48
 
 void CreateWindow2();

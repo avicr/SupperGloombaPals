@@ -5,7 +5,11 @@
 enum eEnemyType
 {
 	ENEMY_GOOMBA = 0,
-	ENEMY_TURTLE
+	ENEMY_TURTLE,
+	ENEMY_PLANT,
+	ENEMY_RESERVED,
+	ENEMY_RESERVED2,
+	ENEMY_GIANT_GOOMBA
 };
 
 class EnemySpawnPoint : public Sprite

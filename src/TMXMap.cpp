@@ -459,6 +459,13 @@ void TMXMap::LoadControl(TiXmlElement* ControlElement)
 
 			NewControl->SpecialEvent = (eSpecialEvent) SpecialEvent;
 		}
+		else if (strcmp(PropElem->Attribute("name"), "event") == 0)
+		{
+			int Event = 0;
+			PropElem->QueryIntAttribute("value", &Event);
+
+			NewControl->Event = (eControlEvent)Event;
+		}
 		
 		PropElem = PropElem->NextSiblingElement();
 	}	
@@ -1427,7 +1434,7 @@ void TMXMap::Tick(double DeltaTime)
 	}
 
 	// Apply scroll velocities
-	if (ScrollVelocityX || ScrollVelocityY)
+	if (!ThePlayer->IsChangingSize() && (ScrollVelocityX || ScrollVelocityY))
 	{
 		AutoScroll();
 	}
