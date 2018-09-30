@@ -807,8 +807,10 @@ PlantEnemySprite::PlantEnemySprite(EnemySpawnPoint* Spawner) :
 	
 	RenderLayer = RENDER_LAYER_BEHIND_FG;
 	
+	CurrentState = PLANT_STATE_RETRACTED;
 	PlayAnimation(GResourceManager->PlantAnimation);
-	EnterState(PLANT_STATE_RETRACTED);
+	SetPosition(Spawner->GetPosX(), Spawner->GetPosY() - 64);
+	EnterState(PLANT_STATE_GOING_UP);
 }
 
 void PlantEnemySprite::EnterState(ePlantState NewState)

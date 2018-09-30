@@ -74,7 +74,7 @@ void PlayerSprite::Tick(double DeltaTime)
 
 	// Check for pit death
 	int KillY = TheMap->GetKillY();
-	if (KillY != -1 && PosY >= KillY)
+	if (!IsWarping() && KillY != -1 && PosY >= KillY)
 	{
 		bSpriteVisible = false;
 		BeginDie();
@@ -549,7 +549,7 @@ bool PlayerSprite::Interact(EnemySprite* Enemy)
 		{
 			Kick(Enemy);
 		}
-		else if (InvincibleCount <= 0)
+		else if (InvincibleCount <= 0 && !IsWarping())
 		{			
 			TakeDamage();
 			SDL_Log("You got hit sucker");			
@@ -1538,6 +1538,7 @@ void PlayerSprite::UpdateWarpSequence()
 			else if (WarpSeq.FrameCount > 58 || (WarpSeq.Entrance.bQuickTransition && WarpSeq.Entrance.WarpType == WARP_INSTANT))
 			{				
 				WarpSeq.bWarpComplete = true;
+				SetPosition(WarpSeq.Exit.PosX, (WarpSeq.Exit.PosY - 1) - (Rect.h - 64));
 				
 				if (WarpSeq.Entrance.WarpType == WARP_PIPE_LEFT_FIRST_WINDOW)
 				{
@@ -1548,6 +1549,7 @@ void PlayerSprite::UpdateWarpSequence()
 		else if (WarpSeq.Entrance.WarpType == WARP_INSTANT)
 		{
 			WarpSeq.bWarpComplete = true;
+			SetPosition(WarpSeq.Exit.PosX, (WarpSeq.Exit.PosY - 1) - (Rect.h - 64));
 		}
 
 		Rect.x = PosX;// -TheMap->GetScrollX();
@@ -1574,7 +1576,7 @@ void PlayerSprite::UpdateWarpExitSequence()
 {
 	if (WarpSeq.FrameCount == 0)
 	{
-		SetPosition(WarpSeq.Exit.PosX, (WarpSeq.Exit.PosY - 1) - (Rect.h - 64));
+		//SetPosition(WarpSeq.Exit.PosX, (WarpSeq.Exit.PosY - 1) - (Rect.h - 64));
 		VelocityX = 0;
 		VelocityY = 0;
 		TheMap->DoWarp(WarpSeq.Exit);

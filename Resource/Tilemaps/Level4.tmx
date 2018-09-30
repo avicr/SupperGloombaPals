@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="1.1.6" orientation="orthogonal" renderorder="right-down" width="268" height="48" tilewidth="64" tileheight="64" infinite="0" nextobjectid="172">
+<map version="1.0" tiledversion="1.1.6" orientation="orthogonal" renderorder="right-down" width="268" height="48" tilewidth="64" tileheight="64" infinite="0" nextobjectid="173">
  <tileset firstgid="1" source="Basic64x64.tsx"/>
  <tileset firstgid="101" source="Basic32x32.tsx"/>
  <tileset firstgid="191" source="MetaTiles.tsx"/>
@@ -206,7 +206,7 @@
   <object id="40" gid="196" x="2112" y="1024" width="64" height="64">
    <properties>
     <property name="killy" type="int" value="1183"/>
-    <property name="locknegativex" type="bool" value="true"/>
+    <property name="locknegativex" type="bool" value="false"/>
     <property name="locknegativey" type="bool" value="true"/>
     <property name="lockx" type="int" value="0"/>
     <property name="locky" type="int" value="1"/>
@@ -374,17 +374,17 @@
     <property name="ENEMY_ID" type="int" value="1"/>
    </properties>
   </object>
-  <object id="169" gid="203" x="5856" y="832" width="64" height="64">
+  <object id="169" gid="203" x="5856" y="896" width="64" height="64">
    <properties>
     <property name="ENEMY_ID" type="int" value="2"/>
    </properties>
   </object>
-  <object id="170" gid="203" x="12384" y="960" width="64" height="64">
+  <object id="170" gid="203" x="12384" y="1024" width="64" height="64">
    <properties>
     <property name="ENEMY_ID" type="int" value="2"/>
    </properties>
   </object>
-  <object id="171" gid="203" x="3296" y="2176" width="64" height="64">
+  <object id="171" gid="203" x="3296" y="2240" width="64" height="64">
    <properties>
     <property name="ENEMY_ID" type="int" value="2"/>
    </properties>

@@ -21,6 +21,7 @@ EnemySpawnPoint::EnemySpawnPoint(eEnemyType InEnemyType, int X, int Y)
 	}
 	if (EnemyType == ENEMY_PLANT)
 	{
+		bCanSpawnWhileVisible = true;
 		SetTexture(GResourceManager->PlantTexture->Texture);
 	}
 	if (EnemyType == ENEMY_GIANT_GOOMBA)
