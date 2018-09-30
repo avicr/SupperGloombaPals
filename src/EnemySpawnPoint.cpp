@@ -4,6 +4,7 @@
 
 EnemySpawnPoint::EnemySpawnPoint(eEnemyType InEnemyType, int X, int Y)
 {
+	bRespawn = true;
 	bCanSpawnWhileVisible = false;
 	bHasSpawnedEnemy = false;
 	bInRange = false;
@@ -21,6 +22,7 @@ EnemySpawnPoint::EnemySpawnPoint(eEnemyType InEnemyType, int X, int Y)
 	if (EnemyType == ENEMY_GIANT_GOOMBA)
 	{
 		bCanSpawnWhileVisible = true;
+		bRespawn = false;
 	}
 	SetWidth(64);
 	SetHeight(64);
@@ -97,5 +99,8 @@ void EnemySpawnPoint::SpawnEnemy()
 
 void EnemySpawnPoint::OnEnemyDestroyed()
 {
-	bHasSpawnedEnemy = false;
+	if (bRespawn)
+	{
+		bHasSpawnedEnemy = false;
+	}
 }

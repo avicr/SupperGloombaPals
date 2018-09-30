@@ -169,6 +169,7 @@ extern Mix_Chunk* FlagPoleSound;
 extern Mix_Chunk* FireworkSound;
 
 extern Mix_Music *BGMusic;
+extern Mix_Music *ChaseMusic;
 extern Mix_Music *UndergroundMusic;
 extern Mix_Music *StarmanMusic;
 extern Mix_Music *DieMusic;
@@ -181,7 +182,7 @@ extern float RenderScale;
 // jump and bump share a channel
 #define VOLUME_NORMAL 30
 #define CHANNEL_JUMP 0
-#define CHANNEL_BUMP 0
+#define CHANNEL_BUMP 1
 #define CHANNEL_STOMP 2
 #define CHANNEL_BREAK_BRICK 3
 #define CHANNEL_COIN 4

@@ -1298,7 +1298,7 @@ bool PlayerSprite::IsWarping()
 
 void PlayerSprite::CheckCollisionWithSprites()
 {
-	if (bWarping)
+	if (bWarping || IsDying())
 	{
 		return;
 	}

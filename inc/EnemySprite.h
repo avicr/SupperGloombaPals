@@ -98,6 +98,7 @@ public:
 	virtual void Render(SDL_Renderer* Renderer, int ResourceNum);
 	bool InMapWindow(SDL_Point Offset = { 0, 0 });
 	SDL_Rect GetScreenSpaceCollisionRect();
+	void GetFired();
 
 	virtual void GetStomped();
 	void UpdateScale();

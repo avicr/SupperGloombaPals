@@ -6,7 +6,7 @@
 #include "../inc/SpriteList.h"
 #include "../inc/TMXMap.h"
 
-#define MUSHROOM_COUNTDOWN 330
+#define MUSHROOM_COUNTDOWN 420
 
 EnemySprite::EnemySprite(EnemySpawnPoint* Spawner)
 {
@@ -209,10 +209,20 @@ TurtleEnemySprite::TurtleEnemySprite(EnemySpawnPoint* Spawner) :
 	DyingCount = 0;
 	CollisionRect = { 6, 80, 56, 46 };
 	VelocityX = -2.1;
+
+	if (TheMap->GetScrollVelocityX() < 0)
+	{
+		VelocityX = 2.1;
+		SetFlip(SDL_FLIP_NONE);
+	}
+	else
+	{
+		SetFlip(SDL_FLIP_HORIZONTAL);
+	}
+
 	PlayAnimation(GResourceManager->TurtleAnimation);
 	SetWidth(64);
-	SetHeight(128);
-	SetFlip(SDL_FLIP_HORIZONTAL);
+	SetHeight(128);	
 }
 
 
@@ -395,12 +405,17 @@ void GiantGoomba::Tick(double DeltaTime)
 			NewMushroom->SetVelocityX(0);
 			NewMushroom->SetVelocityY(0.15);
 			ItemSprites.push_back(NewMushroom);			
+			Mix_PlayChannel(CHANNEL_POWER_UP, PowerUpSound, 0);
 		}
 		else if (CountDown == MUSHROOM_COUNTDOWN - 230 || CountDown == MUSHROOM_COUNTDOWN - 280)
 		{
 			JumpCount++;		
 			VelocityY = -20;
 			Mix_PlayChannel(CHANNEL_JUMP, JumpSound, 0);
+		}
+		else if (CountDown == MUSHROOM_COUNTDOWN - 305)
+		{
+			Mix_PlayMusic(ChaseMusic, -1);
 		}
 		else if (CountDown == 0)
 		{
@@ -451,10 +466,10 @@ void GiantGoomba::EnterState(eGiantGoombaState NewState)
 	case GIANT_STATE_CHASE:				
 		//PosY -= 448;
 		CollisionRect = { 0, 0, GIANT_GOOMBA_SIZE, GIANT_GOOMBA_SIZE };
-		VelocityX = -3.1;
+		VelocityX = -4;
 		CountDown = 4;	
 		ThePlayer->SetFrozen(false);
-		TheMap->SetAutoScrollX(-3);
+		TheMap->SetAutoScrollX(-4);	
 		break;	
 	default:
 		break;
@@ -582,14 +597,18 @@ void GiantGoomba::UpdateScale()
 
 void GiantGoomba::Interact(ItemSprite* Item)
 {
-	Item->Delete();
-	ScaleTarget += 0.08;
 
-	if (ScaleTarget > 1)
+	if (CurrentState == GIANT_STATE_MUSHROOM)
 	{
-		ScaleTarget = 1;
+		Item->Delete();
+		ScaleTarget += 0.08;
+
+		if (ScaleTarget > 1)
+		{
+			ScaleTarget = 1;
+		}
+		Mix_PlayChannel(CHANNEL_POWER_UP, PowerUpGetSound, 0);
 	}
-	Mix_PlayChannel(CHANNEL_POWER_UP, PowerUpGetSound, 0);
 }
 
 bool GiantGoomba::Interact(EnemySprite* Enemy)
@@ -625,6 +644,7 @@ void GiantGoomba::HandleMovement()
 						SimpleSprites.push_back(new BrickBreakSprite(SpawnX + 32, SpawnY + 32, 4));
 
 						Mix_PlayChannel(CHANNEL_BREAK_BRICK, BreakBrickSound, 0);
+						Mix_PlayChannel(CHANNEL_BUMP, BumpSound, 0);
 
 						TheMap->SetForegroundTile(Tiles[i].Location.x, Tiles[i].Location.y, -1);
 						TheMap->SetMetaLayerTile(Tiles[i].Location.x, Tiles[i].Location.y, TILE_NONE);
@@ -766,4 +786,9 @@ void GiantGoomba::GetStomped()
 void GiantGoomba::Interact(Sprite *OtherSprite)
 {
 	OtherSprite->Delete();
+}
+
+void GiantGoomba::GetFired()
+{
+	
 }

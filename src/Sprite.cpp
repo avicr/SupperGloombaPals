@@ -371,6 +371,12 @@ void Sprite::GetBricked(int TileX, int TileY)
 
 void Sprite::CheckCollisionWithSprites()
 {
+	// No interactions if the player is dying
+	if (ThePlayer->IsDying())
+	{
+		return;
+	}
+
 	for (int i = 0; i < EnemySprites.size(); i++)
 	{
 		EnemySprite* Enemy = EnemySprites[i];

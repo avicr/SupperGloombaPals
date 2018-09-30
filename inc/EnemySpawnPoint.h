@@ -25,6 +25,7 @@ protected:
 	bool bCanSpawnWhileVisible;
 	bool bHasSpawnedEnemy;
 	bool bInRange;
+	bool bRespawn;
 	eEnemyType EnemyType;
 
 	eEnemyType GetEnemyTypeFromTileGID(int TileGID);

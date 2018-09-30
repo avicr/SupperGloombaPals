@@ -156,6 +156,7 @@ Mix_Chunk* FlagPoleSound = NULL;
 Mix_Chunk* FireworkSound = NULL;
 
 Mix_Music* BGMusic = NULL;
+Mix_Music* ChaseMusic = NULL;
 Mix_Music* UndergroundMusic = NULL;
 Mix_Music* StarmanMusic = NULL;
 Mix_Music* DieMusic = NULL;
@@ -621,10 +622,13 @@ void HandleCheatInput(SDL_Event& TheEvent)
 		SimpleSprites.push_back(new EventSprite("This is an event!"));
 	}
 
-	// Spawn fire
+	// Spawn star
 	if (TheEvent.key.state == SDL_PRESSED && TheEvent.key.keysym.scancode == SDL_SCANCODE_W)
 	{
-		ThePlayer->ShootFire();
+		int SpawnX = ThePlayer->GetPosX() / 64 * 64 + 64;
+		int SpawnY = ThePlayer->GetPosY() / 64 * 64;
+		StarItemSprite* FlowerSprite = new StarItemSprite(SpawnX, SpawnY);
+		ItemSprites.push_back(FlowerSprite);
 	}
 
 	// Spawn empty brick sprite
@@ -860,6 +864,7 @@ void InitSDL()
 			FireworkSound = Mix_LoadWAV("resource/sounds/firework.wav");
 			
 			BGMusic = Mix_LoadMUS("resource/sounds/bgmusic.wav");
+			ChaseMusic = Mix_LoadMUS("resource/sounds/chase.wav");
 			UndergroundMusic = Mix_LoadMUS("resource/sounds/underground.wav");
 			StarmanMusic = Mix_LoadMUS("resource/sounds/starman.wav");
 			DieMusic = Mix_LoadMUS("resource/sounds/die.wav");
@@ -964,6 +969,7 @@ void CleanUp()
 	Mix_FreeChunk(FireworkSound);
 
 	Mix_FreeMusic(BGMusic);
+	Mix_FreeMusic(ChaseMusic);
 	Mix_FreeMusic(UndergroundMusic);
 	Mix_FreeMusic(StarmanMusic);
 	Mix_FreeMusic(DieMusic);
