@@ -179,7 +179,7 @@ void GoombaEnemySprite::Tick(double DeltaTime)
 		Rect.x = PosX;// -TheMap->GetScrollX();
 		Rect.y = PosY;
 		VelocityY += BASE_FALL_VELOCITY / 2;
-
+		Flip = SDL_FLIP_VERTICAL;
 		if (PosY >= TheMap->GetHeightInPixels())
 		{
 			bPendingDelete = true;
@@ -359,8 +359,7 @@ GiantGoomba::~GiantGoomba()
 {
 	//if (CurrentState >= GIANT_STATE_CHASE)
 	{		
-		SDL_DestroyTexture(Texture);
-		TheMap->SetAutoScrollX(0, false);
+		SDL_DestroyTexture(Texture);		
 	}
 }
 
@@ -405,7 +404,7 @@ void GiantGoomba::Tick(double DeltaTime)
 			NewMushroom->SetVelocityX(0);
 			NewMushroom->SetVelocityY(0.15);
 			ItemSprites.push_back(NewMushroom);			
-			Mix_PlayChannel(CHANNEL_POWER_UP, PowerUpSound, 0);
+			Mix_PlayChannel(CHANNEL_FLAG_POLE, PowerUpSound, 0);
 		}
 		else if (CountDown == MUSHROOM_COUNTDOWN - 230 || CountDown == MUSHROOM_COUNTDOWN - 280)
 		{
@@ -561,7 +560,7 @@ void GiantGoomba::UpdateScale()
 
 			if (Scale > ScaleTarget)
 			{
-				ScaleCountDown = 20;				
+				ScaleCountDown = 30;				
 			}
 		}
 		else if (Scale > ScaleTarget)
@@ -570,7 +569,7 @@ void GiantGoomba::UpdateScale()
 
 			if (Scale < ScaleTarget)
 			{
-				ScaleCountDown = 20;
+				ScaleCountDown = 30;
 			}
 		}
 	}
@@ -585,11 +584,7 @@ void GiantGoomba::UpdateScale()
 			ScaleRate *= -1;
 		}
 		if (ScaleCountDown == 0)
-		{
-			if (Scale < 0.90)
-			{
-				//Mix_HaltChannel(CHANNEL_POWER_UP);
-			}
+		{			
 			Scale = ScaleTarget;
 		}
 	}
@@ -602,7 +597,7 @@ void GiantGoomba::Interact(ItemSprite* Item)
 	{
 		Item->Delete();
 		ScaleTarget += 0.08;
-
+		ScaleRate += 0.02;
 		if (ScaleTarget > 1)
 		{
 			ScaleTarget = 1;
@@ -790,5 +785,14 @@ void GiantGoomba::Interact(Sprite *OtherSprite)
 
 void GiantGoomba::GetFired()
 {
-	
+	Mix_PlayChannel(CHANNEL_BUMP, BumpSound, 0);
+}
+
+void GiantGoomba::GetBricked(int TileX, int TileY)
+{
+	GoombaEnemySprite::GetBricked(TileX, TileY);
+	TheMap->SetAutoScrollX(0, false);
+
+	// TODO: If the player doesn't have a star, play the music
+	Mix_PlayMusic(BGMusic, -1);
 }

@@ -99,6 +99,7 @@ public:
 	bool InMapWindow(SDL_Point Offset = { 0, 0 });
 	SDL_Rect GetScreenSpaceCollisionRect();
 	void GetFired();
+	void GetBricked(int TileX, int TileY);
 
 	virtual void GetStomped();
 	void UpdateScale();

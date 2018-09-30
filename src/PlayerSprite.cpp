@@ -484,7 +484,7 @@ void PlayerSprite::UpdateStarAnimation()
 	if (StarCountdown == 120)
 	{
 		SetColorModForAllTextures({ 0, 0, 0 });
-		// TODO: Get the bg music from the map and play it
+		
 		Mix_PlayMusic(TheGame->GetMusic(), 1);			
 		
 	}
