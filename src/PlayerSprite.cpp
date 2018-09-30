@@ -301,6 +301,18 @@ void PlayerSprite::Tick(double DeltaTime)
 						TheMap->AdjustScrollX(1);
 					}
 				}
+
+				if (PosX - TheMap->GetScrollX() < PLAYER_SCROLL_START + 64 && VelocityX < 0)
+				{
+					if (Rect.x - TheMap->GetScrollX() > 512 - 86)
+					{
+						TheMap->AdjustScrollX(-0.8);
+					}
+					else
+					{
+						TheMap->AdjustScrollX(-1);
+					}
+				}
 			}
 		}
 	}

@@ -10,6 +10,14 @@ using namespace std;
 #define MAX_TILE_OFFSET 4
 #define TILE_VELOCITY 0.72
 
+enum eMapLockFlags
+{
+	MAP_LOCK_POSITIVE_X = 1,
+	MAP_LOCK_NEGATIVE_X = 2,
+	MAP_LOCK_POSITIVE_Y = 4,
+	MAP_LOCK_NEGATIVE_Y = 8,
+};
+
 struct TileOffset
 {
 	float OffsetX = 0;
@@ -65,8 +73,10 @@ struct WarpExit
 	eDirection ExitDirection = DIRECTION_UP;
 	eWarpType WarpType = WARP_INSTANT; 
 	SDL_Color ExitBGColor = { 54, 129, 241, 255 };
-	bool bLockScrollX = false;
-	bool bLockScrollY = true;	
+	/*bool bLockScrollX = false;
+	bool bLockScrollY = true;	*/
+
+	int ScrollLockFlags = MAP_LOCK_NEGATIVE_X | MAP_LOCK_NEGATIVE_Y | MAP_LOCK_POSITIVE_Y;
 	int MaxScrollY = 0;
 	int MaxScrollX = 0;
 	bool bNoScrollChange = false;
@@ -325,8 +335,10 @@ protected:
 	double ScrollVelocityY;
 
 	bool bPlayingLevel;
-	bool bLockScrollX;
-	bool bLockScrollY;
+	/*bool bLockScrollX;
+	bool bLockScrollY;*/
+
+	int ScrollLockFlags;
 
 	double ScrollX;
 	double ScrollY;

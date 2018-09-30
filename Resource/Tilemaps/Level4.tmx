@@ -208,6 +208,8 @@
   <object id="40" gid="196" x="192" y="1024" width="64" height="64">
    <properties>
     <property name="killy" type="int" value="1183"/>
+    <property name="locknegativex" type="bool" value="true"/>
+    <property name="locknegativey" type="bool" value="true"/>
     <property name="lockx" type="int" value="0"/>
     <property name="locky" type="int" value="1"/>
     <property name="musicchange" type="int" value="1"/>

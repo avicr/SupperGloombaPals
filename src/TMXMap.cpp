@@ -520,14 +520,56 @@ void TMXMap::LoadExit(TiXmlElement* ObjectElement)
 			int LockX;
 			PropElem->QueryIntAttribute("value", &LockX);
 
-			NewExit.bLockScrollX = LockX;
+			if (LockX)
+			{
+				NewExit.ScrollLockFlags |= MAP_LOCK_POSITIVE_X;
+			}
+			else
+			{
+				NewExit.ScrollLockFlags &= ~MAP_LOCK_POSITIVE_X;
+			}
 		}
 		else if (strcmp(PropElem->Attribute("name"), "locky") == 0)
 		{
 			int LockY;
 			PropElem->QueryIntAttribute("value", &LockY);
 
-			NewExit.bLockScrollY = LockY;
+			if (LockY)
+			{
+				NewExit.ScrollLockFlags |= MAP_LOCK_POSITIVE_Y;
+			}
+			else
+			{
+				NewExit.ScrollLockFlags &= ~MAP_LOCK_POSITIVE_Y;
+			}
+		}
+		else if (strcmp(PropElem->Attribute("name"), "locknegativex") == 0)
+		{			
+			bool bLockNegativeX;
+			PropElem->QueryBoolAttribute("value", &bLockNegativeX);
+
+			if (bLockNegativeX)
+			{
+				NewExit.ScrollLockFlags |= MAP_LOCK_NEGATIVE_X;
+			}
+			else
+			{
+				NewExit.ScrollLockFlags &= ~MAP_LOCK_NEGATIVE_X;
+			}
+		}
+		else if (strcmp(PropElem->Attribute("name"), "locknegativey") == 0)
+		{
+			bool bLockNegativeY;
+			PropElem->QueryBoolAttribute("value", &bLockNegativeY);
+
+			if (bLockNegativeY)
+			{
+				NewExit.ScrollLockFlags |= MAP_LOCK_NEGATIVE_Y;
+			}
+			else
+			{
+				NewExit.ScrollLockFlags &= ~MAP_LOCK_NEGATIVE_Y;
+			}
 		}
 		else if (strcmp(PropElem->Attribute("name"), "scrollvelocityx") == 0)
 		{
@@ -846,33 +888,34 @@ TMXTileset* TMXMap::GetTilesetFromGID(int GID)
 
 void TMXMap::AdjustScrollX(double Amount)
 {	
-	if (!bAutoScrollX)
+	bool bScrollLocked = Amount > 0 && (ScrollLockFlags & MAP_LOCK_POSITIVE_X);
+	bScrollLocked |= Amount < 0 && (ScrollLockFlags & MAP_LOCK_NEGATIVE_X);
+	
+	if (!bAutoScrollX && !bScrollLocked)
 	{
-		if (!bLockScrollX)
-		{
-			ScrollX += Amount;
+		ScrollX += Amount;
 
-			if (MaxScrollX != 0 && ScrollX > MaxScrollX)
-			{
-				ScrollX = MaxScrollX;
-			}
-		}
+		if (MaxScrollX != 0 && ScrollX > MaxScrollX)
+		{
+			ScrollX = MaxScrollX;
+		}	
 	}
 }
 
 void TMXMap::AdjustScrollY(double Amount)
 {
-	if (!bAutoScrollY)
-	{
-		if (!bLockScrollY)
-		{
-			ScrollY += Amount;
+	bool bScrollLocked = Amount > 0 && (ScrollLockFlags & MAP_LOCK_POSITIVE_Y);
+	bScrollLocked |= Amount < 0 && (ScrollLockFlags & MAP_LOCK_NEGATIVE_Y);	
 
-			if (MaxScrollY != 0 && ScrollY > MaxScrollY)
-			{
-				ScrollY = MaxScrollY;
-			}
-		}
+	if (!bAutoScrollY && !bScrollLocked)
+	{
+		
+		ScrollY += Amount;
+
+		if (MaxScrollY != 0 && ScrollY > MaxScrollY)
+		{
+			ScrollY = MaxScrollY;
+		}		
 	}
 }
 
@@ -906,9 +949,8 @@ void TMXMap::EnforceWarpControls(WarpExit Warp)
 		ScrollY += Warp.ScrollOffsetY;
 	}
 
-	bLockScrollX = Warp.bLockScrollX;
-	bLockScrollY = Warp.bLockScrollY;
-
+	ScrollLockFlags = Warp.ScrollLockFlags;
+	
 	KillY = Warp.KillY;
 	MaxScrollX = Warp.MaxScrollX;
 	MaxScrollY = Warp.MaxScrollY;
@@ -930,6 +972,7 @@ void TMXMap::ToggleRenderCollision()
 
 TMXMap::TMXMap()
 {	
+	ScrollLockFlags = MAP_LOCK_NEGATIVE_X | MAP_LOCK_NEGATIVE_Y | MAP_LOCK_POSITIVE_Y;
 	bAutoScrollX = false;
 	bAutoScrollY = false;	
 	ScrollVelocityX = 0;
@@ -943,8 +986,8 @@ TMXMap::TMXMap()
 	bRenderCollision = false;
 	ScrollX = 0;
 	ScrollY = 26;
-	bLockScrollX = false;
-	bLockScrollY = true;
+	/*bLockScrollX = false;
+	bLockScrollY = true;*/
 }
 
 TMXMap::~TMXMap()
@@ -990,8 +1033,8 @@ void TMXMap::StartLevel()
 
 void TMXMap::EndLevel()
 {
-	bLockScrollX = false;
-	bLockScrollY = true;
+	/*bLockScrollX = false;
+	bLockScrollY = true;*/
 	bPlayingLevel = false;
 	ScrollX = 0;
 	ScrollY = 0;
@@ -1576,12 +1619,14 @@ void TMXMap::AutoScroll()
 
 	double PlayerPosX = ThePlayer->GetPosX();
 	double PlayerPosY = ThePlayer->GetPosY();
+	bool bMovedPlayer = false;
 
 	// Push the player along the edge of the screens
 	if (bAutoScrollX && ScrollVelocityX > 0)
 	{
 		if (ThePlayer->GetPosX() - ScrollX < 0)
 		{
+			bMovedPlayer = true;
 			PlayerPosX = ScrollX;
 		}
 	}
@@ -1591,14 +1636,19 @@ void TMXMap::AutoScroll()
 		// TODO: Don't use the freakin hardcoded window size....
 		if (ThePlayer->GetPosX() + ThePlayer->GetWidth() - ScrollX  > 1024)
 		{
+			bMovedPlayer = true;
 			PlayerPosX = 1024 - ThePlayer->GetWidth() + ScrollX;
 		}
 	}
 
-	ThePlayer->SetPosition(PlayerPosX, PlayerPosY);
-	if (CheckCollision(ThePlayer->GetScreenSpaceCollisionRect(), false))
+	// Check to see if the player got squished
+	if (bMovedPlayer)
 	{
-		ThePlayer->BeginDie();
+		ThePlayer->SetPosition(PlayerPosX, PlayerPosY);
+		if (CheckCollision(ThePlayer->GetScreenSpaceCollisionRect(), false))
+		{
+			ThePlayer->BeginDie();
+		}
 	}
 }
 
