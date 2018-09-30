@@ -207,6 +207,8 @@ void Game::OnGrabFlagPole(bool bSecret)
 	{
 		SimpleSprites.push_back(new EventSprite("Secret exit found"));
 	}
+
+	TheMap->StopSAutoScroll();
 }
 
 void Game::OnPlayerFlagDone()
@@ -407,7 +409,7 @@ void Game::DetermineCurrentLevel()
 		CurrentLevel = 0;
 	}
 
-	CurrentLevel = 2;
+	CurrentLevel = 4;
 }
 
 string Game::GetWorldName()

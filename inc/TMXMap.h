@@ -73,6 +73,8 @@ struct WarpExit
 	int PosY = 0;
 	int Chance = 100;
 	int KillY = -1;
+	int ScrollVelocityX = 0;
+	int ScrollVelocityY = 0;
 	eBrickBreakTilesetID BrickTilesetID = BRICK_TILESET_OVERWORLD;
 };
 
@@ -312,6 +314,9 @@ protected:
 	vector<WarpInfo> Warps;
 	vector <ControlTrigger*> ControlTiles;
 
+	double ScrollVelocityX;
+	double ScrollVelocityY;
+
 	bool bPlayingLevel;
 	bool bLockScrollX;
 	bool bLockScrollY;
@@ -342,6 +347,8 @@ protected:
 
 	string WorldName;
 	double SecondsLeft;	
+	bool bAutoScrollX;
+	bool bAutoScrollY;
 
 	// Which type of brick stuff to spawn
 	eBrickBreakTilesetID BrickTilesetID;
@@ -414,8 +421,11 @@ public:
 	eBrickBreakTilesetID GetBrickTilesetID() { return BrickTilesetID; }
 	AnimationResource* GetBrickBounceAnimForBrickTileset();
 	AnimationResource* GetEmptyBlockBounceAnimForBrickTileset();	
+	void OnPlayerDie();
 
 	SDL_Rect GetVisibleWindow();	
+	void AutoScroll();
+	void StopSAutoScroll();
 
 	TMXMap();
 	~TMXMap();

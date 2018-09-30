@@ -522,6 +522,14 @@ void TMXMap::LoadExit(TiXmlElement* ObjectElement)
 
 			NewExit.bLockScrollY = LockY;
 		}
+		else if (strcmp(PropElem->Attribute("name"), "scrollvelocityx") == 0)
+		{
+			PropElem->QueryIntAttribute("value", &NewExit.ScrollVelocityX);
+		}
+		else if (strcmp(PropElem->Attribute("name"), "scrollvelocityy") == 0)
+		{
+			PropElem->QueryIntAttribute("value", &NewExit.ScrollVelocityY);
+		}
 		else if (strcmp(PropElem->Attribute("name"), "maxscrolly") == 0)
 		{			
 			PropElem->QueryIntAttribute("value", &NewExit.MaxScrollY);			
@@ -831,26 +839,32 @@ TMXTileset* TMXMap::GetTilesetFromGID(int GID)
 
 void TMXMap::AdjustScrollX(double Amount)
 {	
-	if (!bLockScrollX)
+	if (!bAutoScrollX)
 	{
-		ScrollX += Amount;
-
-		if (MaxScrollX != 0 && ScrollX > MaxScrollX)
+		if (!bLockScrollX)
 		{
-			ScrollX = MaxScrollX;
+			ScrollX += Amount;
+
+			if (MaxScrollX != 0 && ScrollX > MaxScrollX)
+			{
+				ScrollX = MaxScrollX;
+			}
 		}
 	}
 }
 
 void TMXMap::AdjustScrollY(double Amount)
 {
-	if (!bLockScrollY)
+	if (!bAutoScrollY)
 	{
-		ScrollY += Amount;
-
-		if (MaxScrollY != 0 && ScrollY > MaxScrollY)
+		if (!bLockScrollY)
 		{
-			ScrollY = MaxScrollY;
+			ScrollY += Amount;
+
+			if (MaxScrollY != 0 && ScrollY > MaxScrollY)
+			{
+				ScrollY = MaxScrollY;
+			}
 		}
 	}
 }
@@ -892,6 +906,14 @@ void TMXMap::EnforceWarpControls(WarpExit Warp)
 	MaxScrollX = Warp.MaxScrollX;
 	MaxScrollY = Warp.MaxScrollY;
 	BrickTilesetID = Warp.BrickTilesetID;
+
+	
+	bAutoScrollX = Warp.ScrollVelocityX;
+	ScrollVelocityX = Warp.ScrollVelocityX;
+	
+	bAutoScrollY = Warp.ScrollVelocityY;
+	ScrollVelocityY = Warp.ScrollVelocityY;
+	
 }
 
 void TMXMap::ToggleRenderCollision()
@@ -901,6 +923,10 @@ void TMXMap::ToggleRenderCollision()
 
 TMXMap::TMXMap()
 {	
+	bAutoScrollX = false;
+	bAutoScrollY = false;	
+	ScrollVelocityX = 0;
+	ScrollVelocityY = 0;
 	BrickTilesetID = BRICK_TILESET_OVERWORLD;
 	MaxScrollX = 0;
 	MaxScrollY = 0;
@@ -947,6 +973,10 @@ void TMXMap::ReleaseAssets()
 
 void TMXMap::StartLevel()
 {
+	ScrollVelocityX = 4;
+	ScrollVelocityY = 0;
+	bAutoScrollX = true;
+	bAutoScrollY = false;
 	bPlayingLevel = true;	
 }
 
@@ -1394,6 +1424,12 @@ void TMXMap::Tick(double DeltaTime)
 			i--;
 		}
 	}
+
+	// Apply scroll velocities
+	if (ScrollVelocityX || ScrollVelocityY)
+	{
+		AutoScroll();
+	}
 }
 
 int TMXMap::GetCoinManagerIndex(int TileX, int TileY)
@@ -1518,4 +1554,51 @@ AnimationResource* TMXMap::GetEmptyBlockBounceAnimForBrickTileset()
 	}
 
 	return NULL;
+}
+
+void TMXMap::OnPlayerDie()
+{
+	StopSAutoScroll();
+}
+
+void TMXMap::AutoScroll()
+{
+	ScrollX += ScrollVelocityX;
+	ScrollY += ScrollVelocityY;
+
+	double PlayerPosX = ThePlayer->GetPosX();
+	double PlayerPosY = ThePlayer->GetPosY();
+
+	// Push the player along the edge of the screens
+	if (bAutoScrollX && ScrollVelocityX > 0)
+	{
+		if (ThePlayer->GetPosX() - ScrollX < 0)
+		{
+			PlayerPosX = ScrollX;
+		}
+	}
+
+	if (bAutoScrollX && ScrollVelocityX < 0)
+	{
+		// TODO: Don't use the freakin hardcoded window size....
+		if (ThePlayer->GetPosX() + ThePlayer->GetWidth() - ScrollX  > 1024)
+		{
+			PlayerPosX = 1024 - ThePlayer->GetWidth() + ScrollX;
+		}
+	}
+
+	ThePlayer->SetPosition(PlayerPosX, PlayerPosY);
+	if (CheckCollision(ThePlayer->GetScreenSpaceCollisionRect(), false))
+	{
+		ThePlayer->BeginDie();
+	}
+}
+
+void TMXMap::StopSAutoScroll()
+{
+	ScrollVelocityX = 0;
+	ScrollVelocityY = 0;
+
+	bAutoScrollX = false;
+	bAutoScrollY = false;
 }

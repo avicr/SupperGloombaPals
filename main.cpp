@@ -72,7 +72,7 @@ LevelInfo Levels[] = {
 /*Secret Level 1*/ { LEVEL_PATH + (string)"Level2.tmx"        , "1-1S", 2, 3 },
 /*Level 2*/		   { LEVEL_PATH + (string)"Level2.tmx"        , "1-2", 4, 3 },
 /*Secret Level 2*/ { LEVEL_PATH + (string)"Level2S.tmx"       , "1-2S", 4, 5 },
-/*Level 3*/		   { LEVEL_PATH + (string)"Level1_1_64x64.tmx", "1-3", 6, 5 },
+/*Level 3*/		   { LEVEL_PATH + (string)"Level3.tmx"        , "1-3", 6, 5 },
 /*Secret Level 3*/ { LEVEL_PATH + (string)"Level3S.tmx"       , "1-3S", 6, 7 },
 /*Level 4*/		   { LEVEL_PATH + (string)"Level2.tmx"        , "1-4", 8, 7 },
 /*Secret Level 4*/ { LEVEL_PATH + (string)"Level1_1_64x64.tmx", "2-B", 8, 9 },
@@ -882,8 +882,8 @@ void InitSDL()
 			Mix_VolumeChunk(FireworkSound, VOLUME_NORMAL);
 			Mix_VolumeMusic(VOLUME_NORMAL);
 			
-			//Mix_Volume(-1, 0);
-			//Mix_VolumeMusic(0);
+			Mix_Volume(-1, 0);
+			Mix_VolumeMusic(0);
 		}
 
 #ifdef FULLSCREEN_1920_1080

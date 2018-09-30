@@ -1266,6 +1266,7 @@ void PlayerSprite::StartWarpSequence(WarpEntrance Entrance, WarpExit Exit)
 		WarpSeq.bWarpComplete = false;
 		WarpSeq.bWarpExitComplete = false;
 		Mix_PlayChannel(CHANNEL_PIPE, PipeSound, 0);
+		TheMap->StopSAutoScroll();
 	}
 }
 
@@ -1897,6 +1898,7 @@ bool PlayerSprite::IsDying()
 
 void PlayerSprite::BeginDie()
 {
+	TheMap->OnPlayerDie();
 	Mix_PlayMusic(DieMusic, 0);
 	StopAnimation();
 	SetTexture(GResourceManager->PlayerGoombaDeadTexture->Texture);		
