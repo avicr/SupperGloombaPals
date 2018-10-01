@@ -205,13 +205,13 @@
     <property name="warpid" value="1"/>
    </properties>
   </object>
-  <object id="40" gid="196" x="223" y="1024" width="64" height="64">
+  <object id="40" gid="196" x="160" y="1024" width="64" height="64">
    <properties>
     <property name="killy" type="int" value="1183"/>
     <property name="lockx" type="int" value="0"/>
     <property name="locky" type="int" value="1"/>
     <property name="musicchange" type="int" value="1"/>
-    <property name="scrolloffsetx" type="int" value="-192"/>
+    <property name="scrolloffsetx" type="int" value="-160"/>
     <property name="scrolloffsety" type="int" value="-740"/>
    </properties>
   </object>
@@ -328,7 +328,7 @@
     <property name="secretexit" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="150" gid="205" x="751.5" y="2238.81" width="508.5" height="201.62">
+  <object id="150" gid="205" x="960" y="2240" width="508.5" height="201.62">
    <properties>
     <property name="resetwhenplayerleaves" type="bool" value="true"/>
     <property name="warpid" type="int" value="6"/>
@@ -338,6 +338,8 @@
    <properties>
     <property name="bgcolor" type="color" value="#ff000000"/>
     <property name="bricktilesetid" type="int" value="1"/>
+    <property name="locknegativey" type="bool" value="false"/>
+    <property name="lockx" type="int" value="1"/>
     <property name="locky" type="int" value="0"/>
     <property name="maxscrolly" type="int" value="0"/>
     <property name="noscrollchange" type="int" value="0"/>

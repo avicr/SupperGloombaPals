@@ -322,6 +322,11 @@ void PlayerSprite::Tick(double DeltaTime)
 		if (bIsInAir)
 		{
 			VelocityY += BASE_FALL_VELOCITY;
+
+			if (VelocityY > 18)
+			{
+				VelocityY = 18;
+			}
 		}
 		else/* if ((int)floor(PosY) % 64 == 0)*/
 		{			
@@ -343,7 +348,7 @@ void PlayerSprite::Tick(double DeltaTime)
 			else
 			{
 				VelocityY += BASE_FALL_VELOCITY;
-			}
+			}			
 		}
 		else
 		{
@@ -358,7 +363,7 @@ void PlayerSprite::Tick(double DeltaTime)
 			else
 			{
 				VelocityY += HOLDING_A_JUMP_FALL_VELOCITY;
-			}
+			}			
 		}
 
 		if (VelocityY > 16)

@@ -28,7 +28,7 @@
 -- Red coins
 
 - Level 2S
--- Loading screen
+-- Dario
 
 - Level 3S
 -- Pits are plugged
@@ -37,7 +37,7 @@
 -- Red coins
 
 - Level 4S
--- Dario
+-- Loading screen
 
 - Level 5S
 -- 2B

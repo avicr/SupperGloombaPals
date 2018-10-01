@@ -414,7 +414,7 @@ void Game::DetermineCurrentLevel()
 		CurrentLevel = 0;
 	}
 
-	CurrentLevel = 6;
+	//CurrentLevel = 3;
 }
 
 string Game::GetWorldName()
