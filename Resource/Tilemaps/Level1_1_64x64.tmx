@@ -339,7 +339,7 @@
     <property name="bgcolor" type="color" value="#ff000000"/>
     <property name="bricktilesetid" type="int" value="1"/>
     <property name="locknegativey" type="bool" value="false"/>
-    <property name="lockx" type="int" value="1"/>
+    <property name="lockx" type="int" value="0"/>
     <property name="locky" type="int" value="0"/>
     <property name="maxscrolly" type="int" value="0"/>
     <property name="noscrollchange" type="int" value="0"/>
