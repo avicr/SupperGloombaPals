@@ -36,6 +36,8 @@ public:
 	virtual bool IsDying();
 	virtual bool WasBricked();
 	virtual bool IsStompable();
+	virtual void GetBricked(int TileX, int TileY);
+	virtual void GetFired();
 	virtual void OnInteractedWith(EnemySprite* Other) {};
 protected:
 	bool bGotBricked;
@@ -50,9 +52,7 @@ class GoombaEnemySprite : public EnemySprite
 public:	
 	GoombaEnemySprite(EnemySpawnPoint* Spawner);
 	virtual void Tick(double DeltaTime);
-	virtual void GetStomped();
-	virtual void GetBricked(int TileX, int TileY);
-	virtual void GetFired();
+	virtual void GetStomped();	
 	virtual bool Interact(EnemySprite* Enemy);		
 	virtual void OnInteractedWith(EnemySprite* Other);
 };

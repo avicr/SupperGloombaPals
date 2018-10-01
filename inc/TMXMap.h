@@ -377,6 +377,7 @@ protected:
 	TMXTileset* MetaTileset;
 	TMXLayer* CollisionLayer;
 	TMXLayer* ForegroundLayer;
+	TMXLayer* BackgroundLayer;
 
 	TMXTileset* LoadTileset(TiXmlElement* TilesetElement);
 	TMXLayer* LoadLayer(TiXmlElement* TilesetElement);	
@@ -421,6 +422,7 @@ public:
 
 	void SetMetaLayerTile(int TileX, int TileY, eTileMetaType TileType);
 	void SetForegroundTile(int TileX, int TileY, int TileID);
+	void SetBackgroundTile(int TileX, int TileY, int TileID);
 	void HandleCollision(int TileX, int TileY, bool bCanBreakBricks = false);
 
 	void Tick(double DeltaTime);

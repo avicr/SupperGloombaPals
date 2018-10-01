@@ -66,7 +66,7 @@ void GoombaEnemySprite::GetStomped()
 	SetTexture(GResourceManager->EGoombaFlagTexture->Texture);
 }
 
-void GoombaEnemySprite::GetBricked(int TileX, int TileY)
+void EnemySprite::GetBricked(int TileX, int TileY)
 {
 	// TODO: Move this shit to the enemy sprite!
 	if (!IsDying())
@@ -90,7 +90,7 @@ void GoombaEnemySprite::GetBricked(int TileX, int TileY)
 	}
 }
 
-void GoombaEnemySprite::GetFired()
+void EnemySprite::GetFired()
 {
 	GetBricked(PosX / 64, PosY / 64);
 }
@@ -365,80 +365,109 @@ GiantGoomba::~GiantGoomba()
 
 void GiantGoomba::Tick(double DeltaTime)
 {
-	//GoombaEnemySprite::Tick(DeltaTime);
-
-	PhysicsSprite::Tick(DeltaTime);
-	HandleMovement();
-
-	CountDown--;	
-
-	if (CurrentState == GIANT_STATE_WALK_TO_START)
+	if (ThePlayer->IsWarping())
 	{
-		if ((int)CountDown % 6 == 0)
-		{
-			if (Flip == SDL_FLIP_HORIZONTAL)
-			{
-				Flip = SDL_FLIP_NONE;
-			}
-			else
-			{
-				Flip = SDL_FLIP_HORIZONTAL;
-			}			
-		}
-		if (PosX <= DestinationX)
-		{
-			LeaveState(CurrentState);
-			EnterState(GIANT_STATE_MUSHROOM);
-		}
-	}
-	else if (CurrentState == GIANT_STATE_MUSHROOM)
-	{		
-		if (CountDown == MUSHROOM_COUNTDOWN - 30 || CountDown == MUSHROOM_COUNTDOWN - 120 || CountDown == MUSHROOM_COUNTDOWN - 135 || CountDown == MUSHROOM_COUNTDOWN - 150 ||
-			CountDown == MUSHROOM_COUNTDOWN - 160 || CountDown == MUSHROOM_COUNTDOWN - 133 || CountDown == MUSHROOM_COUNTDOWN - 138 || 
-			CountDown == MUSHROOM_COUNTDOWN - 140 || CountDown == MUSHROOM_COUNTDOWN - 144 || CountDown == MUSHROOM_COUNTDOWN - 150 || CountDown == MUSHROOM_COUNTDOWN - 155 || 
-			CountDown == MUSHROOM_COUNTDOWN - 157)
-		{
-			//double CurrentSize = 448 * Scale;			
-
-			BigMushroomItemSprite* NewMushroom = new BigMushroomItemSprite(PosX + Rect.w / 2 - 32, TheMap->GetScrollY() - 64, false);
-			NewMushroom->SetVelocityX(0);
-			NewMushroom->SetVelocityY(0.15);
-			ItemSprites.push_back(NewMushroom);			
-			Mix_PlayChannel(CHANNEL_FLAG_POLE, PowerUpSound, 0);
-		}
-		else if (CountDown == MUSHROOM_COUNTDOWN - 230 || CountDown == MUSHROOM_COUNTDOWN - 280)
-		{
-			JumpCount++;		
-			VelocityY = -20;
-			Mix_PlayChannel(CHANNEL_JUMP, JumpSound, 0);
-		}
-		else if (CountDown == MUSHROOM_COUNTDOWN - 305)
-		{
-			Mix_PlayMusic(ChaseMusic, -1);
-		}
-		else if (CountDown == 0)
-		{
-			LeaveState(CurrentState);
-			EnterState(GIANT_STATE_CHASE);
-		}
-	}
-	else if (CurrentState == GIANT_STATE_CHASE)
-	{	
-		if (CountDown == 0)
-		{
-			if (Flip == SDL_FLIP_HORIZONTAL)
-			{
-				Flip = SDL_FLIP_NONE;
-			}
-			else
-			{
-				Flip = SDL_FLIP_HORIZONTAL;
-			}
-			CountDown = 4;
-		}
+		return;
 	}
 
-	UpdateScale();
+	if (DyingCount == 0 && !bGotBricked)
+	{
+		PhysicsSprite::Tick(DeltaTime);
+		HandleMovement();
+
+		CountDown--;
+
+		if (CurrentState == GIANT_STATE_WALK_TO_START)
+		{
+			if ((int)CountDown % 6 == 0)
+			{
+				if (Flip == SDL_FLIP_HORIZONTAL)
+				{
+					Flip = SDL_FLIP_NONE;
+				}
+				else
+				{
+					Flip = SDL_FLIP_HORIZONTAL;
+				}
+			}
+			if (PosX <= DestinationX)
+			{
+				LeaveState(CurrentState);
+				EnterState(GIANT_STATE_MUSHROOM);
+			}
+		}
+		else if (CurrentState == GIANT_STATE_MUSHROOM)
+		{
+			if (CountDown == MUSHROOM_COUNTDOWN - 30 || CountDown == MUSHROOM_COUNTDOWN - 120 || CountDown == MUSHROOM_COUNTDOWN - 135 || CountDown == MUSHROOM_COUNTDOWN - 150 ||
+				CountDown == MUSHROOM_COUNTDOWN - 160 || CountDown == MUSHROOM_COUNTDOWN - 133 || CountDown == MUSHROOM_COUNTDOWN - 138 ||
+				CountDown == MUSHROOM_COUNTDOWN - 140 || CountDown == MUSHROOM_COUNTDOWN - 144 || CountDown == MUSHROOM_COUNTDOWN - 150 || CountDown == MUSHROOM_COUNTDOWN - 155 ||
+				CountDown == MUSHROOM_COUNTDOWN - 157)
+			{
+				//double CurrentSize = 448 * Scale;			
+
+				BigMushroomItemSprite* NewMushroom = new BigMushroomItemSprite(PosX + Rect.w / 2 - 32, TheMap->GetScrollY() - 64, false);
+				NewMushroom->SetVelocityX(0);
+				NewMushroom->SetVelocityY(0.15);
+				ItemSprites.push_back(NewMushroom);
+				Mix_PlayChannel(CHANNEL_FLAG_POLE, PowerUpSound, 0);
+			}
+			else if (CountDown == MUSHROOM_COUNTDOWN - 230 || CountDown == MUSHROOM_COUNTDOWN - 280)
+			{
+				JumpCount++;
+				VelocityY = -20;
+				Mix_PlayChannel(CHANNEL_JUMP, JumpSound, 0);
+			}
+			else if (CountDown == MUSHROOM_COUNTDOWN - 305)
+			{
+				Mix_PlayMusic(ChaseMusic, -1);
+			}
+			else if (CountDown == 0)
+			{
+				LeaveState(CurrentState);
+				EnterState(GIANT_STATE_CHASE);
+			}
+		}
+		else if (CurrentState == GIANT_STATE_CHASE)
+		{
+			if (CountDown == 0)
+			{
+				if (Flip == SDL_FLIP_HORIZONTAL)
+				{
+					Flip = SDL_FLIP_NONE;
+				}
+				else
+				{
+					Flip = SDL_FLIP_HORIZONTAL;
+				}
+				CountDown = 4;
+			}
+		}
+
+		UpdateScale();
+	}
+	else if (bGotBricked)
+	{
+		PosX += VelocityX;
+		PosY += VelocityY;
+		Rect.x = PosX;// -TheMap->GetScrollX();
+		Rect.y = PosY;
+		VelocityY += BASE_FALL_VELOCITY / 2;
+		Flip = SDL_FLIP_VERTICAL;
+		if (PosY >= TheMap->GetHeightInPixels())
+		{
+			bPendingDelete = true;
+		}
+
+	}
+	else
+	{
+		DyingCount++;
+
+		if (DyingCount == DYING_COUNT)
+		{
+			bPendingDelete = true;
+		}
+	}
 }
 
 
@@ -465,7 +494,7 @@ void GiantGoomba::EnterState(eGiantGoombaState NewState)
 	case GIANT_STATE_CHASE:				
 		//PosY -= 448;
 		CollisionRect = { 0, 0, GIANT_GOOMBA_SIZE, GIANT_GOOMBA_SIZE };
-		VelocityX = -4;
+		VelocityX = -4.3;
 		CountDown = 4;	
 		ThePlayer->SetFrozen(false);
 		TheMap->SetAutoScrollX(-4);	
@@ -641,7 +670,7 @@ void GiantGoomba::HandleMovement()
 						Mix_PlayChannel(CHANNEL_BREAK_BRICK, BreakBrickSound, 0);
 						Mix_PlayChannel(CHANNEL_BUMP, BumpSound, 0);
 
-						TheMap->SetForegroundTile(Tiles[i].Location.x, Tiles[i].Location.y, -1);
+						TheMap->SetForegroundTile(Tiles[i].Location.x, Tiles[i].Location.y, -1);						
 						TheMap->SetMetaLayerTile(Tiles[i].Location.x, Tiles[i].Location.y, TILE_NONE);
 					}
 				}
@@ -704,6 +733,7 @@ void GiantGoomba::HandleMovement()
 						{
 							TheMap->SetForegroundTile(Tiles[i].Location.x, Tiles[i].Location.y, -1);
 							TheMap->SetMetaLayerTile(Tiles[i].Location.x, Tiles[i].Location.y, TILE_NONE);
+							TheMap->SetBackgroundTile(Tiles[i].Location.x, Tiles[i].Location.y, -1);
 
 							int SpawnX = Tiles[i].Location.x * 64;
 							int SpawnY = Tiles[i].Location.y * 64;
@@ -729,6 +759,7 @@ void GiantGoomba::HandleMovement()
 						{
 							TheMap->SetForegroundTile(Tiles[i].Location.x, Tiles[i].Location.y, -1);
 							TheMap->SetMetaLayerTile(Tiles[i].Location.x, Tiles[i].Location.y, TILE_NONE);
+							TheMap->SetBackgroundTile(Tiles[i].Location.x, Tiles[i].Location.y, -1);
 
 							int SpawnX = Tiles[i].Location.x * 64;
 							int SpawnY = Tiles[i].Location.y * 64;
@@ -771,7 +802,7 @@ void GiantGoomba::HandleMovement()
 
 void GiantGoomba::GetStomped()
 {
-	ThePlayer->SetVelocityY(-40);
+	ThePlayer->SetVelocityY(-70);
 	ThePlayer->SetVelocityX(-30);
 	ThePlayer->SetPosition(ThePlayer->GetPosX(), ThePlayer->GetPosY() - 32);
 
@@ -834,7 +865,7 @@ void PlantEnemySprite::EnterState(ePlantState NewState)
 	switch (NewState)
 	{
 	case PLANT_STATE_RETRACTED:
-		CountDown = 74;
+		CountDown = 62;
 		VelocityY = 0;
 		break;
 
@@ -844,7 +875,7 @@ void PlantEnemySprite::EnterState(ePlantState NewState)
 		break;
 
 	case PLANT_STATE_EXTENDED:
-		CountDown = 74;
+		CountDown = 62;
 		VelocityY = 0;
 		break;
 
@@ -867,17 +898,43 @@ void PlantEnemySprite::Tick(double DeltaTime)
 {
 	Sprite::Tick(DeltaTime);
 
-	PosX += VelocityX;
-	PosY += VelocityY;
-
-	Rect.x = PosX;
-	Rect.y = PosY;
-
-	CountDown--;
-
-	if (CountDown <= 0)
+	if (DyingCount == 0 && !bGotBricked)
 	{
-		LeaveState(CurrentState);
-		EnterState((ePlantState)(CurrentState + 1));
+		PosX += VelocityX;
+		PosY += VelocityY;
+
+		Rect.x = PosX;
+		Rect.y = PosY;
+
+		CountDown--;
+
+		if (CountDown <= 0)
+		{
+			LeaveState(CurrentState);
+			EnterState((ePlantState)(CurrentState + 1));
+		}
+	}
+	else if (bGotBricked)
+	{
+		PosX += VelocityX;
+		PosY += VelocityY;
+		Rect.x = PosX;// -TheMap->GetScrollX();
+		Rect.y = PosY;
+		VelocityY += BASE_FALL_VELOCITY / 2;
+		Flip = SDL_FLIP_VERTICAL;
+		if (PosY >= TheMap->GetHeightInPixels())
+		{
+			bPendingDelete = true;
+		}
+
+	}
+	else
+	{
+		DyingCount++;
+
+		if (DyingCount == DYING_COUNT)
+		{
+			bPendingDelete = true;
+		}
 	}
 }

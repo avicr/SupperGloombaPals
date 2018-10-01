@@ -184,7 +184,11 @@ void TMXMap::ReadMap(const char* FileName)
 			{
 				Layers.push_back(LoadLayer(pElem));
 				
-				if (strcmp(pElem->Attribute("name"), "Foreground") == 0)
+				if (strcmp(pElem->Attribute("name"), "Background") == 0)
+				{
+					BackgroundLayer = Layers[Layers.size() - 1];
+				}
+				else if (strcmp(pElem->Attribute("name"), "Foreground") == 0)
 				{
 					ForegroundLayer = Layers[Layers.size() - 1];
 
@@ -1229,6 +1233,13 @@ void TMXMap::SetForegroundTile(int TileX, int TileY, int TileType)
 	ForegroundLayer->TileData[TileY][TileX] = TileType + StandardTileGID;
 }
 
+void TMXMap::SetBackgroundTile(int TileX, int TileY, int TileType)
+{
+	// Todo:
+	// if within bounds
+	BackgroundLayer->TileData[TileY][TileX] = TileType + StandardTileGID;
+}
+
 void TMXMap::HandleCollision(int TileX, int TileY, bool bCanBreakBricks)
 {
 	int MetaTileType = GetMetaTileType(TileX, TileY);	
@@ -1479,7 +1490,7 @@ void TMXMap::Tick(double DeltaTime)
 	}
 
 	// Apply scroll velocities
-	if (!ThePlayer->IsChangingSize() && (ScrollVelocityX || ScrollVelocityY))
+	if (!ThePlayer->IsWarping() && !ThePlayer->IsChangingSize() && (ScrollVelocityX || ScrollVelocityY))
 	{
 		AutoScroll();
 	}
