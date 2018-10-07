@@ -90,6 +90,30 @@ void EnemySprite::GetBricked(int TileX, int TileY)
 	}
 }
 
+void EnemySprite::GetStarred(int TileX, int TileY)
+{
+	// TODO: Move this shit to the enemy sprite!
+	if (!IsDying())
+	{
+		Mix_PlayChannel(CHANNEL_KICK, KickSound, 0);
+		VelocityY = -10;
+
+		// Which half of a tile are we on?
+		SDL_Rect MapSpaceCollisionRect = GetMapSpaceCollisionRect();
+
+		if ((MapSpaceCollisionRect.x) / 64 * 64 < TileX)
+		{
+			VelocityX = -3;
+		}
+		else
+		{
+			VelocityX = 3;
+		}
+		bGotBricked = true;
+		Flip = SDL_FLIP_VERTICAL;
+	}
+}
+
 void EnemySprite::GetFired()
 {
 	GetBricked(PosX / 64, PosY / 64);
@@ -936,5 +960,67 @@ void PlantEnemySprite::Tick(double DeltaTime)
 		{
 			bPendingDelete = true;
 		}
+	}
+}
+
+BulletEnemySprite::BulletEnemySprite(EnemySpawnPoint* Spawner) :
+	EnemySprite(Spawner)
+{
+	SetTexture(GResourceManager->BulletTexture->Texture);
+	SetWidth(64);
+	SetHeight(64);
+
+	if (ThePlayer->GetPosX() < Spawner->GetPosX())
+	{
+		VelocityX = -6;
+		DestinationX = Spawner->GetPosX() - 64;
+	}
+	else
+	{
+		VelocityX = 6;
+		SetFlip(SDL_FLIP_HORIZONTAL);
+		DestinationX = Spawner->GetPosX() + 64;
+	}
+
+	Mix_PlayChannel(CHANNEL_FIREWORK, FireworkSound, 0);
+	
+	RenderLayer = RENDER_LAYER_BEHIND_FG;
+	CollisionRect = { 9, 24, 44, 28 };
+}
+
+void BulletEnemySprite::Tick(double DeltaTime)
+{	
+	Sprite::Tick(DeltaTime);
+
+	if (RenderLayer == RENDER_LAYER_BEHIND_FG && (VelocityX <= 0 && PosX < DestinationX || VelocityX > 0 && PosX > DestinationX))
+	{
+		RenderLayer = RENDER_LAYER_TOP;
+	}
+
+	if (bGotBricked)
+	{
+		VelocityY += BASE_FALL_VELOCITY / 4;
+
+		if (VelocityY > 10)
+		{
+			VelocityY = 10;
+		}
+	}
+
+	PosX += VelocityX;
+	PosY += VelocityY;
+
+	Rect.x = PosX;
+	Rect.y = PosY;
+}
+
+void BulletEnemySprite::GetStomped()
+{
+	if (!IsDying())
+	{
+		VelocityX = 0;	
+		PosY--;
+			
+		bGotBricked = true;
 	}
 }

@@ -3,7 +3,7 @@
 #include "../inc/SpriteList.h"
 
 EnemySpawnPoint::EnemySpawnPoint(eEnemyType InEnemyType, int X, int Y)
-{
+{	
 	bRespawn = true;
 	bCanSpawnWhileVisible = false;
 	bHasSpawnedEnemy = false;
@@ -29,6 +29,12 @@ EnemySpawnPoint::EnemySpawnPoint(eEnemyType InEnemyType, int X, int Y)
 		bCanSpawnWhileVisible = true;
 		bRespawn = false;
 	}
+	if (EnemyType == ENEMY_BULLET)
+	{
+		bCanSpawnWhileVisible = true;
+		bRespawn = true;		
+		SetTexture(GResourceManager->BulletTexture->Texture);
+	}
 	SetWidth(64);
 	SetHeight(64);
 	SetPosition(X, Y);
@@ -52,18 +58,18 @@ void EnemySpawnPoint::Tick(double DeltaTime)
 	bool bVisibleSpawnCheckResult = bCanSpawnWhileVisible || !InMapWindow();
 
 	if (bVisibleSpawnCheckResult && InMapWindow({ SPAWN_DISTANCE, SPAWN_DISTANCE }))
-	{				
-		if (!bInRange && !bHasSpawnedEnemy)
+	{
+		if (!bHasSpawnedEnemy && !bInRange)
 		{
-			SpawnEnemy();	
-		}
+			SpawnEnemy();
 
+		}
 		bInRange = true;
 	}
 	else
 	{
 		bInRange = false;
-	}
+	}	
 }
 
 void EnemySpawnPoint::Render(SDL_Renderer* Renderer, int ResourceNum)
@@ -108,6 +114,14 @@ void EnemySpawnPoint::SpawnEnemy()
 		NewEnemy->SetHeight(128);
 		EnemySprites.push_back(NewEnemy);
 	}
+	else if (EnemyType == ENEMY_BULLET)
+	{
+		BulletEnemySprite* NewEnemy = new BulletEnemySprite(this);
+		NewEnemy->SetPosition(PosX, PosY);
+		NewEnemy->SetWidth(64);
+		NewEnemy->SetHeight(64);
+		EnemySprites.push_back(NewEnemy);		
+	}
 }
 
 void EnemySpawnPoint::OnEnemyDestroyed()
@@ -115,5 +129,34 @@ void EnemySpawnPoint::OnEnemyDestroyed()
 	if (bRespawn)
 	{
 		bHasSpawnedEnemy = false;
+	}
+}
+
+TimedEnemySpawnPoint::TimedEnemySpawnPoint(eEnemyType InEnemyType, int X, int Y)
+	: EnemySpawnPoint(InEnemyType, X, Y)
+{	
+	if (EnemyType == ENEMY_BULLET)
+	{
+		NumRespawnFrames = 200;
+		RespawnCountDown = NumRespawnFrames;
+	}
+}
+
+void TimedEnemySpawnPoint::Tick(double DeltaTime)
+{
+	bool bVisibleSpawnCheckResult = bCanSpawnWhileVisible || !InMapWindow();
+	RespawnCountDown--;
+	
+	if (RespawnCountDown == 0)
+	{
+		bool bPlayerTooClose = PosX - (ThePlayer->GetPosX() + ThePlayer->GetWidth()) <= 96 &&
+			ThePlayer->GetPosX() - (PosX + Rect.w) <= 96;
+
+		if (!bPlayerTooClose && InMapWindow({ SPAWN_DISTANCE, SPAWN_DISTANCE }))
+		{
+			SpawnEnemy();			
+		}
+
+		RespawnCountDown = NumRespawnFrames;
 	}
 }
