@@ -22,7 +22,7 @@ public:
 class BrickBreakSprite : public Sprite
 {
 public:
-	BrickBreakSprite(int X, int Y, double InVelocityX);
+	BrickBreakSprite(int X, int Y, double InVelocityX, eTileMetaType MetaTileType = TILE_BREAKABLE);
 	virtual void Tick(double DeltaTime);
 };
 

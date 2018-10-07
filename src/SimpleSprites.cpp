@@ -65,7 +65,7 @@ void CoinEffectSprite::Tick(double DeltaTime)
 	}
 }
 
-BrickBreakSprite::BrickBreakSprite(int X, int Y, double InVelocityX)
+BrickBreakSprite::BrickBreakSprite(int X, int Y, double InVelocityX, eTileMetaType MetaTileType)
 {	
 	eBrickBreakTilesetID BrickTilesetID = TheMap->GetBrickTilesetID();
 	SetPosition(X, Y);
@@ -79,13 +79,20 @@ BrickBreakSprite::BrickBreakSprite(int X, int Y, double InVelocityX)
 	{
  		eBrickBreakTilesetID BricktileSet = TheMap->GetBrickTilesetID();
 		
-		switch (BricktileSet)
+		if (!TheMap->IsDestroyableByFireTile(MetaTileType))
 		{
-		case BRICK_TILESET_UNDERGROUND:
+			switch (BricktileSet)
+			{
+			case BRICK_TILESET_UNDERGROUND:
 				PlayAnimation(GResourceManager->BrickBreakUAnimation);
 				break;
-		default:
-			PlayAnimation(GResourceManager->BrickBreakAnimation);
+			default:
+				PlayAnimation(GResourceManager->BrickBreakAnimation);
+			}			
+		}
+		else
+		{
+			PlayAnimation(GResourceManager->IceBreakAnimation);
 		}
 	}
 	else
@@ -185,19 +192,10 @@ void FireBallSprite::Tick(double DeltaTime)
 			{								
 				if (TheMap->IsDestroyableByFireTile(HitTileLocs[i].MetaTileType))
 				{
-					TheMap->SetForegroundTile(HitTileLocs[i].Location.x, HitTileLocs[i].Location.y, -1);
-					TheMap->SetMetaLayerTile(HitTileLocs[i].Location.x, HitTileLocs[i].Location.y, TILE_NONE);
-					Mix_PlayChannel(CHANNEL_BREAK_BRICK, BreakBrickSound, 0);
-
-					int SpawnX = HitTileLocs[i].Location.x * 64;
-					int SpawnY = HitTileLocs[i].Location.y * 64;
-					SimpleSprites.push_back(new BrickBreakSprite(SpawnX, SpawnY - 32, -4));
-					SimpleSprites.push_back(new BrickBreakSprite(SpawnX + 32, SpawnY - 32, 4));
-					SimpleSprites.push_back(new BrickBreakSprite(SpawnX, SpawnY + 32, -4));
-					SimpleSprites.push_back(new BrickBreakSprite(SpawnX + 32, SpawnY + 32, 4));
-					
+					TheMap->DoBrickBreak(HitTileLocs[i].Location.x, HitTileLocs[i].Location.y);
+					bPendingDelete = true;
 					bDestroyedBrick = true;
-					break;
+					return;
 				}
 			}
 
@@ -228,21 +226,9 @@ void FireBallSprite::Tick(double DeltaTime)
 			{
 				if (TheMap->IsDestroyableByFireTile(HitTileLocs[i].MetaTileType))
 				{
-					bool bDestroyedBrick = false;
+					TheMap->DoBrickBreak(HitTileLocs[i].Location.x, HitTileLocs[i].Location.y);
 					bPendingDelete = true;
-					TheMap->SetForegroundTile(HitTileLocs[i].Location.x, HitTileLocs[i].Location.y, -1);
-					TheMap->SetMetaLayerTile(HitTileLocs[i].Location.x, HitTileLocs[i].Location.y, TILE_NONE);
-					Mix_PlayChannel(CHANNEL_BREAK_BRICK, BreakBrickSound, 0);
-
-					int SpawnX = HitTileLocs[i].Location.x * 64;
-					int SpawnY = HitTileLocs[i].Location.y * 64;
-					SimpleSprites.push_back(new BrickBreakSprite(SpawnX, SpawnY - 32, -4));
-					SimpleSprites.push_back(new BrickBreakSprite(SpawnX + 32, SpawnY - 32, 4));
-					SimpleSprites.push_back(new BrickBreakSprite(SpawnX, SpawnY + 32, -4));
-					SimpleSprites.push_back(new BrickBreakSprite(SpawnX + 32, SpawnY + 32, 4));
-					
-					bDestroyedBrick = true;
-					break;
+					return;
 				}
 			}
 		}
@@ -259,21 +245,9 @@ void FireBallSprite::Tick(double DeltaTime)
 				{
 					if (TheMap->IsDestroyableByFireTile(HitTileLocs[i].MetaTileType))
 					{
-						bool bDestroyedBrick = false;
+						TheMap->DoBrickBreak(HitTileLocs[i].Location.x, HitTileLocs[i].Location.y);
 						bPendingDelete = true;
-						TheMap->SetForegroundTile(HitTileLocs[i].Location.x, HitTileLocs[i].Location.y, -1);
-						TheMap->SetMetaLayerTile(HitTileLocs[i].Location.x, HitTileLocs[i].Location.y, TILE_NONE);
-						Mix_PlayChannel(CHANNEL_BREAK_BRICK, BreakBrickSound, 0);
-
-						int SpawnX = HitTileLocs[i].Location.x * 64;
-						int SpawnY = HitTileLocs[i].Location.y * 64;
-						SimpleSprites.push_back(new BrickBreakSprite(SpawnX, SpawnY - 32, -4));
-						SimpleSprites.push_back(new BrickBreakSprite(SpawnX + 32, SpawnY - 32, 4));
-						SimpleSprites.push_back(new BrickBreakSprite(SpawnX, SpawnY + 32, -4));
-						SimpleSprites.push_back(new BrickBreakSprite(SpawnX + 32, SpawnY + 32, 4));
-
-						bDestroyedBrick = true;
-						break;
+						return;
 					}
 				}
 			}
@@ -289,21 +263,9 @@ void FireBallSprite::Tick(double DeltaTime)
 				{
 					if (TheMap->IsDestroyableByFireTile(HitTileLocs[i].MetaTileType))
 					{
-						bool bDestroyedBrick = false;
+						TheMap->DoBrickBreak(HitTileLocs[i].Location.x, HitTileLocs[i].Location.y);
 						bPendingDelete = true;
-						TheMap->SetForegroundTile(HitTileLocs[i].Location.x, HitTileLocs[i].Location.y, -1);
-						TheMap->SetMetaLayerTile(HitTileLocs[i].Location.x, HitTileLocs[i].Location.y, TILE_NONE);
-						Mix_PlayChannel(CHANNEL_BREAK_BRICK, BreakBrickSound, 0);
-
-						int SpawnX = HitTileLocs[i].Location.x * 64;
-						int SpawnY = HitTileLocs[i].Location.y * 64;
-						SimpleSprites.push_back(new BrickBreakSprite(SpawnX, SpawnY - 32, -4));
-						SimpleSprites.push_back(new BrickBreakSprite(SpawnX + 32, SpawnY - 32, 4));
-						SimpleSprites.push_back(new BrickBreakSprite(SpawnX, SpawnY + 32, -4));
-						SimpleSprites.push_back(new BrickBreakSprite(SpawnX + 32, SpawnY + 32, 4));
-
-						bDestroyedBrick = true;
-						break;
+						return;
 					}
 				}
 			}

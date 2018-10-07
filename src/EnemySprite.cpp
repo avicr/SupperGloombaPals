@@ -684,7 +684,9 @@ void GiantGoomba::HandleMovement()
 				{
 					if (TheMap->IsCollidableTile(Tiles[i].MetaTileType, Tiles[i].Location.x, Tiles[i].Location.y))
 					{
-						int SpawnX = Tiles[i].Location.x * 64;
+						TheMap->DoBrickBreak(Tiles[i].Location.x, Tiles[i].Location.y);
+
+						/*int SpawnX = Tiles[i].Location.x * 64;
 						int SpawnY = Tiles[i].Location.y * 64;
 						SimpleSprites.push_back(new BrickBreakSprite(SpawnX, SpawnY - 32, -4));
 						SimpleSprites.push_back(new BrickBreakSprite(SpawnX + 32, SpawnY - 32, 4));
@@ -695,7 +697,7 @@ void GiantGoomba::HandleMovement()
 						Mix_PlayChannel(CHANNEL_BUMP, BumpSound, 0);
 
 						TheMap->SetForegroundTile(Tiles[i].Location.x, Tiles[i].Location.y, -1);						
-						TheMap->SetMetaLayerTile(Tiles[i].Location.x, Tiles[i].Location.y, TILE_NONE);
+						TheMap->SetMetaLayerTile(Tiles[i].Location.x, Tiles[i].Location.y, TILE_NONE);*/
 					}
 				}
 				//break;

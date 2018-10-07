@@ -683,6 +683,11 @@ void TMXMap::Render(SDL_Renderer* Renderer, int ScreenX, int ScreenY, int Source
 {
 	SimpleSprites.Render(Renderer, RENDER_LAYER_BEHIND_BG);
 
+	if (bPlayingLevel && ThePlayer->IsWarping())
+	{
+		ThePlayer->Render(Renderer);
+	}
+
 	for (int i = 0; i < Layers.size(); i++)
 	{
 		// Render the item sprites just before the foreground layer
@@ -691,7 +696,7 @@ void TMXMap::Render(SDL_Renderer* Renderer, int ScreenX, int ScreenY, int Source
 			ItemSprites.Render(Renderer, RENDER_LAYER_BEHIND_FG);
 			EnemySprites.Render(Renderer, RENDER_LAYER_BEHIND_FG);
 
-			if (bPlayingLevel && (ThePlayer->IsWarping() || ThePlayer->GetRenderLayer() == RENDER_LAYER_BEHIND_FG))
+			if (bPlayingLevel && !ThePlayer->IsWarping() && ThePlayer->GetRenderLayer() == RENDER_LAYER_BEHIND_FG)
 			{				
 				ThePlayer->Render(Renderer);
 			}
@@ -1178,7 +1183,7 @@ bool TMXMap::IsCollidableTile(int MetaTileID, int TileX, int TileY, SDL_Point Te
 	int ForegroundTile = ForegroundLayer->TileData[TileY][TileX];
 
 	if (MetaTileID == TILE_RED_COIN_BLOCK  || MetaTileID == TILE_COIN_BLOCK || MetaTileID == TILE_POWER_UP || MetaTileID == TILE_ONE_UP || MetaTileID == TILE_BREAKABLE || MetaTileID == TILE_MULTI_COIN_BLOCK || MetaTileID == TILE_STAR || MetaTileID == TILE_MAGIC_MUSHROOM || MetaTileID == TILE_DESTROY_WITH_FIRE ||
-		MetaTileID == TILE_DESTROY_WITH_FIRE_OR_BUMP)
+		MetaTileID == TILE_DESTROY_WITH_FIRE_LEAVE_COLLISION)
 	{
 		if (ForegroundTile != -1)
 		{
@@ -1195,6 +1200,33 @@ bool TMXMap::IsCollidableTile(int MetaTileID, int TileX, int TileY, SDL_Point Te
 	return false;
 }
 
+void TMXMap::DoBrickBreak(int TileX, int TileY)
+{
+	int SpawnX = TileX * 64;
+	int SpawnY = TileY * 64;
+	eTileMetaType MetaTile = GetMetaTileType(TileX, TileY);
+
+	SimpleSprites.push_back(new BrickBreakSprite(SpawnX, SpawnY - 32, -4, MetaTile));
+	SimpleSprites.push_back(new BrickBreakSprite(SpawnX + 32, SpawnY - 32, 4, MetaTile));
+	SimpleSprites.push_back(new BrickBreakSprite(SpawnX, SpawnY + 32, -4, MetaTile));
+	SimpleSprites.push_back(new BrickBreakSprite(SpawnX + 32, SpawnY + 32, 4, MetaTile));
+
+	Mix_PlayChannel(CHANNEL_BREAK_BRICK, BreakBrickSound, 0);
+	Mix_PlayChannel(CHANNEL_BUMP, BumpSound, 0);
+
+	SetForegroundTile(TileX, TileY, -1);
+
+	if (MetaTile == TILE_DESTROY_WITH_FIRE_LEAVE_COLLISION)
+	{
+		SetMetaLayerTile(TileX, TileY, TILE_COLLISION);
+	}
+	else
+	{
+		SetMetaLayerTile(TileX, TileY, TILE_NONE);
+	}
+	
+}
+
 bool TMXMap::IsHiddenBlockTile(int ID)
 {	
 
@@ -1209,7 +1241,7 @@ bool TMXMap::IsHiddenBlockTile(int ID)
 bool TMXMap::IsBreakableBlockTile(int ID)
 {
 
-	if (ID == TILE_BREAKABLE || ID == TILE_DESTROY_WITH_FIRE_OR_BUMP || ID == TILE_BREAK_ON_TOUCH)
+	if (ID == TILE_BREAKABLE || ID == TILE_BREAK_ON_TOUCH)
 	{
 		return true;
 	}
@@ -1293,18 +1325,7 @@ void TMXMap::HandleCollision(int TileX, int TileY, bool bCanBreakBricks)
 
 		if (MetaTileType == TILE_BREAK_ON_TOUCH)
 		{
-			int SpawnX = TileX * 64;
-			int SpawnY = TileY * 64;
-			SimpleSprites.push_back(new BrickBreakSprite(SpawnX, SpawnY - 32, -4));
-			SimpleSprites.push_back(new BrickBreakSprite(SpawnX + 32, SpawnY - 32, 4));
-			SimpleSprites.push_back(new BrickBreakSprite(SpawnX, SpawnY + 32, -4));
-			SimpleSprites.push_back(new BrickBreakSprite(SpawnX + 32, SpawnY + 32, 4));
-
-			Mix_PlayChannel(CHANNEL_BREAK_BRICK, BreakBrickSound, 0);			
-			Sprite* NewBlock = new EmptyBlockSprite(TileX * 64, TileY * 64 - 64, NULL, true, 0, TileX, TileY, ITEM_NONE);
-
-			SetMetaLayerTile(TileX, TileY, TILE_NONE);
-			SetForegroundTile(TileX, TileY, -1);
+			DoBrickBreak(TileX, TileY);
 		}
 		else if (MetaTileType == TILE_MULTI_COIN_BLOCK)
 		{
@@ -1386,20 +1407,9 @@ void TMXMap::HandleCollision(int TileX, int TileY, bool bCanBreakBricks)
 	{
 		if (bCanBreakBricks)
 		{
-			SetForegroundTile(TileX, TileY, -1);
-			SetMetaLayerTile(TileX, TileY, TILE_NONE);			
+			
 			ThePlayer->AddScore(50);
-			Mix_PlayChannel(CHANNEL_BREAK_BRICK, BreakBrickSound, 0);
-
-			int SpawnX = TileX * 64;
-			int SpawnY = TileY * 64;
-			SimpleSprites.push_back(new BrickBreakSprite(SpawnX, SpawnY - 32, -4));
-			SimpleSprites.push_back(new BrickBreakSprite(SpawnX + 32, SpawnY - 32, 4));
-			SimpleSprites.push_back(new BrickBreakSprite(SpawnX, SpawnY + 32, -4));
-			SimpleSprites.push_back(new BrickBreakSprite(SpawnX + 32, SpawnY + 32, 4));
-
-			Sprite* NewBlock = new EmptyBlockSprite(TileX * 64, TileY * 64 - 64, NULL, true, 0, TileX, TileY, ITEM_NONE);
-			SimpleSprites.push_back(NewBlock);
+			DoBrickBreak(TileX, TileY);
 			
 		}
 		else
@@ -1579,7 +1589,7 @@ SDL_Rect TMXMap::GetVisibleWindow()
 
 bool TMXMap::IsDestroyableByFireTile(int ID)
 {
-	return ID == TILE_DESTROY_WITH_FIRE || ID == TILE_DESTROY_WITH_FIRE_OR_BUMP;
+	return ID == TILE_DESTROY_WITH_FIRE || ID == TILE_DESTROY_WITH_FIRE_LEAVE_COLLISION;
 }
 
 double TMXMap::TradeTimeForPoints(int Amount)

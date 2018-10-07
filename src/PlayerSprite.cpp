@@ -1333,7 +1333,7 @@ void PlayerSprite::CheckWarpCollision()
 			SDL_Rect WarpCollision = { Warps[i].Entrances[j].PosX, Warps[i].Entrances[j].PosY, 64, 64 };
 			SDL_Rect ResultRect;
 
-			SDL_Rect CollisionRect = GetMapSpaceCollisionRect();
+			SDL_Rect CollisionRect = GetMapSpaceCollisionRect();			
 
 			// Make the warp a little smaller so we can't hang off the edge when going down pipes
 			SDL_Rect VerticalWarpCollision = { Warps[i].Entrances[j].PosX + 32, Warps[i].Entrances[j].PosY, 0, 64 };
@@ -1341,7 +1341,13 @@ void PlayerSprite::CheckWarpCollision()
 			// Down pipe
 			if (Warps[i].Entrances[j].WarpType == WARP_PIPE_DOWN && IsDownPressed(LastKeyboardState) && CollisionRect.x + CollisionRect.w >= VerticalWarpCollision.x && CollisionRect.x <= VerticalWarpCollision.x + VerticalWarpCollision.w && CollisionRect.y + CollisionRect.h + 1 == VerticalWarpCollision.y)
 			{
-				StartWarpSequence(Warps[i].Entrances[j], Warps[i].Exits[0]);
+				eTileMetaType MetaTileBelow = TheMap->GetMetaTileType(Warps[i].Entrances[j].PosX / 64, Warps[i].Entrances[j].PosY / 64);
+				eTileMetaType MetaTileBelowAndRight = TheMap->GetMetaTileType(Warps[i].Entrances[j].PosX / 64 + 1, Warps[i].Entrances[j].PosY / 64);
+
+				if (!TheMap->IsDestroyableByFireTile(MetaTileBelow) && !TheMap->IsDestroyableByFireTile(MetaTileBelowAndRight))
+				{
+					StartWarpSequence(Warps[i].Entrances[j], Warps[i].Exits[0]);
+				}
 			}
 			// Up pipe
 			else if (Warps[i].Entrances[j].WarpType == WARP_PIPE_UP && IsUpPressed(LastKeyboardState) && CollisionRect.x + CollisionRect.w >= VerticalWarpCollision.x && CollisionRect.x <= VerticalWarpCollision.x + VerticalWarpCollision.w && CollisionRect.y - 6 <= VerticalWarpCollision.y + VerticalWarpCollision.h)
@@ -1536,9 +1542,9 @@ void PlayerSprite::UpdateWarpSequence()
 			}
 			else if (!WarpSeq.Entrance.bQuickTransition && WarpSeq.FrameCount <= 58)
 			{
-				if (WarpSeq.Exit.MusicChange)
+				if (WarpSeq.FrameCount == 33 && WarpSeq.Exit.MusicChange)
 				{
-					Mix_PauseMusic();
+					Mix_HaltMusic();
 				}
 				GRenderBlackout = true;
 			}

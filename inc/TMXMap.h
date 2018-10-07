@@ -166,7 +166,7 @@ enum eTileMetaType
 	TILE_TRIGGER,
 	TILE_MAGIC_MUSHROOM,
 	TILE_DESTROY_WITH_FIRE,
-	TILE_DESTROY_WITH_FIRE_OR_BUMP,
+	TILE_DESTROY_WITH_FIRE_LEAVE_COLLISION,
 	TILE_FLAG_POLE,
 	TILE_BREAK_ON_TOUCH,	
 	TILE_RED_COIN_BLOCK,
@@ -424,6 +424,8 @@ public:
 	bool IsBreakableBlockTile(int ID);
 	bool IsCoinTile(int ID);
 	bool IsCollidableTile(int MetaTileID, int TileX, int TileY, SDL_Point TestPoint = { -1, -1 });
+
+	void DoBrickBreak(int TileX, int TileY);
 
 	void SetMetaLayerTile(int TileX, int TileY, eTileMetaType TileType);
 	void SetForegroundTile(int TileX, int TileY, int TileID);

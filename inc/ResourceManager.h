@@ -55,6 +55,7 @@ public:
 	DECLARE_TEXTURE_RESOURCE(MagicMushroomTexture, "magicmushroom.bmp", false)
 	DECLARE_TEXTURE_RESOURCE(BrickBreakTexture, "brickbreak.bmp", false)
 	DECLARE_TEXTURE_RESOURCE(BrickBreakUTexture, "brickbreakU.bmp", false)
+	DECLARE_TEXTURE_RESOURCE(IceBreakTexture, "breakice.png", false)
 	DECLARE_TEXTURE_RESOURCE(FlowerTexture, "flower.bmp", false)
 	DECLARE_TEXTURE_RESOURCE(FireTexture, "fire.bmp", false)
 	DECLARE_TEXTURE_RESOURCE(ExplosionTexture, "explosion.bmp", false)
@@ -159,6 +160,20 @@ public:
 		}
 	}
 	END_DECLARE_ANIMATION_RESOURCE(BrickBreakAnimation)
+
+	BEGIN_DECLARE_ANIMATION_RESORCE(IceBreakAnimation)
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			int SpriteWidth = 64;
+			int SpriteHeight = 64;
+			SDL_Rect SrcRect = { i * SpriteWidth, 0, SpriteWidth, SpriteHeight };
+			bUseAbsoluteFrameCount = true;
+
+			Frames.push_back(new Frame(ResourceManager::IceBreakTexture, SrcRect, 3));
+		}
+	}
+	END_DECLARE_ANIMATION_RESOURCE(IceBreakAnimation)
 
 	BEGIN_DECLARE_ANIMATION_RESORCE(BrickBreakUAnimation)
 	{
