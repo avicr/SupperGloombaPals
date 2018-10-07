@@ -37,6 +37,7 @@ public:
 	virtual bool WasBricked();
 	virtual bool IsStompable();
 	virtual void GetBricked(int TileX, int TileY);
+	virtual void GetStarred(int TileX, int TileY);
 	virtual void GetFired();
 	virtual void OnInteractedWith(EnemySprite* Other) {};
 protected:
@@ -127,4 +128,20 @@ public:
 	void EnterState(ePlantState NewState);
 	void LeaveState(ePlantState PreviousState);
 	bool IsStompable() { return false; }
+};
+
+class BulletEnemySprite : public EnemySprite
+{
+protected:
+
+	// The position where we should switch our render layer
+	double DestinationX;
+public:
+	BulletEnemySprite(EnemySpawnPoint* Spawner);
+
+	virtual void Tick(double DeltaTime);
+	void GetFired() {};
+	void GetBricked(int TileX, int TileY) {};
+	void GetStomped();
+
 };

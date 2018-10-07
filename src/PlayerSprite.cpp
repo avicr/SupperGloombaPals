@@ -541,7 +541,7 @@ bool PlayerSprite::Interact(EnemySprite* Enemy)
 	{
 		if (StarCountdown)
 		{
-			Enemy->GetBricked(PosX / 64 * 64, PosY / 64 * 64);
+			Enemy->GetStarred(PosX / 64 * 64, PosY / 64 * 64);
 			AddScore(100, Enemy->GetPosX(), Enemy->GetPosY());
 		}
 		// If the bottom of the player's foot is ontop or above the enemy, kill it
@@ -571,6 +571,7 @@ void PlayerSprite::Interact(ItemSprite* Item)
 		return;
 	}
 
+	bool bIsOneUp = false;
 	eItemType ItemType = Item->GetItem();
 	Item->GetCollected();	
 
@@ -595,6 +596,7 @@ void PlayerSprite::Interact(ItemSprite* Item)
 	else if (ItemType == ITEM_ONE_UP)
 	{
 		Lives++;
+		bIsOneUp = true;
 		Mix_PlayChannel(CHANNEL_ONE_UP, OneUpSound, 0);
 	}
 	else if (ItemType == ITEM_STAR)
@@ -622,7 +624,7 @@ void PlayerSprite::Interact(ItemSprite* Item)
 		Mix_PlayChannel(CHANNEL_POWER_UP, PowerUpGetSound, 0);
 	}
 	
-	AddScore(1000, Item->GetPosX(), Item->GetPosY());
+	AddScore(1000, Item->GetPosX(), Item->GetPosY(), bIsOneUp);
 	
 	// Delete the item that we just consumed
 	ItemSprites.DeletePendingActors();
@@ -1180,7 +1182,7 @@ void PlayerSprite::Stomp(Sprite* Other)
 	//Launch();
 }
 
-void PlayerSprite::Launch()
+void PlayerSprite::Launch(double InVelocityY)
 {
 	if (IsOnGround())
 	{		
@@ -1188,7 +1190,7 @@ void PlayerSprite::Launch()
 		Rect.y-=2;
 	}
 
-	VelocityY = -16;
+	VelocityY = InVelocityY;
 }
 
 void PlayerSprite::IncreaseStompCounter(int Amount)

@@ -303,9 +303,14 @@ struct TMXTileset
 		ImagePath = ImagePath.replace(0, 2, "Resource");
 				
 		SDL_Surface * Image = SDL_LoadBMP(ImagePath.c_str());
-		SDL_Log("Loaded: %d", Image);
+		if (!Image)
+		{
+			Image = IMG_Load(ImagePath.c_str());
+		}
 		SDL_SetColorKey(Image, SDL_TRUE, SDL_MapRGB(Image->format, 0xFF, 0, 0xFF));
 		TilesetTexture = SDL_CreateTextureFromSurface(GetRenderer(), Image);		
+
+		SDL_Log("Loaded: %d", Image);
 
 		SDL_FreeSurface(Image);
 	}

@@ -787,11 +787,6 @@
     <property name="ENEMY_ID" type="int" value="2"/>
    </properties>
   </object>
-  <object id="254" gid="203" x="20320" y="8256" width="64" height="64">
-   <properties>
-    <property name="ENEMY_ID" type="int" value="2"/>
-   </properties>
-  </object>
   <object id="255" gid="196" x="160" y="1024" width="64" height="64">
    <properties>
     <property name="killy" type="int" value="1183"/>

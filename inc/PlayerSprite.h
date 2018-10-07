@@ -73,7 +73,7 @@ public:
 	bool IsDying();
 	void BeginDie();
 	int GetTripLevel() {return TripLevel;}
-	void Launch();
+	void Launch(double InVelocityY = -16);
 	void GrabFlagPole(class FlagPoleSprite* FlagPole);
 	void UpdateFlagPoleAnimation();
 	void OnFlagFinished();

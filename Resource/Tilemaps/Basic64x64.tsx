@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tileset name="Basic64x64" tilewidth="64" tileheight="64" tilecount="100" columns="10">
- <image source="../textures/tilesheet01_64x64.bmp" trans="ff00ff" width="640" height="640"/>
+ <image source="../textures/tilesheet01_64x64.png" trans="ff00ff" width="640" height="640"/>
  <tile id="18" type="PIPE_ENTRANCE"/>
  <tile id="19" type="ENEMY_SPAWN"/>
  <tile id="29" type="ENEMY_SPAWN">

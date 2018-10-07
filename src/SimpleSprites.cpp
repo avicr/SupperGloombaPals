@@ -197,6 +197,7 @@ void FireBallSprite::Tick(double DeltaTime)
 					SimpleSprites.push_back(new BrickBreakSprite(SpawnX + 32, SpawnY + 32, 4));
 					
 					bDestroyedBrick = true;
+					break;
 				}
 			}
 
@@ -225,7 +226,7 @@ void FireBallSprite::Tick(double DeltaTime)
 		{
 			for (int i = 0; i < HitTileLocs.size(); i++)
 			{
-				if (HitTileLocs[i].MetaTileType == TILE_DESTROY_WITH_FIRE)
+				if (TheMap->IsDestroyableByFireTile(HitTileLocs[i].MetaTileType))
 				{
 					bool bDestroyedBrick = false;
 					bPendingDelete = true;
@@ -241,18 +242,22 @@ void FireBallSprite::Tick(double DeltaTime)
 					SimpleSprites.push_back(new BrickBreakSprite(SpawnX + 32, SpawnY + 32, 4));
 					
 					bDestroyedBrick = true;
+					break;
 				}
 			}
 		}
+
 		if (IsOnGround() && VelocityY >= 0)
 		{
+			NewRect = GetScreenSpaceCustomRect();			
 			VelocityY = -10;
+			NewRect.y++;
 			HitTileLocs.clear();
 			if (TheMap->CheckCollision(NewRect, HitTileLocs, true))
 			{
 				for (int i = 0; i < HitTileLocs.size(); i++)
 				{
-					if (HitTileLocs[i].MetaTileType == TILE_DESTROY_WITH_FIRE)
+					if (TheMap->IsDestroyableByFireTile(HitTileLocs[i].MetaTileType))
 					{
 						bool bDestroyedBrick = false;
 						bPendingDelete = true;
@@ -268,6 +273,7 @@ void FireBallSprite::Tick(double DeltaTime)
 						SimpleSprites.push_back(new BrickBreakSprite(SpawnX + 32, SpawnY + 32, 4));
 
 						bDestroyedBrick = true;
+						break;
 					}
 				}
 			}
@@ -281,7 +287,7 @@ void FireBallSprite::Tick(double DeltaTime)
 			{
 				for (int i = 0; i < HitTileLocs.size(); i++)
 				{
-					if (HitTileLocs[i].MetaTileType == TILE_DESTROY_WITH_FIRE)
+					if (TheMap->IsDestroyableByFireTile(HitTileLocs[i].MetaTileType))
 					{
 						bool bDestroyedBrick = false;
 						bPendingDelete = true;
@@ -297,6 +303,7 @@ void FireBallSprite::Tick(double DeltaTime)
 						SimpleSprites.push_back(new BrickBreakSprite(SpawnX + 32, SpawnY + 32, 4));
 
 						bDestroyedBrick = true;
+						break;
 					}
 				}
 			}

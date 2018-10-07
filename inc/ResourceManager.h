@@ -66,6 +66,7 @@ public:
 	DECLARE_TEXTURE_RESOURCE(FlagTexture, "flag.bmp", false);
 	DECLARE_TEXTURE_RESOURCE(SecretFlagTexture, "secretflag.bmp", false);
 	DECLARE_TEXTURE_RESOURCE(PlayerFlagTexture, "playerflag.bmp", false);
+	DECLARE_TEXTURE_RESOURCE(BulletTexture, "bullet.bmp", false);
 
 	
 	BEGIN_DECLARE_ANIMATION_RESORCE(GoombaGrowAnimation)

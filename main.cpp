@@ -839,7 +839,8 @@ void InitSDL()
 	{
 
 		SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK);
-		
+		IMG_Init(IMG_INIT_PNG);
+
 		if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024) == -1)
 		{			
 		}
@@ -978,6 +979,9 @@ void CleanUp()
 	SDL_DestroyRenderer(GRenderer);
 	SDL_DestroyWindow(GWindow);
 	DestroyWindow2();
+
+	TTF_Quit();
+	IMG_Quit();
 	SDL_Quit();
 }
 

@@ -195,6 +195,7 @@ extern float RenderScale;
 #define CHANNEL_FLAG_POLE 11
 #define CHANNEL_EVENT 12
 #define CHANNEL_RED_COIN 13
+#define CHANNEL_FIREWORK 14
 
 #define SCREEN_WIDTH 1024
 #define SCREEN_HEIGHT 896

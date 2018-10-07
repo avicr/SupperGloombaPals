@@ -345,7 +345,16 @@ void TMXMap::LoadObjects(TiXmlElement* ObjectElement)
 				PropElem = PropElem->NextSiblingElement();
 			}	
 
- 			SimpleSprites.push_back(new EnemySpawnPoint((eEnemyType)EnemyType, X, Y - 64));
+			EnemySpawnPoint* NewEnemySpawnPoint;
+			if (EnemyType == ENEMY_BULLET)
+			{
+				NewEnemySpawnPoint = new TimedEnemySpawnPoint((eEnemyType)EnemyType, X, Y - 64);
+			}
+			else
+			{
+				NewEnemySpawnPoint = new EnemySpawnPoint((eEnemyType)EnemyType, X, Y - 64);
+			}
+ 			SimpleSprites.push_back(NewEnemySpawnPoint);
 		}
 		// Warp entrances
 		else if (TileId == 4)

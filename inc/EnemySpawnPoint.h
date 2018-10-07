@@ -7,7 +7,7 @@ enum eEnemyType
 	ENEMY_GOOMBA = 0,
 	ENEMY_TURTLE,
 	ENEMY_PLANT,
-	ENEMY_RESERVED,
+	ENEMY_BULLET,
 	ENEMY_RESERVED2,
 	ENEMY_GIANT_GOOMBA
 };
@@ -21,7 +21,7 @@ public:
 	virtual void SpawnEnemy();
 	virtual void OnEnemyDestroyed();
 
-protected:	
+protected:		
 	bool bCanSpawnWhileVisible;
 	bool bHasSpawnedEnemy;
 	bool bInRange;
@@ -31,3 +31,12 @@ protected:
 	eEnemyType GetEnemyTypeFromTileGID(int TileGID);
 };
 
+class TimedEnemySpawnPoint : public EnemySpawnPoint
+{
+protected:
+	int RespawnCountDown;
+	int NumRespawnFrames;
+public:	
+	TimedEnemySpawnPoint(eEnemyType InEnemyType, int X, int Y);
+	virtual void Tick(double DeltaTime);
+};
