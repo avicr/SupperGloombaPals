@@ -127,8 +127,8 @@ SDL_Rect EnemySprite::GetScreenSpaceCustomRect()
 GoombaEnemySprite::GoombaEnemySprite(EnemySpawnPoint* Spawner) :
 	EnemySprite(Spawner)
 {
-	Sprite::Sprite(GResourceManager->EGoombaSpriteTexture->Texture);
-	
+	Sprite::Sprite(GResourceManager->GuyTexture->Texture);
+	SetTexture(GResourceManager->GuyTexture->Texture);
 	DyingCount = 0;
 	CollisionRect = {14, 20, 40, 28};
 	VelocityX = -2.1;
@@ -137,7 +137,7 @@ GoombaEnemySprite::GoombaEnemySprite(EnemySpawnPoint* Spawner) :
 	{
 		VelocityX = 2.1;
 	}
-	PlayAnimation(GResourceManager->EGoombaAnimation);
+	//PlayAnimation(GResourceManager->EGoombaAnimation);
 }
 
 void GoombaEnemySprite::Tick(double DeltaTime)
@@ -159,7 +159,7 @@ void GoombaEnemySprite::Tick(double DeltaTime)
 			{				
 				VelocityX *= -1; 
 				HandleTileCollision(Tiles);
-				SetFlip(VelocityX < 0 ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
+				//SetFlip(VelocityX < 0 ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
 				break;				
 			}
 			else

@@ -888,8 +888,8 @@ void InitSDL()
 			Mix_VolumeChunk(FireworkSound, VOLUME_NORMAL);
 			Mix_VolumeMusic(VOLUME_NORMAL);
 			
-			/*Mix_Volume(-1, 0);
-			Mix_VolumeMusic(0);*/
+			//Mix_Volume(-1, 0);
+			Mix_VolumeMusic(0);
 		}
 
 #ifdef FULLSCREEN_1920_1080

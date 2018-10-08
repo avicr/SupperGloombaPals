@@ -264,6 +264,8 @@
    <properties>
     <property name="bgcolor" type="color" value="#ff162cc8"/>
     <property name="bricktilesetid" type="int" value="1"/>
+    <property name="locknegativex" type="bool" value="false"/>
+    <property name="locknegativey" type="bool" value="false"/>
     <property name="locky" type="int" value="0"/>
     <property name="musicchange" type="int" value="2"/>
     <property name="nopositionchange" type="bool" value="true"/>
