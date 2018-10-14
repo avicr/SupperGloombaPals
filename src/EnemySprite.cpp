@@ -159,7 +159,7 @@ void GoombaEnemySprite::Tick(double DeltaTime)
 			{				
 				VelocityX *= -1; 
 				HandleTileCollision(Tiles);
-				//SetFlip(VelocityX < 0 ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
+				SetFlip(VelocityX < 0 ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
 				break;				
 			}
 			else
