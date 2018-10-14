@@ -1071,7 +1071,7 @@ bool PlayerSprite::HandleVerticalMovement()
  					TheMap->HandleCollision(HitTiles[i].Location.x, HitTiles[i].Location.y, PowerUpState != POWER_NONE);
 					// Move player out of the block tile
 					if (!bCollided)
-					{
+					{						
 						PosY += 1;
 					}
 
@@ -1120,7 +1120,8 @@ void PlayerSprite::AddCoins(int Amount)
 
 	if (Coins >= 100)
 	{
-		//AddLife();
+		Lives++;
+		Mix_PlayChannel(CHANNEL_ONE_UP, OneUpSound, 0);
 		Coins = Coins % 100;
 	}
 	Mix_PlayChannel(CHANNEL_COIN, CoinSound, 0);

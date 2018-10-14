@@ -1410,6 +1410,8 @@ void TMXMap::HandleCollision(int TileX, int TileY, bool bCanBreakBricks)
 			
 			ThePlayer->AddScore(50);
 			DoBrickBreak(TileX, TileY);
+			Sprite* NewBlock = new EmptyBlockSprite(TileX * 64, TileY * 64 - 64, NULL, false, -1, TileX, TileY);
+			SimpleSprites.push_back(NewBlock);
 			
 		}
 		else

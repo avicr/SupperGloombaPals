@@ -34,7 +34,7 @@ class ResourceManager
 	friend AssetResource;
 
 public:
-	DECLARE_TEXTURE_RESOURCE(PlayerGoombaTexture, "Goomba.bmp", true)
+	DECLARE_TEXTURE_RESOURCE(PlayerGoombaTexture, "goomba.bmp", true)
 	DECLARE_TEXTURE_RESOURCE(PlayerGoombaTallTexture, "PlayerGoombaTall.bmp", true)
 	DECLARE_TEXTURE_RESOURCE(GoombaGrowTexture, "playergrow.bmp", true)
 	DECLARE_TEXTURE_RESOURCE(GoombaDuckTexture, "goombaduck.bmp", true)
