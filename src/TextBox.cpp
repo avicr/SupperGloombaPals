@@ -139,7 +139,7 @@ void TextBox::Tick()
 		DrawBitmapText(CharToRender, Margin + CurCharIndex * FontSizeInPixels, Margin + CurrentLine * FontSizeInPixels, FontSizeInPixels, FontSizeInPixels, GRenderer, FontShadowedWhite, 1, 1, false);
 
 		CurCharIndex++;
-		
+		Mix_PlayChannel(CHANNEL_TEXT, TextSound, 0);
 		// Did we write the last character in the line?
 		if (CurCharIndex >= Pages[CurrentPage][CurrentLine].length())
 		{				

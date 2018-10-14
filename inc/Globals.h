@@ -166,6 +166,7 @@ extern Mix_Chunk* EventSound;
 extern Mix_Chunk* KickSound;
 extern Mix_Chunk* PipeSound;
 extern Mix_Chunk* FlagPoleSound;
+extern Mix_Chunk* TextSound;
 extern Mix_Chunk* FireworkSound;
 
 extern Mix_Music *BGMusic;
@@ -196,6 +197,7 @@ extern float RenderScale;
 #define CHANNEL_EVENT 12
 #define CHANNEL_RED_COIN 13
 #define CHANNEL_FIREWORK 14
+#define CHANNEL_TEXT 15
 
 #define SCREEN_WIDTH 1024
 #define SCREEN_HEIGHT 896

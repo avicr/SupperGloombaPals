@@ -155,6 +155,7 @@ Mix_Chunk* EventSound = NULL;
 Mix_Chunk* KickSound = NULL;
 Mix_Chunk* PipeSound = NULL;
 Mix_Chunk* FlagPoleSound = NULL;
+Mix_Chunk* TextSound = NULL;
 Mix_Chunk* FireworkSound = NULL;
 
 Mix_Music* BGMusic = NULL;
@@ -875,6 +876,7 @@ void InitSDL()
 			KickSound = Mix_LoadWAV("resource/sounds/kick.wav");
 			PipeSound = Mix_LoadWAV("resource/sounds/pipe.wav");
 			FlagPoleSound = Mix_LoadWAV("resource/sounds/flagpole.wav");
+			TextSound = Mix_LoadWAV("resource/sounds/LOZ_Text.wav");
 			FireworkSound = Mix_LoadWAV("resource/sounds/firework.wav");
 			
 			BGMusic = Mix_LoadMUS("resource/sounds/bgmusic.wav");
@@ -898,6 +900,7 @@ void InitSDL()
 			Mix_VolumeChunk(KickSound, VOLUME_NORMAL);
 			Mix_VolumeChunk(PipeSound, VOLUME_NORMAL);
 			Mix_VolumeChunk(FlagPoleSound, VOLUME_NORMAL);
+			Mix_VolumeChunk(TextSound, VOLUME_NORMAL);
 			Mix_VolumeChunk(FireworkSound, VOLUME_NORMAL);
 			Mix_VolumeMusic(VOLUME_NORMAL);
 			
@@ -980,6 +983,7 @@ void CleanUp()
 	Mix_FreeChunk(EventSound);
 	Mix_FreeChunk(PipeSound);
 	Mix_FreeChunk(FlagPoleSound);
+	Mix_FreeChunk(TextSound);
 	Mix_FreeChunk(FireworkSound);
 
 	Mix_FreeMusic(BGMusic);
