@@ -155,6 +155,7 @@
     <ClCompile Include="src\SimpleSprites.cpp" />
     <ClCompile Include="src\Sprite.cpp" />
     <ClCompile Include="src\SpriteList.cpp" />
+    <ClCompile Include="src\TextBox.cpp" />
     <ClCompile Include="src\TMXMap.cpp" />
     <ClCompile Include="tinyxml\tinystr.cpp" />
     <ClCompile Include="tinyxml\tinyxml.cpp" />
@@ -176,6 +177,7 @@
     <ClInclude Include="inc\SimpleSprites.h" />
     <ClInclude Include="inc\Sprite.h" />
     <ClInclude Include="inc\SpriteList.h" />
+    <ClInclude Include="inc\TextBox.h" />
     <ClInclude Include="inc\TMXMap.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

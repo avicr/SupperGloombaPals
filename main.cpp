@@ -12,6 +12,7 @@
 #include "inc/SimpleSprites.h"
 #include "inc/SpriteList.h"
 #include "inc/ItemSprite.h"
+#include "inc/TextBox.h"
 #include "inc/Game.h"
 
 bool bDrawDeltaTime = false;
@@ -133,6 +134,7 @@ int SecretExitKeys[10] =
 SpriteList<Sprite*> SimpleSprites;
 SpriteList<EnemySprite*> EnemySprites;
 SpriteList<ItemSprite*> ItemSprites;
+
 //SpriteList<WarpSprite*> WarpSprites;
 
 bool bDrawUgly = false;
@@ -197,7 +199,6 @@ float EaseOut(float t, float b, float c, float d) {
 float EaseInOut(float t, float b, float c, float d) {
 	return -c / 2 * (cos(M_PI*t / d) - 1) + b;
 }
-
 
 int RenderThread(void* Dat)
 {
@@ -617,6 +618,12 @@ void HandleCheatInput(SDL_Event& TheEvent)
 		ItemSprites.push_back(FlowerSprite);
 	}
 
+	// Do test dialog
+	if (TheEvent.key.state == SDL_PRESSED && TheEvent.key.keysym.scancode == SDL_SCANCODE_D)
+	{
+		TheGame->DoTextBox(SCREEN_WIDTH / 2 - 350, 100, 700, 300, "THIS IS A TEST. \l HAHA \l GOD IT HAS TO BE IN ALL CAPS. \p THIS IS A PAGE BREAK. \p DID I DO SPACES? I GUESS I DID!  THIS IS LONG, BUT NOT REALLY THAT LONG I GUESS.");
+	}
+
 	if (TheEvent.key.state == SDL_PRESSED && TheEvent.key.keysym.scancode == SDL_SCANCODE_E)
 	{
 		SimpleSprites.push_back(new EventSprite("This is an event!"));
@@ -685,15 +692,19 @@ void Tick(double DeltaTime)
 	}
 	else
 	{
-		TheMap->Tick(DeltaTime);
-		SimpleSprites.Tick(DeltaTime);
-
-		if (!ThePlayer->IsChangingSize())
+		if (!TheGame->IsDoingTextBox())
 		{
-			EnemySprites.Tick(DeltaTime);
-			ItemSprites.Tick(DeltaTime);
+			TheMap->Tick(DeltaTime);
+			SimpleSprites.Tick(DeltaTime);
+
+			if (!ThePlayer->IsChangingSize())
+			{
+				EnemySprites.Tick(DeltaTime);
+				ItemSprites.Tick(DeltaTime);
+			}
+			ThePlayer->Tick(DeltaTime);
 		}
-		ThePlayer->Tick(DeltaTime);
+
 		TheGame->Tick();
 	}
 }
@@ -727,6 +738,8 @@ void Render(double DeltaTime)
 		ThePlayer->DrawHUD();
 
 		SimpleSprites.Render(GRenderer, RENDER_LAYER_ABOVE_ALL);
+		TheGame->Render(GRenderer);
+
 		PresentBackBuffer();
 
 		if (bShowWindow2)
@@ -1076,6 +1089,8 @@ void LoadBitMapFont(string FileName, Glyph *Glyphs)
 	CopyGlyph(Glyphs['-'], FontTexture, 608);
 	CopyGlyph(Glyphs['!'], FontTexture, 624);
 	CopyGlyph(Glyphs['?'], FontTexture, 640);
+	CopyGlyph(Glyphs[127], FontTexture, 656);
+	CopyGlyph(Glyphs[','], FontTexture, 672);
 
 	SDL_FreeSurface(Image);
 	SDL_DestroyTexture(FontTexture);

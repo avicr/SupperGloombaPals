@@ -137,7 +137,7 @@ GoombaEnemySprite::GoombaEnemySprite(EnemySpawnPoint* Spawner) :
 	{
 		VelocityX = 2.1;
 	}
-	//PlayAnimation(GResourceManager->EGoombaAnimation);
+	PlayAnimation(GResourceManager->EGoombaAnimation);
 }
 
 void GoombaEnemySprite::Tick(double DeltaTime)

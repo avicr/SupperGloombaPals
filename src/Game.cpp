@@ -13,6 +13,7 @@ Game::Game()
 	CurrentLevel = 0;
 	bLevelComplete = false;
 	NumberOfTimesPortaled = 0;	
+	TheTextBox = NULL;
 }
 
 void Game::LoadCurrentLevel()
@@ -34,6 +35,13 @@ void Game::EndGame()
 
 void Game::StartLevel()
 {	
+	if (TheTextBox)
+	{
+		delete TheTextBox;
+	}
+
+	TheTextBox = NULL;
+
 	NumberOfTimesPortaled = 0;
 	bSecretExit = false;
 	PostLevelCountDown = IN_CASTLE_FRAMES;
@@ -124,6 +132,19 @@ bool Game::IsLevelComplete()
 
 void Game::Tick()
 {
+	if (TheTextBox != nullptr)
+	{
+		if (TheTextBox->IsDone())
+		{
+			delete TheTextBox;
+			TheTextBox = nullptr;
+		}
+		else
+		{
+			TheTextBox->Tick();
+		}				
+	}
+
 	if (GameState == STATE_TIMER_AWARD)
 	{
 		UpdateTimerAward();
@@ -156,6 +177,14 @@ void Game::Tick()
 				exit(1);
 			}
 		}
+	}
+}
+
+void Game::Render(SDL_Renderer* Renderer)
+{
+	if (TheTextBox)
+	{
+		TheTextBox->Render(Renderer);
 	}
 }
 
@@ -451,4 +480,17 @@ bool Game::HasRedCoinBeenGathered(int TileX, int TileY)
 	}
 
 	return false;
+}
+
+void Game::DoTextBox(int InPosX, int InPosY, int InWidth, int InHeight, string InText)
+{
+	if (TheTextBox == nullptr)
+	{
+		TheTextBox = new TextBox(InPosX, InPosY, InWidth, InHeight, InText);
+	}
+}
+
+bool Game::IsDoingTextBox()
+{
+	return TheTextBox != nullptr && !TheTextBox->IsDone();
 }

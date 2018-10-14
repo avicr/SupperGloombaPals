@@ -1,5 +1,7 @@
 #pragma once
 
+#include "TextBox.h"
+
 struct SaveData
 {
 	int SpecialEvents[SPECIAL_EVENT_LAST + 1];
@@ -47,6 +49,7 @@ class Game
 	bool bSecretExit;
 	int NumberOfTimesPortaled;
 	vector<SDL_Point> GatheredRedCoinLocations;
+	TextBox* TheTextBox;
 
 public:
 	Game();
@@ -68,6 +71,7 @@ public:
 	bool IsLevelComplete();
 
 	void Tick();
+	void Render(SDL_Renderer* Renderer);
 
 	eGameState GetGameState();
 	void UpdateTimerAward();	
@@ -91,5 +95,7 @@ public:
 	void AddGatheredRedCoinLocation(SDL_Point RedCoinLocation);
 	bool HasRedCoinBeenGathered(int TileX, int TileY);
 	int GetNumberOfRedCoinsFound() { return GatheredRedCoinLocations.size(); }
+	void DoTextBox(int InPosX, int InPosY, int InWidth, int InHeight, string InText);
 
+	bool IsDoingTextBox();
 };
