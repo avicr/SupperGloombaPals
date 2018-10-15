@@ -2,6 +2,12 @@
 
 #include "Globals.h"
 
+enum eTextBoxStyle
+{
+	TBS_Modern,
+	TBS_Zelda
+};
+
 enum eTextBoxState
 {
 	TS_GROWING = 0,
@@ -27,6 +33,9 @@ protected:
 	int CurCharIndex;
 	bool bDone;
 	bool bWaitingForInput;
+	eTextBoxStyle Style;
+
+	SDL_Color TextBGColor;
 	
 	SDL_Texture* Texture;
 	eTextBoxState State;
@@ -40,4 +49,5 @@ public:
 	void Tick();
 	void Render(SDL_Renderer* Renderer);
 	bool IsDone();
+	eTextBoxStyle GetStyle();
 };

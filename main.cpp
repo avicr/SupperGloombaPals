@@ -622,7 +622,8 @@ void HandleCheatInput(SDL_Event& TheEvent)
 	// Do test dialog
 	if (TheEvent.key.state == SDL_PRESSED && TheEvent.key.keysym.scancode == SDL_SCANCODE_D)
 	{
-		TheGame->DoTextBox(SCREEN_WIDTH / 2 - 350, 100, 700, 300, "THIS IS A TEST. \l HAHA \l GOD IT HAS TO BE IN ALL CAPS. \p THIS IS A PAGE BREAK. \p DID I DO SPACES? I GUESS I DID!  THIS IS LONG, BUT NOT REALLY THAT LONG I GUESS.");
+		//TheGame->DoTextBox(SCREEN_WIDTH / 2 - 350, 100, 700, 300, "THIS IS A TEST. \l HAHA \l GOD IT HAS TO BE IN ALL CAPS. \p THIS IS A PAGE BREAK. \p DID I DO SPACES? I GUESS I DID!  THIS IS LONG, BUT NOT REALLY THAT LONG I GUESS.");
+		TheGame->DoTextBox(SCREEN_WIDTH / 2 - 350, 358, 700, 430, "IT'S DANGEROUS TO GO \l   ALONE! TAKE THIS");
 	}
 
 	if (TheEvent.key.state == SDL_PRESSED && TheEvent.key.keysym.scancode == SDL_SCANCODE_E)

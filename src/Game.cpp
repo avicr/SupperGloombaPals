@@ -136,8 +136,11 @@ void Game::Tick()
 	{
 		if (TheTextBox->IsDone())
 		{
-			delete TheTextBox;
-			TheTextBox = nullptr;
+			if (TheTextBox->GetStyle() != TBS_Zelda)
+			{
+				delete TheTextBox;
+				TheTextBox = nullptr;
+			}
 		}
 		else
 		{

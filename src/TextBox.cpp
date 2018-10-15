@@ -6,8 +6,18 @@
 TextBox::TextBox(int InPosX, int InPosY, int InWidth, int InHeight, string InText)
 {
 	SDL_assert(InText.length() < 4096);
-	CharacterFrameDelay = 4;
-	
+	CharacterFrameDelay = 6;
+	Style = TBS_Zelda;
+
+	if (Style == TBS_Zelda)
+	{
+		TextBGColor = { 255, 0, 255, 0 };
+	}
+	else
+	{
+		TextBGColor = { 0, 0, 0, 255 };
+	}
+
 	PosX = InPosX;
 	PosY = InPosY;
 	Width = InWidth;
@@ -18,7 +28,8 @@ TextBox::TextBox(int InPosX, int InPosY, int InWidth, int InHeight, string InTex
 	Texture = SDL_CreateTexture(GRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, InWidth, InHeight);
 	
 	SDL_SetRenderTarget(GRenderer, Texture);	
-	SDL_SetRenderDrawColor(GRenderer, 0, 0, 0, 0);
+	SDL_SetRenderDrawColor(GRenderer, TextBGColor.r, TextBGColor.g, TextBGColor.b, TextBGColor.a);
+	SDL_SetTextureBlendMode(Texture, SDL_BLENDMODE_BLEND);
 	SDL_RenderClear(GRenderer);
 	SDL_SetRenderTarget(GRenderer, NULL);
 
@@ -132,7 +143,7 @@ void TextBox::Tick()
 			return;
 		}
 	}
-	else if (FrameCount % CharacterFrameDelay == 0)
+	else if ((FrameCount % CharacterFrameDelay) == 0)
 	{
 		SDL_SetRenderTarget(GRenderer, Texture);
 		string CharToRender = Pages[CurrentPage][CurrentLine].substr(CurCharIndex, 1);
@@ -146,7 +157,18 @@ void TextBox::Tick()
 			// Did we write the last line in the page?
 			if (CurrentLine + 1 >= Pages[CurrentPage].size())
 			{
-				bWaitingForInput = true;
+				if (Style != TBS_Zelda)
+				{
+					bWaitingForInput = true;
+				}
+				else
+				{
+					CurCharIndex = 0;
+					if (CurrentPage == Pages.size() - 1)
+					{
+						bDone = true;
+					}
+				}
 			}
 			else
 			{				
@@ -167,7 +189,7 @@ void TextBox::Render(SDL_Renderer* Renderer)
 	if (bWaitingForInput && (FrameCount % 24) > 6)
 	{
 		//DstRect = { PosX + Margin + CurCharIndex * FontSizeInPixels, PosY + Margin + CurrentLine * FontSizeInPixels, 32, 32 };
-		DstRect = { PosX + Margin + Width - FontSizeInPixels * 2, PosY + Height - FontSizeInPixels - Margin, 32, 32 };
+		DstRect = { PosX + Margin + Width - FontSizeInPixels * 2, PosY + Height - FontSizeInPixels - Margin, FontSizeInPixels, FontSizeInPixels };
 		SDL_RenderCopy(Renderer, FontShadowedWhite[127].Texture, NULL, &DstRect);
 	}
 }
@@ -175,4 +197,9 @@ void TextBox::Render(SDL_Renderer* Renderer)
 bool TextBox::IsDone()
 {
 	return bDone;
+}
+
+eTextBoxStyle TextBox::GetStyle()
+{
+	return Style;
 }
