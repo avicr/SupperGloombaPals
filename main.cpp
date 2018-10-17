@@ -14,6 +14,8 @@
 #include "inc/ItemSprite.h"
 #include "inc/TextBox.h"
 #include "inc/Game.h"
+#include <iostream>
+#include <fstream>
 
 bool bDrawDeltaTime = false;
 Glyph FontShadowedWhite[128];
@@ -39,6 +41,7 @@ SDL_Color NextTripColor = { 0, 255, 0, 255 };
 SDL_Color PrevTripColor = { 0, 255, 0, 255 };
 SDL_Color TripColor = { 0, 255, 0, 255 };
 double BGColorLerp = 0;
+string DialogString = "IT'S DANGEROUS TO GO \l \s \s ALONE! TAKE THIS";
 
 TTF_Font* MainFont;
 
@@ -80,6 +83,7 @@ LevelInfo Levels[] = {
 /*Level 5*/	 	   { LEVEL_PATH + (string)"Level1_1_64x64.tmx", "1-5", 10, 9 },
 /*Secret Level 5*/ { LEVEL_PATH + (string)"Level2.tmx"        , "1-5S", 10, 10 },
 /*Level 11*/	   { LEVEL_PATH + (string)"Level1_1_64x64.tmx", "1-6", -1, -1 },
+/*Level 12*/       { LEVEL_PATH + (string)"matt.tmx", "?-?", -1, -1 },
 };
 
 // Look up table to make sure save file isn't being tampared with
@@ -623,7 +627,8 @@ void HandleCheatInput(SDL_Event& TheEvent)
 	if (TheEvent.key.state == SDL_PRESSED && TheEvent.key.keysym.scancode == SDL_SCANCODE_D)
 	{
 		//TheGame->DoTextBox(SCREEN_WIDTH / 2 - 350, 100, 700, 300, "THIS IS A TEST. \l HAHA \l GOD IT HAS TO BE IN ALL CAPS. \p THIS IS A PAGE BREAK. \p DID I DO SPACES? I GUESS I DID!  THIS IS LONG, BUT NOT REALLY THAT LONG I GUESS.");
-		TheGame->DoTextBox(SCREEN_WIDTH / 2 - 350, 358, 700, 430, "IT'S DANGEROUS TO GO \l   ALONE! TAKE THIS");
+		ReadDialog();
+		DoDialogTest();
 	}
 
 	if (TheEvent.key.state == SDL_PRESSED && TheEvent.key.keysym.scancode == SDL_SCANCODE_E)
@@ -1096,6 +1101,7 @@ void LoadBitMapFont(string FileName, Glyph *Glyphs)
 	CopyGlyph(Glyphs['?'], FontTexture, 640);
 	CopyGlyph(Glyphs[127], FontTexture, 656);
 	CopyGlyph(Glyphs[','], FontTexture, 672);
+	CopyGlyph(Glyphs['\''], FontTexture, 688);
 
 	SDL_FreeSurface(Image);
 	SDL_DestroyTexture(FontTexture);
@@ -1267,4 +1273,22 @@ void ShowWindow2(bool bShow)
 	}
 
 	bShowWindow2 = bShow;
+}
+
+void ReadDialog()
+{
+	ifstream InFile("dialog.txt");
+	string Temp;
+	DialogString = "";
+	do
+	{
+		getline(InFile, Temp);
+		DialogString += Temp;
+	} while (Temp != "" && !InFile.eof());
+}
+
+void DoDialogTest()
+{
+	TheGame->DoTextBox(SCREEN_WIDTH / 2 - 350, 100, 700, 300, DialogString);
+	//TheGame->DoTextBox(SCREEN_WIDTH / 2 - 350, 358, 700, 430, DialogString);
 }

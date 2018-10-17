@@ -6,16 +6,18 @@
 TextBox::TextBox(int InPosX, int InPosY, int InWidth, int InHeight, string InText)
 {
 	SDL_assert(InText.length() < 4096);
-	CharacterFrameDelay = 6;
-	Style = TBS_Zelda;
+	
+	Style = TBS_Modern;
 
 	if (Style == TBS_Zelda)
 	{
 		TextBGColor = { 255, 0, 255, 0 };
+		CharacterFrameDelay = 6;
 	}
 	else
 	{
 		TextBGColor = { 0, 0, 0, 255 };
+		CharacterFrameDelay = 4;
 	}
 
 	PosX = InPosX;
@@ -56,14 +58,20 @@ TextBox::TextBox(int InPosX, int InPosY, int InWidth, int InHeight, string InTex
 	{								
 		string Word = result.front();				
 
-		if (Word == "\l")
+		if (Word == "\\n" || Word == "\\N")
 		{
 			result.pop();
 			CurrentLine++;
 			CurLineLen = 0;
 			Pages[CurrentPage].push_back(string());
 		}
-		else if (Word == "\p")
+		else if (Word == "\\s" || Word == "\\S")
+		{
+			result.pop();			
+			CurLineLen++;
+			Pages[CurrentPage][CurrentLine].push_back(' ');
+		}
+		else if (Word == "\\p" || Word == "\\P")
 		{
 			result.pop();
 			CurLineLen = 0;
@@ -100,35 +108,46 @@ TextBox::TextBox(int InPosX, int InPosY, int InWidth, int InHeight, string InTex
 	bWaitingForInput = false;
 	CurrentPage = 0;
 	CurrentLine = 0;
-	FrameCount = 0;
+	FrameCount = CharacterFrameDelay;
 	CurCharIndex = 0;
 	bDone = false;
+	CursorFrame = 0;
+	bButtonPressedLastFrame = false;
+	bNeedToLetGoOfButton = true;
 }
 
 void TextBox::Tick()
-{
-	FrameCount++;
+{	
+	
+	FrameCount--;
+	CursorFrame++;
 
 	if (bDone)
 	{
 		return;
 	}	
 
-	if (bWaitingForInput)
-	{
-		const Uint8 *state = SDL_GetKeyboardState(NULL);
+	const Uint8 *state = SDL_GetKeyboardState(NULL);
 
+	if (ThePlayer->IsButton1Pressed(state) && !bNeedToLetGoOfButton)
+	{
+		FrameCount -= 2;
+	}
+
+	if (bWaitingForInput && !bButtonPressedLastFrame)
+	{		
 		if (ThePlayer->IsButton1Pressed(state))
 		{
 			bWaitingForInput = false;
+			bNeedToLetGoOfButton = true;
 
 			CurrentPage++;
 			CurrentLine = 0;
-			FrameCount = 0;
+			FrameCount = CharacterFrameDelay;
 			CurCharIndex = 0;
 
 			SDL_SetRenderTarget(GRenderer, Texture);
-			SDL_SetRenderDrawColor(GRenderer, 0, 0, 0, 0);
+			SDL_SetRenderDrawColor(GRenderer, TextBGColor.r, TextBGColor.g, TextBGColor.b, TextBGColor.a);
 			SDL_RenderClear(GRenderer);
 			SDL_SetRenderTarget(GRenderer, NULL);
 
@@ -143,12 +162,12 @@ void TextBox::Tick()
 			return;
 		}
 	}
-	else if ((FrameCount % CharacterFrameDelay) == 0)
+	else if (FrameCount <= 0 && !bWaitingForInput)
 	{
 		SDL_SetRenderTarget(GRenderer, Texture);
 		string CharToRender = Pages[CurrentPage][CurrentLine].substr(CurCharIndex, 1);
 		DrawBitmapText(CharToRender, Margin + CurCharIndex * FontSizeInPixels, Margin + CurrentLine * FontSizeInPixels, FontSizeInPixels, FontSizeInPixels, GRenderer, FontShadowedWhite, 1, 1, false);
-
+		FrameCount = CharacterFrameDelay;
 		CurCharIndex++;
 		Mix_PlayChannel(CHANNEL_TEXT, TextSound, 0);
 		// Did we write the last character in the line?
@@ -179,6 +198,13 @@ void TextBox::Tick()
 
 		SDL_SetRenderTarget(GRenderer, NULL);
 	}	
+
+	bButtonPressedLastFrame = ThePlayer->IsButton1Pressed(state);
+
+	if (!bButtonPressedLastFrame)
+	{
+		bNeedToLetGoOfButton = false;
+	}
 }
 
 void TextBox::Render(SDL_Renderer* Renderer)
@@ -186,7 +212,7 @@ void TextBox::Render(SDL_Renderer* Renderer)
 	SDL_Rect DstRect = { PosX, PosY, Width, Height };
 	SDL_RenderCopy(Renderer, Texture, NULL, &DstRect);
 
-	if (bWaitingForInput && (FrameCount % 24) > 6)
+	if (bWaitingForInput && (CursorFrame % 24) > 6)
 	{
 		//DstRect = { PosX + Margin + CurCharIndex * FontSizeInPixels, PosY + Margin + CurrentLine * FontSizeInPixels, 32, 32 };
 		DstRect = { PosX + Margin + Width - FontSizeInPixels * 2, PosY + Height - FontSizeInPixels - Margin, FontSizeInPixels, FontSizeInPixels };

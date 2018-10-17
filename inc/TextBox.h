@@ -33,6 +33,9 @@ protected:
 	int CurCharIndex;
 	bool bDone;
 	bool bWaitingForInput;
+	int CursorFrame;
+	bool bButtonPressedLastFrame;
+	bool bNeedToLetGoOfButton;
 	eTextBoxStyle Style;
 
 	SDL_Color TextBGColor;

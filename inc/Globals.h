@@ -1,4 +1,4 @@
-#define CHEAT
+//#define CHEAT
 //#define FULLSCREEN_1920_1080
 #define PARTY
 #ifndef GLOBALS_H
@@ -118,6 +118,8 @@ using namespace std;
 
 void DrawBitmapText(string Text, int X, int Y, int SizeX, int SizeY, SDL_Renderer *Renderer, Glyph Glyphs[127], float SpaceScaleX, float SpaceScaleY, bool bRightJustify);
 Mix_Music* GetMusicFromID(int ID);
+void ReadDialog();
+void DoDialogTest();
 
 extern const double GlyphSpace;
 extern class ResourceManager *GResourceManager;

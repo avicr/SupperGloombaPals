@@ -5,7 +5,7 @@
 #include "../inc/ItemSprite.h"
 #include "../inc/SimpleSprites.h"
 #include "../inc/Game.h"
-
+#include <fstream>
 int oldx;
 int oldy;
 
@@ -1278,6 +1278,10 @@ void PlayerSprite::OnFireBallDestroy()
 
 void PlayerSprite::StartWarpSequence(WarpEntrance Entrance, WarpExit Exit)
 {	
+	ofstream OutFile("Dialog.txt");
+	//OutFile.clear();
+	OutFile << "YOU HAD TO HAVE KNOWN THERE WAS MORE... ;)";
+
 	if (Exit.WarpType == WARP_CONTROL)
 	{
 		// TODO:

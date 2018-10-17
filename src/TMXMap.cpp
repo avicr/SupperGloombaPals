@@ -1002,7 +1002,7 @@ TMXMap::TMXMap()
 	MaxScrollY = 0;
 	KillY = -1;
 	bPlayingLevel = false;	
-	SecondsLeft = 300;
+	SecondsLeft = 3000;
 	bRenderCollision = false;
 	ScrollX = 0;
 	ScrollY = 26;
@@ -1183,7 +1183,7 @@ bool TMXMap::IsCollidableTile(int MetaTileID, int TileX, int TileY, SDL_Point Te
 	int ForegroundTile = ForegroundLayer->TileData[TileY][TileX];
 
 	if (MetaTileID == TILE_RED_COIN_BLOCK  || MetaTileID == TILE_COIN_BLOCK || MetaTileID == TILE_POWER_UP || MetaTileID == TILE_ONE_UP || MetaTileID == TILE_BREAKABLE || MetaTileID == TILE_MULTI_COIN_BLOCK || MetaTileID == TILE_STAR || MetaTileID == TILE_MAGIC_MUSHROOM || MetaTileID == TILE_DESTROY_WITH_FIRE ||
-		MetaTileID == TILE_DESTROY_WITH_FIRE_LEAVE_COLLISION)
+		MetaTileID == TILE_DESTROY_WITH_FIRE_LEAVE_COLLISION || MetaTileID == TILE_DIALOG_BLOCK)
 	{
 		if (ForegroundTile != -1)
 		{
@@ -1230,7 +1230,7 @@ void TMXMap::DoBrickBreak(int TileX, int TileY)
 bool TMXMap::IsHiddenBlockTile(int ID)
 {	
 
-	if (ID == TILE_RED_COIN_BLOCK || ID == TILE_COIN_BLOCK || ID == TILE_POWER_UP || ID == TILE_ONE_UP || ID == TILE_UGLY || ID == TILE_MULTI_COIN_BLOCK || ID == TILE_STAR || ID == TILE_MAGIC_MUSHROOM || ID == TILE_BREAK_ON_TOUCH)
+	if (ID == TILE_RED_COIN_BLOCK || ID == TILE_COIN_BLOCK || ID == TILE_POWER_UP || ID == TILE_ONE_UP || ID == TILE_UGLY || ID == TILE_MULTI_COIN_BLOCK || ID == TILE_STAR || ID == TILE_MAGIC_MUSHROOM || ID == TILE_BREAK_ON_TOUCH || ID == TILE_DIALOG_BLOCK)
 	{
 		return true;
 	}
@@ -1326,6 +1326,11 @@ void TMXMap::HandleCollision(int TileX, int TileY, bool bCanBreakBricks)
 		if (MetaTileType == TILE_BREAK_ON_TOUCH)
 		{
 			DoBrickBreak(TileX, TileY);
+		}
+		else if (MetaTileType == TILE_DIALOG_BLOCK)
+		{
+			ReadDialog();
+			DoDialogTest();
 		}
 		else if (MetaTileType == TILE_MULTI_COIN_BLOCK)
 		{

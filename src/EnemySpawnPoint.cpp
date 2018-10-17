@@ -137,7 +137,7 @@ TimedEnemySpawnPoint::TimedEnemySpawnPoint(eEnemyType InEnemyType, int X, int Y)
 {	
 	if (EnemyType == ENEMY_BULLET)
 	{
-		NumRespawnFrames = 200;
+		NumRespawnFrames = 130;
 		RespawnCountDown = NumRespawnFrames;
 	}
 }

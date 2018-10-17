@@ -81,8 +81,8 @@
     <LibraryPath>E:\Work\SDL2-2.0.5\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>e:\Work\SDL2-2.0.5\include;$(IncludePath)</IncludePath>
-    <LibraryPath>e:\Work\SDL2-2.0.5\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>E:\Work\SDL2-2.0.8\include;E:\Projects\SupperGloombaPals\SDL2_image-2.0.3\include;$(IncludePath)</IncludePath>
+    <LibraryPath>E:\Work\SDL2-2.0.8\lib\x64;E:\Projects\SupperGloombaPals\SDL2_image-2.0.3\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -131,13 +131,13 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>SDL2main.lib;SDL2.lib;%(AdditionalDependencies);SDl2_mixer.lib;E:\Projects\SupperGloombaPals\SDL2_image-2.0.3\lib\x64\SDL2_image.lib</AdditionalDependencies>
-      <SubSystem>Console</SubSystem>
+      <AdditionalDependencies>SDL2main.lib;SDL2.lib;%(AdditionalDependencies);SDl2_mixer.lib;E:\Projects\SupperGloombaPals\SDL2_image-2.0.3\lib\x64\SDL2_image.lib;SDL2_ttf.lib;SDL2_Image.lib</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
