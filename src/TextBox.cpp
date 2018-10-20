@@ -51,7 +51,32 @@ TextBox::TextBox(int InPosX, int InPosY, int InWidth, int InHeight, string InTex
 	std::istringstream iss(InText);
 	for (std::string s; iss >> s; )
 	{
-		result.push(s);
+		std::transform(s.begin(), s.end(), s.begin(), ::toupper);
+		int EscapeCharIndex = s.find("\\");
+
+		if (EscapeCharIndex != -1)
+		{
+			string EscapeSequenceString = s.substr(EscapeCharIndex, 2);			
+
+			string LeftString = s.substr(0, EscapeCharIndex);
+			string RightString = s.substr(EscapeCharIndex+2, s.length() - (EscapeCharIndex+2));
+
+			if (LeftString != "")
+			{
+				result.push(LeftString);				
+			}
+			
+			result.push(EscapeSequenceString);
+			
+			if (RightString != "")
+			{
+				result.push(RightString);
+			}
+		}
+		else
+		{
+			result.push(s);
+		}
 	}
 
 	while (result.size() != 0)
