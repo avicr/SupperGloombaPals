@@ -369,3 +369,15 @@ void MagicMushroomItemSprite::Tick(double DeltaTime)
 	Rect.y = PosY;
 }
 
+PlotDeviceItemSprite::PlotDeviceItemSprite(int X, int Y, bool bDoGrowAnimation)
+	: FlowerItemSprite(X, Y, bDoGrowAnimation)
+{
+	SetTexture(GResourceManager->PlotDeviceTexture->Texture);	
+	AnimData.Anim = NULL;
+	SetWidth(64);
+	SetHeight(64);
+	ItemType = ITEM_PLOT_DEVICE;
+
+	CollisionRect = { 8, 0, 50, 50 };
+
+}

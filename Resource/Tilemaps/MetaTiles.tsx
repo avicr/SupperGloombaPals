@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset name="MetaTiles" tilewidth="64" tileheight="64" tilecount="22" columns="11">
- <image source="../textures/MetaTiles.bmp" trans="ff00ff" width="704" height="128"/>
+<tileset name="MetaTiles" tilewidth="64" tileheight="64" tilecount="33" columns="11">
+ <image source="../textures/MetaTiles.bmp" trans="ff00ff" width="704" height="192"/>
  <tile id="0" type="BLOCK"/>
  <tile id="1" type="ITEM"/>
  <tile id="2" type="ITEM">
@@ -49,4 +49,9 @@
  <tile id="18" type="FLAG_POLE"/>
  <tile id="20" type="RED_COIN"/>
  <tile id="21" type="RED_COIN"/>
+ <tile id="23" type="ITEM">
+  <properties>
+   <property name="item" type="int" value="5"/>
+  </properties>
+ </tile>
 </tileset>

@@ -58,6 +58,10 @@ void EmptyBlockSprite::TickAnimation(double DeltaTime)
 					{
 						ItemSprites.push_back(new MagicMushroomItemSprite(TileX * 64, (TileY - 1) * 64));
 					}
+					else if (ItemToSpawn == ITEM_PLOT_DEVICE)
+					{
+						ItemSprites.push_back(new PlotDeviceItemSprite(TileX * 64, (TileY - 1) * 64));
+					}
 
 				}
 				bPendingDelete = true;

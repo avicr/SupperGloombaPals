@@ -41,7 +41,7 @@ SDL_Color NextTripColor = { 0, 255, 0, 255 };
 SDL_Color PrevTripColor = { 0, 255, 0, 255 };
 SDL_Color TripColor = { 0, 255, 0, 255 };
 double BGColorLerp = 0;
-string DialogString = "IT'S DANGEROUS TO GO \l \s \s ALONE! TAKE THIS";
+string DialogString = "IT'S DANGEROUS TO GO \\n \\s \\s ALONE! TAKE THIS";
 
 TTF_Font* MainFont;
 

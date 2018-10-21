@@ -1182,8 +1182,10 @@ bool TMXMap::IsCollidableTile(int MetaTileID, int TileX, int TileY, SDL_Point Te
 
 	int ForegroundTile = ForegroundLayer->TileData[TileY][TileX];
 
-	if (MetaTileID == TILE_RED_COIN_BLOCK  || MetaTileID == TILE_COIN_BLOCK || MetaTileID == TILE_POWER_UP || MetaTileID == TILE_ONE_UP || MetaTileID == TILE_BREAKABLE || MetaTileID == TILE_MULTI_COIN_BLOCK || MetaTileID == TILE_STAR || MetaTileID == TILE_MAGIC_MUSHROOM || MetaTileID == TILE_DESTROY_WITH_FIRE ||
-		MetaTileID == TILE_DESTROY_WITH_FIRE_LEAVE_COLLISION || MetaTileID == TILE_DIALOG_BLOCK)
+	if (MetaTileID == TILE_RED_COIN_BLOCK  || MetaTileID == TILE_COIN_BLOCK || MetaTileID == TILE_POWER_UP || 
+		MetaTileID == TILE_ONE_UP || MetaTileID == TILE_BREAKABLE || MetaTileID == TILE_MULTI_COIN_BLOCK || 
+		MetaTileID == TILE_STAR || MetaTileID == TILE_MAGIC_MUSHROOM || MetaTileID == TILE_DESTROY_WITH_FIRE ||
+		MetaTileID == TILE_DESTROY_WITH_FIRE_LEAVE_COLLISION || MetaTileID == TILE_DIALOG_BLOCK || MetaTileID == TILE_PLOT_DEVICE)
 	{
 		if (ForegroundTile != -1)
 		{
@@ -1230,7 +1232,9 @@ void TMXMap::DoBrickBreak(int TileX, int TileY)
 bool TMXMap::IsHiddenBlockTile(int ID)
 {	
 
-	if (ID == TILE_RED_COIN_BLOCK || ID == TILE_COIN_BLOCK || ID == TILE_POWER_UP || ID == TILE_ONE_UP || ID == TILE_UGLY || ID == TILE_MULTI_COIN_BLOCK || ID == TILE_STAR || ID == TILE_MAGIC_MUSHROOM || ID == TILE_BREAK_ON_TOUCH || ID == TILE_DIALOG_BLOCK)
+	if (ID == TILE_RED_COIN_BLOCK || ID == TILE_COIN_BLOCK || ID == TILE_POWER_UP || ID == TILE_ONE_UP || 
+		ID == TILE_UGLY || ID == TILE_MULTI_COIN_BLOCK || ID == TILE_STAR || ID == TILE_MAGIC_MUSHROOM || 
+		ID == TILE_BREAK_ON_TOUCH || ID == TILE_DIALOG_BLOCK || ID == TILE_PLOT_DEVICE)
 	{
 		return true;
 	}
@@ -1311,6 +1315,10 @@ void TMXMap::HandleCollision(int TileX, int TileY, bool bCanBreakBricks)
 		else if (MetaTileType == TILE_MAGIC_MUSHROOM)
 		{
 			ItemTypeToSpawn = ITEM_MAGIC_MUSHROOM;
+		}
+		else if (MetaTileType == TILE_PLOT_DEVICE)
+		{
+			ItemTypeToSpawn = ITEM_PLOT_DEVICE;
 		}
 
 		int TileToReplace = 33;

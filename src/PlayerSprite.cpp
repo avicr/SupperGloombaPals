@@ -623,8 +623,17 @@ void PlayerSprite::Interact(ItemSprite* Item)
 		
 		Mix_PlayChannel(CHANNEL_POWER_UP, PowerUpGetSound, 0);
 	}
+	else if (ItemType == ITEM_PLOT_DEVICE)
+	{
+		//Mix_PlayChannel(CHANNEL_POWER_UP, PowerUpGetSound, 0);
+
+		DoDialogTest();		
+	}
 	
-	AddScore(1000, Item->GetPosX(), Item->GetPosY(), bIsOneUp);
+	if (ItemType != ITEM_PLOT_DEVICE)
+	{
+		AddScore(1000, Item->GetPosX(), Item->GetPosY(), bIsOneUp);
+	}
 	
 	// Delete the item that we just consumed
 	ItemSprites.DeletePendingActors();

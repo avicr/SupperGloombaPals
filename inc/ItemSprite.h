@@ -10,6 +10,7 @@ enum eItemType
 	ITEM_STAR,
 	ITEM_ONE_UP,
 	ITEM_MAGIC_MUSHROOM,
+	ITEM_PLOT_DEVICE,
 	ITEM_NONE = 255
 };
 
@@ -62,4 +63,10 @@ class MagicMushroomItemSprite : public BigMushroomItemSprite
 public:
 	MagicMushroomItemSprite(int X, int Y, bool bDoGrowAnimation = true);
 	virtual void Tick(double DeltaTime);
+};
+
+class PlotDeviceItemSprite : public FlowerItemSprite
+{
+public:
+	PlotDeviceItemSprite(int X, int Y, bool bGrowAnmation = true);
 };
