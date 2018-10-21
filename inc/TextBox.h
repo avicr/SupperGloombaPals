@@ -36,6 +36,7 @@ protected:
 	int CursorFrame;
 	bool bButtonPressedLastFrame;
 	bool bNeedToLetGoOfButton;
+	bool bPlotDevice;
 	eTextBoxStyle Style;
 
 	SDL_Color TextBGColor;
@@ -47,7 +48,8 @@ protected:
 	vector< vector <string> > Pages;
 
 public:
-	TextBox(int InPosX, int InPosY, int InWidth, int InHeight, string InText);
+	TextBox(int InPosX, int InPosY, int InWidth, int InHeight, string InText, bool bIsPlotDevice = false);
+	~TextBox();
 	
 	void Tick();
 	void Render(SDL_Renderer* Renderer);

@@ -485,11 +485,11 @@ bool Game::HasRedCoinBeenGathered(int TileX, int TileY)
 	return false;
 }
 
-void Game::DoTextBox(int InPosX, int InPosY, int InWidth, int InHeight, string InText)
+void Game::DoTextBox(int InPosX, int InPosY, int InWidth, int InHeight, string InText, bool bIsPlotDevice)
 {
 	if (TheTextBox == nullptr)
 	{
-		TheTextBox = new TextBox(InPosX, InPosY, InWidth, InHeight, InText);
+		TheTextBox = new TextBox(InPosX, InPosY, InWidth, InHeight, InText, bIsPlotDevice);
 	}
 }
 

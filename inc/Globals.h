@@ -37,6 +37,7 @@ enum eSpecialEvent
 	SPECIAL_EVENT_LOADING_LEVEL,
 	SPECIAL_EVENT_PORTALS,
 	SPECIAL_EVENT_RED_COINS_2,
+	SPECIAL_EVENT_PLOT_DEVICE,
 	SPECIAL_EVENT_LAST
 };
 
@@ -118,8 +119,8 @@ using namespace std;
 
 void DrawBitmapText(string Text, int X, int Y, int SizeX, int SizeY, SDL_Renderer *Renderer, Glyph Glyphs[127], float SpaceScaleX, float SpaceScaleY, bool bRightJustify);
 Mix_Music* GetMusicFromID(int ID);
-void ReadDialog();
-void DoDialogTest();
+void ReadDialog(string FileName = "Dialog.txt");
+void DoDialogTest(string FileName = "Dialog.txt");
 
 extern const double GlyphSpace;
 extern class ResourceManager *GResourceManager;
@@ -136,7 +137,7 @@ extern SDL_Point FireworkLocations[];
 extern struct LevelInfo Levels[];
 extern bool bShowWindow2;
 
-extern int SpecialEventKeys[];
+extern unsigned int SpecialEventKeys[];
 extern int NormalExitKeys[];
 extern int SecretExitKeys[];
 extern string SpecialEventDescprtions[];

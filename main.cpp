@@ -87,14 +87,15 @@ LevelInfo Levels[] = {
 };
 
 // Look up table to make sure save file isn't being tampared with
-int SpecialEventKeys[] =
+unsigned int SpecialEventKeys[] =
 {
 	0,
 	640,
 	6400,
 	583,
 	7983,
-	249
+	249,
+	45761
 };
 
 string SpecialEventDescprtions[] =
@@ -104,7 +105,8 @@ string SpecialEventDescprtions[] =
 	"That pipe used to work",
 	"There are no loading screens",
 	"Now you're thinking with portals",
-	"Casual red coins"
+	"Casual red coins",
+	"Plot device...literally"
 };
 
 int NormalExitKeys[10] =
@@ -1275,9 +1277,9 @@ void ShowWindow2(bool bShow)
 	bShowWindow2 = bShow;
 }
 
-void ReadDialog()
+void ReadDialog(string FileName)
 {
-	ifstream InFile("dialog.txt");
+	ifstream InFile(FileName);
 	string Temp;
 	DialogString = "";
 	do
@@ -1287,8 +1289,10 @@ void ReadDialog()
 	} while (Temp != "" && !InFile.eof());
 }
 
-void DoDialogTest()
-{
-	TheGame->DoTextBox(SCREEN_WIDTH / 2 - 350, 100, 700, 300, DialogString);
+void DoDialogTest(string FileName)
+{	
+	ReadDialog(FileName);
+
+   	TheGame->DoTextBox(SCREEN_WIDTH / 2 - 350, 100, 700, 300, DialogString, true);
 	//TheGame->DoTextBox(SCREEN_WIDTH / 2 - 350, 358, 700, 430, DialogString);
 }

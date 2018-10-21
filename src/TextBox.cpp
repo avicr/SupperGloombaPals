@@ -1,12 +1,14 @@
 #include "../inc/TextBox.h"
 #include "../inc/PlayerSprite.h"
+#include "../inc/Game.h"
 #include <queue>
 #include <sstream>
 
-TextBox::TextBox(int InPosX, int InPosY, int InWidth, int InHeight, string InText)
+TextBox::TextBox(int InPosX, int InPosY, int InWidth, int InHeight, string InText, bool bIsPlotDevice)
 {
 	SDL_assert(InText.length() < 4096);
 	
+	bPlotDevice = bIsPlotDevice;
 	Style = TBS_Modern;
 
 	if (Style == TBS_Zelda)
@@ -253,4 +255,12 @@ bool TextBox::IsDone()
 eTextBoxStyle TextBox::GetStyle()
 {
 	return Style;
+}
+
+TextBox::~TextBox()
+{
+	if (bPlotDevice)
+	{
+		TheGame->HandleSpecialEvent(SPECIAL_EVENT_PLOT_DEVICE);
+	}
 }

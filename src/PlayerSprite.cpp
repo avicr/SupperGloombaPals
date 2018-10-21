@@ -6,8 +6,16 @@
 #include "../inc/SimpleSprites.h"
 #include "../inc/Game.h"
 #include <fstream>
+
 int oldx;
 int oldy;
+
+const int NumberDialogs = 2;
+char* PlotDeviceTextFiles[NumberDialogs] =
+{
+	"Dialog.txt",
+	"Gario.txt"
+};
 
 void PlayerSprite::Tick(double DeltaTime)
 {	
@@ -626,8 +634,9 @@ void PlayerSprite::Interact(ItemSprite* Item)
 	else if (ItemType == ITEM_PLOT_DEVICE)
 	{
 		//Mix_PlayChannel(CHANNEL_POWER_UP, PowerUpGetSound, 0);
-
-		DoDialogTest();		
+		
+		int DialogRoll = rand() % NumberDialogs;
+		DoDialogTest(PlotDeviceTextFiles[DialogRoll]);
 	}
 	
 	if (ItemType != ITEM_PLOT_DEVICE)
