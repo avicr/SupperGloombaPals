@@ -1032,7 +1032,7 @@ SunEnemySprite::SunEnemySprite() : EnemySprite(NULL)
 {
 	RotationSpeed = 830;
 	Radius = 48;
-	SetTexture(GResourceManager->SunTexture->Texture);
+	PlayAnimation(GResourceManager->SunAnimation);
 	SetWidth(128);
 	SetHeight(128);
 	bDrawScreenSpace = true;
@@ -1041,8 +1041,7 @@ SunEnemySprite::SunEnemySprite() : EnemySprite(NULL)
 	
 	Center.x = 64;
 	Center.y = 128;
-
-	SunState = Sun_WaitThenAttackRight;
+	
 	VelocityX = 0;
 	VelocityY = 0;
 	CountDown = 60;
@@ -1053,7 +1052,7 @@ SunEnemySprite::SunEnemySprite() : EnemySprite(NULL)
 
 void SunEnemySprite::Tick(double DeltaTime)
 {	
-
+	Sprite::Tick(DeltaTime);
 	if (SunState == Sun_WaitThenAttackRight)
 	{
 		//Angle += RotationSpeed * DeltaTime;
@@ -1134,7 +1133,7 @@ void SunEnemySprite::Tick(double DeltaTime)
 	else if (SunState == Sun_WaitForUpperReturn)
 	{		
 		//VelocityY -= 0.25;
-		PosX += 7;
+		PosX += 6.5;
 
 		PosY = -0.0036490483539095 * (PosX * PosX) + 3.269547325102881 * PosX + 67.62139917695473;
 
@@ -1145,7 +1144,7 @@ void SunEnemySprite::Tick(double DeltaTime)
 	}
 	else if (SunState == Sun_WaitForUpperReturn2)
 	{
-		PosX -= 7;
+		PosX -= 6.5;
 
 		PosY = -0.0036490483539095 * (PosX * PosX) + 3.269547325102881 * PosX + 67.62139917695473;
 
@@ -1231,9 +1230,15 @@ void SunEnemySprite::EnterState(eSunState NewState)
 
 		break;
 	};
+	Scale += 1;
 	SunState = NewState;
 }
 void SunEnemySprite::LeaveState(eSunState PreviousState)
 {
 
+}
+
+SDL_Rect SunEnemySprite::GetScreenSpaceCollisionRect()
+{
+	return{ Rect.x + 32, Rect.y + 32, 128 - 64, 128 - 64 };
 }

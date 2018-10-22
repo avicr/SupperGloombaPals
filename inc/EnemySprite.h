@@ -173,5 +173,6 @@ protected:
 public:
 	SunEnemySprite();
 
+	virtual SDL_Rect GetScreenSpaceCollisionRect();
 	virtual void Tick(double DeltaTime);
 };

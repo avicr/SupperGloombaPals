@@ -38,7 +38,6 @@ INIT_TEXTURE_RESOURCE(BulletTexture)
 INIT_TEXTURE_RESOURCE(GuyTexture)
 INIT_TEXTURE_RESOURCE(PlotDeviceTexture)
 INIT_TEXTURE_RESOURCE(SunTexture)
-INIT_TEXTURE_RESOURCE(SunTexture2)
 
 INIT_ANIMATION_RESOURCE(PlayerGoombaAnimation)
 INIT_ANIMATION_RESOURCE(PlayerGoombaTallAnimation)
@@ -62,6 +61,7 @@ INIT_ANIMATION_RESOURCE(GoombaShrinkAnimation)
 INIT_ANIMATION_RESOURCE(FireworkAnimation)
 INIT_ANIMATION_RESOURCE(PlantAnimation)
 INIT_ANIMATION_RESOURCE(IceBreakAnimation)
+INIT_ANIMATION_RESOURCE(SunAnimation)
 
 ResourceManager::ResourceManager()
 {

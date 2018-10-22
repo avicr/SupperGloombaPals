@@ -71,8 +71,22 @@ public:
 	DECLARE_TEXTURE_RESOURCE(GuyTexture, "guy.bmp", false);
 	DECLARE_TEXTURE_RESOURCE(PlotDeviceTexture, "PlotDevice.bmp", false);
 	DECLARE_TEXTURE_RESOURCE(SunTexture, "sun.bmp", false);
-	DECLARE_TEXTURE_RESOURCE(SunTexture2, "sun2.bmp", false);
 
+	BEGIN_DECLARE_ANIMATION_RESORCE(SunAnimation)
+	{	
+		bUseAbsoluteFrameCount = true;
+
+		int SpriteWidth = 128;
+		int SpriteHeight = 128;
+		
+		SDL_Rect SrcRect = { 0, 0, SpriteWidth, SpriteHeight };		
+		Frames.push_back(new Frame(ResourceManager::SunTexture, SrcRect, 32));
+
+		SrcRect.x += SpriteWidth;
+		Frames.push_back(new Frame(ResourceManager::SunTexture, SrcRect, 16));
+		
+	}
+	END_DECLARE_ANIMATION_RESOURCE(SunAnimation)
 	
 	BEGIN_DECLARE_ANIMATION_RESORCE(GoombaGrowAnimation)
 	{
