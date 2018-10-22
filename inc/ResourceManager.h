@@ -70,6 +70,8 @@ public:
 	DECLARE_TEXTURE_RESOURCE(BulletTexture, "bullet.bmp", false);
 	DECLARE_TEXTURE_RESOURCE(GuyTexture, "guy.bmp", false);
 	DECLARE_TEXTURE_RESOURCE(PlotDeviceTexture, "PlotDevice.bmp", false);
+	DECLARE_TEXTURE_RESOURCE(SunTexture, "sun.bmp", false);
+	DECLARE_TEXTURE_RESOURCE(SunTexture2, "sun2.bmp", false);
 
 	
 	BEGIN_DECLARE_ANIMATION_RESORCE(GoombaGrowAnimation)

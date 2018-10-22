@@ -625,6 +625,12 @@ void HandleCheatInput(SDL_Event& TheEvent)
 		ItemSprites.push_back(FlowerSprite);
 	}
 
+	// Spawn sun
+	if (TheEvent.key.state == SDL_PRESSED && TheEvent.key.keysym.scancode == SDL_SCANCODE_S)
+	{		
+		EnemySprites.push_back(new SunEnemySprite());
+	}
+
 	// Do test dialog
 	if (TheEvent.key.state == SDL_PRESSED && TheEvent.key.keysym.scancode == SDL_SCANCODE_D)
 	{
@@ -913,7 +919,7 @@ void InitSDL()
 			Mix_VolumeMusic(VOLUME_NORMAL);
 			
 			//Mix_Volume(-1, 0);
-			//Mix_VolumeMusic(0);
+			Mix_VolumeMusic(0);
 		}
 
 #ifdef FULLSCREEN_1920_1080

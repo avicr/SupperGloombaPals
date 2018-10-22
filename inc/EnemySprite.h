@@ -25,6 +25,17 @@ enum ePlantState
 	PLANT_STATE_GOING_DOWN,	
 };
 
+enum eSunState
+{
+	Sun_WaitFarEnough = 0,
+	Sun_WaitThenAttackRight,
+	Sun_WaitAndResetTimer20,
+	Sun_WaitForUpperReturn,
+	Sun_WaitThenAttackLeft,
+	Sun_WaitAndResetTimer20Again,
+	Sun_WaitForUpperReturn2
+};
+
 class EnemySprite : public PhysicsSprite
 {
 public:
@@ -144,4 +155,23 @@ public:
 	void GetBricked(int TileX, int TileY) {};
 	void GetStomped();
 
+};
+
+class SunEnemySprite : public EnemySprite
+{
+protected:
+	float RotationSpeed;
+	float Radius;
+
+	SDL_Point Center;
+	float Angle;
+	eSunState SunState;
+
+	void EnterState(eSunState NewState);
+	void LeaveState(eSunState PreviousState);
+
+public:
+	SunEnemySprite();
+
+	virtual void Tick(double DeltaTime);
 };

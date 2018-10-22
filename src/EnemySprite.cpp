@@ -6,6 +6,7 @@
 #include "../inc/SpriteList.h"
 #include "../inc/TMXMap.h"
 
+#define PI 3.14159265
 #define MUSHROOM_COUNTDOWN 420
 
 EnemySprite::EnemySprite(EnemySpawnPoint* Spawner)
@@ -1025,4 +1026,214 @@ void BulletEnemySprite::GetStomped()
 			
 		bGotBricked = true;
 	}
+}
+
+SunEnemySprite::SunEnemySprite() : EnemySprite(NULL)
+{
+	RotationSpeed = 830;
+	Radius = 48;
+	SetTexture(GResourceManager->SunTexture->Texture);
+	SetWidth(128);
+	SetHeight(128);
+	bDrawScreenSpace = true;
+	SetPosition(128, 128);
+	Angle = 0;
+	
+	Center.x = 64;
+	Center.y = 128;
+
+	SunState = Sun_WaitThenAttackRight;
+	VelocityX = 0;
+	VelocityY = 0;
+	CountDown = 60;
+	SetPosition(128, 128);
+	Angle = -90;
+	EnterState(Sun_WaitThenAttackRight);
+}
+
+void SunEnemySprite::Tick(double DeltaTime)
+{	
+
+	if (SunState == Sun_WaitThenAttackRight)
+	{
+		//Angle += RotationSpeed * DeltaTime;
+		//if (Angle >= 360)
+		//{
+		//	Angle = 0;
+		//}
+		//double OffsetX = -sin((Angle)*PI / 180) * Radius;
+		//double OffsetY = cos((Angle)*PI / 180) * Radius;
+
+		//VelocityX = OffsetX / 3.25;// +Center.x;
+		//VelocityY = OffsetY / 3.25;// *1.65 + Center.y - 50;
+
+		//if (CountDown <= 0 && Angle > 180)
+		//{
+		//	EnterState(Sun_WaitAndResetTimer20);
+		//}
+
+		Angle += RotationSpeed * DeltaTime;
+		if (Angle >= 360)
+		{
+			Angle = 0;
+		}
+		double OffsetX = -sin((Angle+90)*PI / 180) * Radius;
+		double OffsetY = cos((Angle+90)*PI / 180) * Radius;
+
+		PosX = OffsetX + Center.x;
+		PosY = OffsetY + Center.y;
+
+		if (CountDown <= 0 && Angle == 0)
+		{
+			EnterState(Sun_WaitAndResetTimer20);
+		}
+	}
+	else if (SunState == Sun_WaitThenAttackLeft)
+	{
+		//Angle -= RotationSpeed * DeltaTime;
+		//if (Angle <= -360)
+		//{
+		//	Angle = 0;
+		//}
+		//double OffsetX = -sin(Angle*PI / 180) * Radius;
+		//double OffsetY = cos(Angle*PI / 180) * Radius;
+
+		//VelocityX = OffsetX / 3.25;// +Center.x;
+		//VelocityY = OffsetY / 3.25;// *1.65 + Center.y - 50;
+
+		Angle += RotationSpeed * DeltaTime;
+		if (Angle >= 360)
+		{
+			Angle = 0;
+		}
+		double OffsetX = sin((Angle + 90)*PI / 180) * Radius;
+		double OffsetY = cos((Angle + 90)*PI / 180) * Radius;
+
+		PosX = OffsetX + Center.x;
+		PosY = OffsetY + Center.y;
+
+		if (CountDown <= 0 && Angle == 0)
+		{
+			EnterState(Sun_WaitAndResetTimer20Again);
+		}
+	}
+	else if (SunState == Sun_WaitAndResetTimer20)
+	{
+		if (CountDown <= 0)
+		{
+			EnterState(Sun_WaitForUpperReturn);
+		}
+	}
+	else if (SunState == Sun_WaitAndResetTimer20Again)
+	{
+		if (CountDown <= 0)
+		{
+			EnterState(Sun_WaitForUpperReturn2);
+		}
+	}
+	else if (SunState == Sun_WaitForUpperReturn)
+	{		
+		//VelocityY -= 0.25;
+		PosX += 7;
+
+		PosY = -0.0036490483539095 * (PosX * PosX) + 3.269547325102881 * PosX + 67.62139917695473;
+
+		if (PosY < 119)
+		{
+			EnterState(Sun_WaitThenAttackLeft);
+		}
+	}
+	else if (SunState == Sun_WaitForUpperReturn2)
+	{
+		PosX -= 7;
+
+		PosY = -0.0036490483539095 * (PosX * PosX) + 3.269547325102881 * PosX + 67.62139917695473;
+
+		if (PosY < 119)
+		{
+			EnterState(Sun_WaitThenAttackRight);
+		}
+	}
+	PosX += VelocityX;
+	PosY += VelocityY;
+	Rect.x = PosX;
+	Rect.y = PosY;
+
+	/*if (Rect.y > 800 && VelocityY > 0)
+	{
+		VelocityY *= ;
+		Velocity
+	}*/
+
+	CountDown--;
+	
+}
+
+void SunEnemySprite::EnterState(eSunState NewState)
+{
+	switch (NewState)
+	{
+
+	case Sun_WaitForUpperReturn:
+		VelocityX = 0;
+		VelocityY = 0;
+		/*PosX = 40;
+		PosY = 54;*/
+		/*PosX = 40;
+		PosY = 54;*/
+		//CountDown = 40;
+		
+		break;
+
+	case Sun_WaitForUpperReturn2:
+		VelocityX = 0;
+		VelocityY = 0;
+		/*PosX = 862;
+		PosY = 54;*/
+		//CountDown = 40;
+
+		break;
+
+	case Sun_WaitAndResetTimer20:
+		VelocityX = 0;
+		VelocityY = 0;		
+		CountDown = 20;
+
+		break;
+
+	case Sun_WaitAndResetTimer20Again:
+		VelocityX = 0;
+		VelocityY = 0;
+		
+		CountDown = 20;
+
+		break;
+
+	case Sun_WaitThenAttackLeft:
+		VelocityX = 0;
+		VelocityY = 0;
+		CountDown = 60;
+		//SetPosition(862, 54);
+		Angle = 0;
+		Center.x = 832;
+		Center.y = 128;
+		
+		break;
+
+	case Sun_WaitThenAttackRight:
+		VelocityX = 0;
+		VelocityY = 0;
+		CountDown = 60;
+		//SetPosition(128, 54);
+		Angle = 0;
+		Center.x = 64;
+		Center.y = 128;
+
+		break;
+	};
+	SunState = NewState;
+}
+void SunEnemySprite::LeaveState(eSunState PreviousState)
+{
+
 }

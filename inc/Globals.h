@@ -1,4 +1,4 @@
-//#define CHEAT
+#define CHEAT
 //#define FULLSCREEN_1920_1080
 #define PARTY
 #ifndef GLOBALS_H
