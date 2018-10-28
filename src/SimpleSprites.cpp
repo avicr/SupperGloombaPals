@@ -280,12 +280,17 @@ void FireBallSprite::Tick(double DeltaTime)
 
 bool FireBallSprite::Interact(EnemySprite* Enemy)
 {
-	if (!Enemy->IsDying())
+	if (Enemy->IsFireable())
 	{
 		bPendingDelete = true;
 		// TODO: Get enemy point value???
 		ThePlayer->AddScore(100, Enemy->GetPosX(), Enemy->GetPosY());
 		Enemy->GetFired();
+	}
+	else
+	{
+		Mix_PlayChannel(CHANNEL_BUMP, BumpSound, 0);
+		bPendingDelete = true;
 	}
 
 	return false;

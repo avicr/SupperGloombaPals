@@ -95,7 +95,8 @@ unsigned int SpecialEventKeys[] =
 	583,
 	7983,
 	249,
-	45761
+	45761,
+	8348
 };
 
 string SpecialEventDescprtions[] =
@@ -106,7 +107,8 @@ string SpecialEventDescprtions[] =
 	"There are no loading screens",
 	"Now you're thinking with portals",
 	"Casual red coins",
-	"Plot device...literally"
+	"Plot device...literally",
+	"Fight fire with turtle"
 };
 
 int NormalExitKeys[10] =

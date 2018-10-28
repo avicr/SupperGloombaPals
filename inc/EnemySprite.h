@@ -47,6 +47,7 @@ public:
 	virtual bool IsDying();
 	virtual bool WasBricked();
 	virtual bool IsStompable();
+	virtual bool IsFireable();
 	virtual void GetBricked(int TileX, int TileY);
 	virtual void GetStarred(int TileX, int TileY);
 	virtual void GetFired();
@@ -175,4 +176,8 @@ public:
 
 	virtual SDL_Rect GetScreenSpaceCollisionRect();
 	virtual void Tick(double DeltaTime);
+	virtual bool IsStompable();	
+	virtual bool IsFireable();
+	virtual void GetBricked(int TileX, int TileY);
+	virtual void GetStarred(int TileX, int TileY);	
 };

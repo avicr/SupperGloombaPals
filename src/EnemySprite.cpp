@@ -5,6 +5,7 @@
 #include "../inc/ItemSprite.h"
 #include "../inc/SpriteList.h"
 #include "../inc/TMXMap.h"
+#include "../inc/Game.h"
 
 #define PI 3.14159265
 #define MUSHROOM_COUNTDOWN 420
@@ -36,6 +37,11 @@ bool EnemySprite::WasBricked()
 
 bool EnemySprite::IsStompable()
 {	
+	return !IsDying();
+}
+
+bool EnemySprite::IsFireable()
+{
 	return !IsDying();
 }
 
@@ -93,7 +99,6 @@ void EnemySprite::GetBricked(int TileX, int TileY)
 
 void EnemySprite::GetStarred(int TileX, int TileY)
 {
-	// TODO: Move this shit to the enemy sprite!
 	if (!IsDying())
 	{
 		Mix_PlayChannel(CHANNEL_KICK, KickSound, 0);
@@ -1053,118 +1058,129 @@ SunEnemySprite::SunEnemySprite() : EnemySprite(NULL)
 void SunEnemySprite::Tick(double DeltaTime)
 {	
 	Sprite::Tick(DeltaTime);
-	if (SunState == Sun_WaitThenAttackRight)
+
+	if (!IsDying())
 	{
-		//Angle += RotationSpeed * DeltaTime;
-		//if (Angle >= 360)
-		//{
-		//	Angle = 0;
-		//}
-		//double OffsetX = -sin((Angle)*PI / 180) * Radius;
-		//double OffsetY = cos((Angle)*PI / 180) * Radius;
-
-		//VelocityX = OffsetX / 3.25;// +Center.x;
-		//VelocityY = OffsetY / 3.25;// *1.65 + Center.y - 50;
-
-		//if (CountDown <= 0 && Angle > 180)
-		//{
-		//	EnterState(Sun_WaitAndResetTimer20);
-		//}
-
-		Angle += RotationSpeed * DeltaTime;
-		if (Angle >= 360)
+		if (SunState == Sun_WaitThenAttackRight)
 		{
-			Angle = 0;
+			//Angle += RotationSpeed * DeltaTime;
+			//if (Angle >= 360)
+			//{
+			//	Angle = 0;
+			//}
+			//double OffsetX = -sin((Angle)*PI / 180) * Radius;
+			//double OffsetY = cos((Angle)*PI / 180) * Radius;
+
+			//VelocityX = OffsetX / 3.25;// +Center.x;
+			//VelocityY = OffsetY / 3.25;// *1.65 + Center.y - 50;
+
+			//if (CountDown <= 0 && Angle > 180)
+			//{
+			//	EnterState(Sun_WaitAndResetTimer20);
+			//}
+
+			Angle += RotationSpeed * DeltaTime;
+			if (Angle >= 360)
+			{
+				Angle = 0;
+			}
+			double OffsetX = -sin((Angle + 90)*PI / 180) * Radius;
+			double OffsetY = cos((Angle + 90)*PI / 180) * Radius;
+
+			PosX = OffsetX + Center.x;
+			PosY = OffsetY + Center.y;
+
+			if (CountDown <= 0 && Angle == 0)
+			{
+				EnterState(Sun_WaitAndResetTimer20);
+			}
 		}
-		double OffsetX = -sin((Angle+90)*PI / 180) * Radius;
-		double OffsetY = cos((Angle+90)*PI / 180) * Radius;
-
-		PosX = OffsetX + Center.x;
-		PosY = OffsetY + Center.y;
-
-		if (CountDown <= 0 && Angle == 0)
+		else if (SunState == Sun_WaitThenAttackLeft)
 		{
-			EnterState(Sun_WaitAndResetTimer20);
+			//Angle -= RotationSpeed * DeltaTime;
+			//if (Angle <= -360)
+			//{
+			//	Angle = 0;
+			//}
+			//double OffsetX = -sin(Angle*PI / 180) * Radius;
+			//double OffsetY = cos(Angle*PI / 180) * Radius;
+
+			//VelocityX = OffsetX / 3.25;// +Center.x;
+			//VelocityY = OffsetY / 3.25;// *1.65 + Center.y - 50;
+
+			Angle += RotationSpeed * DeltaTime;
+			if (Angle >= 360)
+			{
+				Angle = 0;
+			}
+			double OffsetX = sin((Angle + 90)*PI / 180) * Radius;
+			double OffsetY = cos((Angle + 90)*PI / 180) * Radius;
+
+			PosX = OffsetX + Center.x;
+			PosY = OffsetY + Center.y;
+
+			if (CountDown <= 0 && Angle == 0)
+			{
+				EnterState(Sun_WaitAndResetTimer20Again);
+			}
 		}
+		else if (SunState == Sun_WaitAndResetTimer20)
+		{
+			if (CountDown <= 0)
+			{
+				EnterState(Sun_WaitForUpperReturn);
+			}
+		}
+		else if (SunState == Sun_WaitAndResetTimer20Again)
+		{
+			if (CountDown <= 0)
+			{
+				EnterState(Sun_WaitForUpperReturn2);
+			}
+		}
+		else if (SunState == Sun_WaitForUpperReturn)
+		{
+			//VelocityY -= 0.25;
+			PosX += 6.5;
+
+			PosY = -0.0036490483539095 * (PosX * PosX) + 3.269547325102881 * PosX + 67.62139917695473;
+
+			if (PosY < 119)
+			{
+				EnterState(Sun_WaitThenAttackLeft);
+			}
+		}
+		else if (SunState == Sun_WaitForUpperReturn2)
+		{
+			PosX -= 6.5;
+
+			PosY = -0.0036490483539095 * (PosX * PosX) + 3.269547325102881 * PosX + 67.62139917695473;
+
+			if (PosY < 119)
+			{
+				EnterState(Sun_WaitThenAttackRight);
+			}
+		}
+		PosX += VelocityX;
+		PosY += VelocityY;
+		Rect.x = PosX;
+		Rect.y = PosY;
+
+		/*if (Rect.y > 800 && VelocityY > 0)
+		{
+			VelocityY *= ;
+			Velocity
+		}*/
+
+		CountDown--;
 	}
-	else if (SunState == Sun_WaitThenAttackLeft)
+	else
 	{
-		//Angle -= RotationSpeed * DeltaTime;
-		//if (Angle <= -360)
-		//{
-		//	Angle = 0;
-		//}
-		//double OffsetX = -sin(Angle*PI / 180) * Radius;
-		//double OffsetY = cos(Angle*PI / 180) * Radius;
-
-		//VelocityX = OffsetX / 3.25;// +Center.x;
-		//VelocityY = OffsetY / 3.25;// *1.65 + Center.y - 50;
-
-		Angle += RotationSpeed * DeltaTime;
-		if (Angle >= 360)
-		{
-			Angle = 0;
-		}
-		double OffsetX = sin((Angle + 90)*PI / 180) * Radius;
-		double OffsetY = cos((Angle + 90)*PI / 180) * Radius;
-
-		PosX = OffsetX + Center.x;
-		PosY = OffsetY + Center.y;
-
-		if (CountDown <= 0 && Angle == 0)
-		{
-			EnterState(Sun_WaitAndResetTimer20Again);
-		}
+		PosX += VelocityX;
+		PosY += VelocityY;
+		Rect.x = PosX;
+		Rect.y = PosY;
 	}
-	else if (SunState == Sun_WaitAndResetTimer20)
-	{
-		if (CountDown <= 0)
-		{
-			EnterState(Sun_WaitForUpperReturn);
-		}
-	}
-	else if (SunState == Sun_WaitAndResetTimer20Again)
-	{
-		if (CountDown <= 0)
-		{
-			EnterState(Sun_WaitForUpperReturn2);
-		}
-	}
-	else if (SunState == Sun_WaitForUpperReturn)
-	{		
-		//VelocityY -= 0.25;
-		PosX += 6.5;
-
-		PosY = -0.0036490483539095 * (PosX * PosX) + 3.269547325102881 * PosX + 67.62139917695473;
-
-		if (PosY < 119)
-		{
-			EnterState(Sun_WaitThenAttackLeft);
-		}
-	}
-	else if (SunState == Sun_WaitForUpperReturn2)
-	{
-		PosX -= 6.5;
-
-		PosY = -0.0036490483539095 * (PosX * PosX) + 3.269547325102881 * PosX + 67.62139917695473;
-
-		if (PosY < 119)
-		{
-			EnterState(Sun_WaitThenAttackRight);
-		}
-	}
-	PosX += VelocityX;
-	PosY += VelocityY;
-	Rect.x = PosX;
-	Rect.y = PosY;
-
-	/*if (Rect.y > 800 && VelocityY > 0)
-	{
-		VelocityY *= ;
-		Velocity
-	}*/
-
-	CountDown--;
 	
 }
 
@@ -1241,4 +1257,44 @@ void SunEnemySprite::LeaveState(eSunState PreviousState)
 SDL_Rect SunEnemySprite::GetScreenSpaceCollisionRect()
 {
 	return{ Rect.x + 32, Rect.y + 32, 128 - 64, 128 - 64 };
+}
+
+bool SunEnemySprite::IsStompable()
+{
+	return false;
+}
+
+bool SunEnemySprite::IsFireable()
+{
+	return false;
+}
+
+void SunEnemySprite::GetBricked(int TileX, int TileY)
+{
+	// TODO: Move this shit to the enemy sprite!
+	if (!IsDying())
+	{
+		Mix_PlayChannel(CHANNEL_KICK, KickSound, 0);
+		VelocityY = 20;
+
+		// Which half of a tile are we on?
+		SDL_Rect MapSpaceCollisionRect = GetMapSpaceCollisionRect();
+
+		if ((MapSpaceCollisionRect.x) / 64 * 64 < TileX)
+		{
+			VelocityX = -3;
+		}
+		else
+		{
+			VelocityX = 3;
+		}
+		bGotBricked = true;
+		Flip = SDL_FLIP_VERTICAL;
+		TheGame->HandleSpecialEvent(SPECIAL_EVENT_SUN);
+	}
+}
+
+void SunEnemySprite::GetStarred(int TileX, int TileY)
+{
+	
 }
