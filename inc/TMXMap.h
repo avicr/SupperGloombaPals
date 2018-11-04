@@ -173,6 +173,7 @@ enum eTileMetaType
 	TILE_RED_COIN,
 	TILE_DIALOG_BLOCK,
 	TILE_PLOT_DEVICE,
+	TILE_ONEWAY_UP,
 	TILE_NONE = 255
 };
 
@@ -420,8 +421,8 @@ public:
 	eTileMetaType GetMetaTileType(int TileX, int TileY);
 
 	/** TileLoc - X, Y tile that the player collided with*/
-	bool CheckCollision(SDL_Rect Rect, vector<TileInfo>& TileLoc, bool bIgnoreBorders = false, bool bSolidTilesOnly = false);	
-	bool CheckCollision(SDL_Rect Rect, bool bIgnoreBorders = false);
+	bool CheckCollision(SDL_Rect Rect, vector<TileInfo>& TileLoc, bool bIgnoreBorders = false, bool bSolidTilesOnly = false, float VelocityY = 0);	
+	bool CheckCollision(SDL_Rect Rect, bool bIgnoreBorders = false, float VelocityY = 0);
 	bool IsHiddenBlockTile(int ID);
 	bool IsBreakableBlockTile(int ID);
 	bool IsCoinTile(int ID);

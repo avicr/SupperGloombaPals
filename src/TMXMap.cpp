@@ -1061,7 +1061,7 @@ void TMXMap::EndLevel()
 	ReleaseAssets();
 }
 
-bool TMXMap::CheckCollision(SDL_Rect Rect, vector<TileInfo>& HitTileLocs, bool bIgnoreBorders, bool bSolidTilesOnly)
+bool TMXMap::CheckCollision(SDL_Rect Rect, vector<TileInfo>& HitTileLocs, bool bIgnoreBorders, bool bSolidTilesOnly, float VelocityY)
 {	
 	/*if (ThePlayer-> ThePlayer->GetPosX() < TheMap->GetScrollX())
 	{
@@ -1130,6 +1130,19 @@ bool TMXMap::CheckCollision(SDL_Rect Rect, vector<TileInfo>& HitTileLocs, bool b
 			if (!bCollided)
 			{
 				bCollided = IsCollidableTile(CollisionLayer->TileData[y][x] - MetaTileGID, x, y);
+
+				// Check to see if we are standing on a one way tile
+				if (bCollided && CollisionLayer->TileData[y][x] - MetaTileGID == TILE_ONEWAY_UP)
+				{
+					if (VelocityY < 0 || Rect.y + Rect.h + ScrollY > y * 64)
+					{
+						bCollided = false;
+					}	
+					else
+					{
+   						bCollided = true;
+					}
+				}
 			}
 			/*if (bCollided)
 			{
@@ -1155,11 +1168,13 @@ bool TMXMap::CheckCollision(SDL_Rect Rect, vector<TileInfo>& HitTileLocs, bool b
 	return bCollided;
 }
 
-bool TMXMap::CheckCollision(SDL_Rect Rect, bool bIgnoreBorders)
+bool TMXMap::CheckCollision(SDL_Rect Rect, bool bIgnoreBorders, float VelocityY)
 {		
 	vector<TileInfo> TouchingTiles;
 
-	return CheckCollision(Rect, TouchingTiles, bIgnoreBorders);
+	bool bCollided = CheckCollision(Rect, TouchingTiles, bIgnoreBorders, false, VelocityY);
+	
+	return bCollided;
 }
 
 eTileMetaType TMXMap::GetMetaTileType(int TileX, int TileY)
@@ -1185,7 +1200,8 @@ bool TMXMap::IsCollidableTile(int MetaTileID, int TileX, int TileY, SDL_Point Te
 	if (MetaTileID == TILE_RED_COIN_BLOCK  || MetaTileID == TILE_COIN_BLOCK || MetaTileID == TILE_POWER_UP || 
 		MetaTileID == TILE_ONE_UP || MetaTileID == TILE_BREAKABLE || MetaTileID == TILE_MULTI_COIN_BLOCK || 
 		MetaTileID == TILE_STAR || MetaTileID == TILE_MAGIC_MUSHROOM || MetaTileID == TILE_DESTROY_WITH_FIRE ||
-		MetaTileID == TILE_DESTROY_WITH_FIRE_LEAVE_COLLISION || MetaTileID == TILE_DIALOG_BLOCK || MetaTileID == TILE_PLOT_DEVICE)
+		MetaTileID == TILE_DESTROY_WITH_FIRE_LEAVE_COLLISION || MetaTileID == TILE_DIALOG_BLOCK || MetaTileID == TILE_PLOT_DEVICE ||
+		MetaTileID == TILE_ONEWAY_UP)
 	{
 		if (ForegroundTile != -1)
 		{

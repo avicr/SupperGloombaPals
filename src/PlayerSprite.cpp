@@ -286,7 +286,7 @@ void PlayerSprite::Tick(double DeltaTime)
 				VelocityY = 0;
 			}
 
-			if (TheMap->CheckCollision(NewRect))
+			if (TheMap->CheckCollision(NewRect, false, VelocityY))
 			{
 				// Cap max speed when colliding with a wall
 				bCollided = true;
@@ -408,7 +408,7 @@ void PlayerSprite::Tick(double DeltaTime)
 
 	// Wall ejection!
 	vector<TileInfo> HitTiles;
-	bool bCollidedDuringFinalCheck = TheMap->CheckCollision(GetScreenSpaceCollisionRect(), HitTiles);
+	bool bCollidedDuringFinalCheck = TheMap->CheckCollision(GetScreenSpaceCollisionRect(), HitTiles,false, false, VelocityY);
 
 	for (int i = 0; i < HitTiles.size(); i++)
 	{
@@ -466,6 +466,8 @@ void PlayerSprite::Tick(double DeltaTime)
 			Rect.x = PosX;
 		}
 		else*/
+
+		if (HitTiles[0].MetaTileType != TILE_ONEWAY_UP)
 		{
 			// Go left if there is an emtpy tile to the left
 			if (EjectionDirection == DIRECTION_LEFT || (EjectionDirection != DIRECTION_RIGHT && PosX - TheMap->GetScrollX() > 0 && HitTiles.size() > 0 && !TheMap->IsCollidableTile(HitTiles[0].MetaTileType, HitTiles[0].Location.x, HitTiles[0].Location.y)))
@@ -1003,8 +1005,17 @@ bool PlayerSprite::HandleVerticalMovement()
 		NewRect.y += VelocityY > 0 ? 1 : -1;
 		vector<TileInfo> HitTiles;
 		// Did we bump into a brick going up?
-		bCollided = TheMap->CheckCollision(NewRect, HitTiles);
+		bCollided = TheMap->CheckCollision(NewRect, HitTiles, false, false, VelocityY);
 
+		// Hack: If we are touching a one way tile on the bottom row of the collided tiles, just make it solid...
+		if (VelocityY >= 0 && HitTiles.size() > 1)
+		{
+			if ((HitTiles[HitTiles.size() - 2].MetaTileType == TILE_ONEWAY_UP && Rect.y + Rect.h < HitTiles[HitTiles.size() - 2].Location.y * 64) ||
+				(HitTiles[HitTiles.size() - 1].MetaTileType == TILE_ONEWAY_UP && Rect.y + Rect.h < HitTiles[HitTiles.size() - 1].Location.y * 64))
+			{
+				bCollided = true;
+			}
+		}
 		// If we have 4 tiles returned that means there is a chance we hit a block on the edge, in which case we need to clear 
 		// collided flag to let the user jump around the block.
 
@@ -1012,10 +1023,10 @@ bool PlayerSprite::HandleVerticalMovement()
 		{
 			TileInfo SingleHitTile({ 0, 0, }, TILE_NONE, -1);
 
-			int BottomLeftTileType = TheMap->GetMetaTileType(HitTiles[0].Location.x, HitTiles[0].Location.y);
-			int BottomRightTileType = TheMap->GetMetaTileType(HitTiles[1].Location.x, HitTiles[1].Location.y);
-			bool bBottomLeftIsCollidable = TheMap->IsCollidableTile(BottomLeftTileType, HitTiles[0].Location.x, HitTiles[0].Location.y);
-			bool bBottomRightIsCollidable = TheMap->IsCollidableTile(BottomRightTileType, HitTiles[1].Location.x, HitTiles[1].Location.y);
+			int BottomLeftTileType = TheMap->GetMetaTileType(HitTiles[0].Location.x, HitTiles[0].Location.y) && HitTiles[0].MetaTileType != TILE_ONEWAY_UP;
+			int BottomRightTileType = TheMap->GetMetaTileType(HitTiles[1].Location.x, HitTiles[1].Location.y) && HitTiles[0].MetaTileType != TILE_ONEWAY_UP;
+			bool bBottomLeftIsCollidable = TheMap->IsCollidableTile(BottomLeftTileType, HitTiles[0].Location.x, HitTiles[0].Location.y) && HitTiles[0].MetaTileType != TILE_ONEWAY_UP;
+			bool bBottomRightIsCollidable = TheMap->IsCollidableTile(BottomRightTileType, HitTiles[1].Location.x, HitTiles[1].Location.y) && HitTiles[0].MetaTileType != TILE_ONEWAY_UP;
 					
 			//SingleHitTile = bBottomLeftIsCollidable ? HitTiles[0] : HitTiles[1];				
 			// Closer to the left tile
