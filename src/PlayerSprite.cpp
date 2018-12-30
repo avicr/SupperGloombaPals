@@ -10,6 +10,25 @@
 int oldx;
 int oldy;
 
+int AdventurePixelsToMove[] = {
+	0,
+	7,
+	3,
+	7,
+	0,
+	6,
+	9,
+	7,
+	6,
+	8,
+	7,
+	4,
+	4,
+	6,
+	3,
+	7,
+};
+
 const int NumberDialogs = 2;
 char* PlotDeviceTextFiles[NumberDialogs] =
 {
@@ -19,6 +38,12 @@ char* PlotDeviceTextFiles[NumberDialogs] =
 
 void PlayerSprite::Tick(double DeltaTime)
 {	
+	if (bIsAdventure)
+	{
+		AdventureTick(DeltaTime);
+		return;
+	}
+
 	// Don't do anything if the level isn't playing
 	if (TheGame->GetGameState() > STATE_RIDING_FLAG_POLE)
 	{
@@ -680,8 +705,14 @@ void PlayerSprite::OnGetFire()
 
 void PlayerSprite::HandleInput(double DeltaTime)
 {
-	MovingFlags = MOVING_NONE;
 
+	if (bIsAdventure)
+	{
+		AdventureHandleInput(DeltaTime);
+		return;
+	}
+
+	MovingFlags = MOVING_NONE;
 
 	if (EndOfLevelCountdown || bFrozen)
 	{
@@ -801,7 +832,7 @@ void PlayerSprite::HandleInput(double DeltaTime)
 	}
 
 	// Shoot fireball!
-	if (!bButtonPreviouslyPressed[1] && bPressingButton1 && PowerUpState == POWER_FLOWER)
+	if (!bButtonPreviouslyPressed[1] && bPressingButton1 && PowerUpState == POWER_FLOWER && TheGame->GetGameState() < STATE_RIDING_FLAG_POLE)
 	{
 		ShootFire();
 	}
@@ -932,7 +963,7 @@ void PlayerSprite::HandleJump()
 }
 
 PlayerSprite::PlayerSprite()
-{
+{	
 	NumRedCoins = 0;
 	bDrawHUD = true;
 	bExitedLevel = false;
@@ -963,6 +994,8 @@ PlayerSprite::PlayerSprite()
 	bIsJumping = false;
 	bGrowing = false;
 	bShrinking = false;
+	bIsAdventure = false;
+	AdventureMoveIndex = 0;
 	bDucking = false;
 	StartJumpVelocity = 0;	
 	CollisionRenderColor.r = 0;
@@ -1322,6 +1355,7 @@ void PlayerSprite::StartWarpSequence(WarpEntrance Entrance, WarpExit Exit)
 		VelocityX = 0;
 		VelocityY = 0;
 		bWarping = true;
+		RenderLayer = RENDER_LAYER_BEHIND_BG;
 		WarpSeq.FrameCount = 0;
 		WarpSeq.Entrance = Entrance;
 		WarpSeq.Exit = Exit;
@@ -1493,7 +1527,7 @@ void PlayerSprite::CheckControlCollision()
 				}
 				int WarpIndex = TheMap->GetWarpIndex(Controls[i]->WarpID);
 
-				if (WarpIndex != -1)
+				if (WarpIndex != -1 || Controls[i]->WarpID == -1)
 				{
 					TheGame->HandleControl(Controls[i]);
 				}
@@ -1624,6 +1658,36 @@ void PlayerSprite::UpdateWarpExitSequence()
 	if (WarpSeq.FrameCount == 0)
 	{
 		//SetPosition(WarpSeq.Exit.PosX, (WarpSeq.Exit.PosY - 1) - (Rect.h - 64));
+
+		if (WarpSeq.Exit.WarpType == WARP_PIPE_ZELDA_DOOR)
+		{
+			bIsAdventure = true;			
+			SetPosition(WarpSeq.Exit.PosX, (WarpSeq.Exit.PosY - 1) - (Rect.h - 64));
+		}
+		else
+		{
+			if (bIsAdventure)
+			{
+				bIsAdventure = false;
+				TheGame->EndTextBox();
+				
+				if (PowerUpState >= POWER_BIG)
+				{
+					CollisionRect = { 5, 32, 54, 96 };					
+					SetWidth(64);
+					SetHeight(128);
+					SetPosition(WarpSeq.Exit.PosX, (WarpSeq.Exit.PosY - 1) - (Rect.h - 64));
+
+				}
+				else
+				{
+					CollisionRect = { 5, 16, 54, 48 };
+					SetWidth(64);
+					SetHeight(64);
+				}
+			}
+		}
+
 		VelocityX = 0;
 		VelocityY = 0;
 		TheMap->DoWarp(WarpSeq.Exit);
@@ -1660,11 +1724,21 @@ void PlayerSprite::UpdateWarpExitSequence()
 		}
 		
 	}
-	else if (WarpSeq.Exit.WarpType >= WARP_PIPE_UP && WarpSeq.Exit.WarpType <= WARP_PIPE_RIGHT || WarpSeq.Exit.WarpType == WARP_PIPE_RIGHT_SECOND_WINDOW)
+	else if (WarpSeq.Exit.WarpType >= WARP_PIPE_UP && WarpSeq.Exit.WarpType <= WARP_PIPE_RIGHT || WarpSeq.Exit.WarpType == WARP_PIPE_RIGHT_SECOND_WINDOW ||
+		     WarpSeq.Exit.WarpType == WARP_PIPE_ZELDA_DOOR)
 	{
 		SDL_Point StartDelta = { 0, 0 };
 		SDL_Point DeltaPos = { 0, 0 };
 
+		if (WarpSeq.Exit.WarpType == WARP_PIPE_ZELDA_DOOR)
+		{
+			PlayAnimation(GResourceManager->AdventureUpAnimation);
+			SetWidth(64);
+			SetHeight(64);
+			CollisionRect = { 5, 16, 54, 48 };
+			DeltaPos.y = -8;
+			StartDelta.y = 16;			
+		}
 		if (WarpSeq.Exit.WarpType == WARP_PIPE_UP)
 		{
 			DeltaPos.y = -4;
@@ -1707,20 +1781,46 @@ void PlayerSprite::UpdateWarpExitSequence()
 				ShowWindow2(true);
 			}
 		}
-		else if (WarpSeq.FrameCount <= 67)
+
+		if (WarpSeq.Exit.WarpType != WARP_PIPE_ZELDA_DOOR)
 		{
-			
-		}
-		else if (WarpSeq.FrameCount <= 99)
-		{
-			PosX += DeltaPos.x;
-			PosY += DeltaPos.y;
+			if (WarpSeq.FrameCount <= 67)
+			{
+
+			}
+			else if (WarpSeq.FrameCount <= 99)
+			{
+				PosX += DeltaPos.x;
+				PosY += DeltaPos.y;
+			}
+			else
+			{
+				WarpSeq.bWarpExitComplete = true;
+
+			}
 		}
 		else
-		{						
-			WarpSeq.bWarpExitComplete = true;
-						
+		{
+			if (WarpSeq.FrameCount == 2)
+			{
+				RenderLayer = RENDER_LAYER_BEHIND_FG;
+			}
+			if (WarpSeq.FrameCount <= 30)
+			{
+
+			}
+			else if (WarpSeq.FrameCount <= 36)
+			{
+				PosX += DeltaPos.x;
+				PosY += DeltaPos.y;
+			}
+			else
+			{
+				WarpSeq.bWarpExitComplete = true;
+
+			}
 		}
+		
 	}
 		
 	Rect.x = PosX;// -TheMap->GetScrollX();
@@ -1739,6 +1839,7 @@ void PlayerSprite::UpdateWarpExitSequence()
 			VelocityY = 0;
 		}
 		bWarping = false;
+		RenderLayer = RENDER_LAYER_TOP;
 	}
 }
 
@@ -1812,66 +1913,77 @@ void PlayerSprite::DrawHUD()
 	{
 		return;
 	}
-	// Draw score
-	char TempString[10];
-	itoa(Score, TempString, 10);
-	DrawBitmapText("GARIO", 97, 32, 32, 32, GRenderer, FontShadowedWhite, GlyphSpace, 1.25, false);
-	
-	int i = 0;
-	int NumZeros = 6 - strlen(TempString);
-	NumZeros = NumZeros < 0 ? 0 : NumZeros;
 
-	for (i = 0; i < NumZeros; i++)
-	{ 
-		DrawBitmapText("0", 97 + i * (GlyphSpace * 32), 60, 32, 32, GRenderer, FontShadowedWhite, GlyphSpace, 1.25, false);
-	}
-	DrawBitmapText(TempString, 97 + i * (GlyphSpace * 32), 60, 32, 32, GRenderer, FontShadowedWhite, GlyphSpace, 1.25, false);
+	if (bIsAdventure)
+	{
+		SDL_Rect SrcRect = { 0, 0, 948, 220 };
+		SDL_Rect DstRect = { 0, 0, 948, 220 };
 		
-	// Draw red coins
-	// Draw coins	
-	SDL_Rect SrcRect = { 0, 0, 64, 64 };
-	SDL_Rect DstRect;
-
-	for (i = 0; i < NumRedCoins; i++)
-	{
-		DstRect = { 350 + i * 32, 30, 32, 32 };
-
-		SDL_RenderCopy(GRenderer, GResourceManager->RedCoinEffectTexture->Texture, &SrcRect, &DstRect);
+		SDL_RenderCopy(GRenderer, GResourceManager->AdventureHUDTexture->Texture, &SrcRect, &DstRect);		
 	}
-
-	// Draw coins	
-	SrcRect = { 0, 0, 64, 64 };
-	DstRect = { 350, 60, 32, 32 };
-
-	SDL_RenderCopy(GRenderer, GResourceManager->CoinEffectTexture->Texture, &SrcRect, &DstRect);
-	itoa(Coins, TempString, 10);
-	DrawBitmapText("X", 389, 60, 32, 32, GRenderer, FontShadowedWhite, GlyphSpace, 1.25, false);
-	NumZeros = 2 - strlen(TempString);
-	NumZeros = NumZeros < 0 ? 0 : NumZeros;
-
-	for (i = 0; i < NumZeros; i++)
+	else
 	{
-		DrawBitmapText("0", 420 + i * (GlyphSpace * 32), 60, 32, 32, GRenderer, FontShadowedWhite, GlyphSpace, 1.25, false);
-	}
-	DrawBitmapText(TempString, 420 + i * (GlyphSpace * 32), 60, 32, 32, GRenderer, FontShadowedWhite, GlyphSpace, 1.25, false);
+		// Draw score
+		char TempString[10];
+		itoa(Score, TempString, 10);
+		DrawBitmapText("GARIO", 97, 32, 32, 32, GRenderer, FontShadowedWhite, GlyphSpace, 1.25, false);
 
-	// Draw the world string
-	DrawBitmapText("WORLD", 578, 32, 32, 32, GRenderer, FontShadowedWhite, GlyphSpace, 1.25, false);
-	DrawBitmapText(TheGame->GetWorldName(), 602, 60, 32, 32, GRenderer, FontShadowedWhite, GlyphSpace, 1.25, false);
+		int i = 0;
+		int NumZeros = 6 - strlen(TempString);
+		NumZeros = NumZeros < 0 ? 0 : NumZeros;
 
-	// Draw the time string	
-	itoa(TheMap->GetSecondsLeft(), TempString, 10);
-	DrawBitmapText("TIME", 827, 32, 32, 32, GRenderer, FontShadowedWhite, GlyphSpace, 1.25, false);
-	NumZeros = 3 - strlen(TempString);
-	NumZeros = NumZeros < 0 ? 0 : NumZeros;
-
-	if (TheMap->LevelPlaying())
-	{
 		for (i = 0; i < NumZeros; i++)
 		{
-			DrawBitmapText("0", 845 + i * (GlyphSpace * 32), 60, 32, 32, GRenderer, FontShadowedWhite, GlyphSpace, 1.25, false);
+			DrawBitmapText("0", 97 + i * (GlyphSpace * 32), 60, 32, 32, GRenderer, FontShadowedWhite, GlyphSpace, 1.25, false);
 		}
-		DrawBitmapText(TempString, 845 + i * (GlyphSpace * 32), 60, 32, 32, GRenderer, FontShadowedWhite, GlyphSpace, 1.25, false);
+		DrawBitmapText(TempString, 97 + i * (GlyphSpace * 32), 60, 32, 32, GRenderer, FontShadowedWhite, GlyphSpace, 1.25, false);
+
+		// Draw red coins
+		// Draw coins	
+		SDL_Rect SrcRect = { 0, 0, 64, 64 };
+		SDL_Rect DstRect;
+
+		for (i = 0; i < NumRedCoins; i++)
+		{
+			DstRect = { 350 + i * 32, 30, 32, 32 };
+
+			SDL_RenderCopy(GRenderer, GResourceManager->RedCoinEffectTexture->Texture, &SrcRect, &DstRect);
+		}
+
+		// Draw coins	
+		SrcRect = { 0, 0, 64, 64 };
+		DstRect = { 350, 60, 32, 32 };
+
+		SDL_RenderCopy(GRenderer, GResourceManager->CoinEffectTexture->Texture, &SrcRect, &DstRect);
+		itoa(Coins, TempString, 10);
+		DrawBitmapText("X", 389, 60, 32, 32, GRenderer, FontShadowedWhite, GlyphSpace, 1.25, false);
+		NumZeros = 2 - strlen(TempString);
+		NumZeros = NumZeros < 0 ? 0 : NumZeros;
+
+		for (i = 0; i < NumZeros; i++)
+		{
+			DrawBitmapText("0", 420 + i * (GlyphSpace * 32), 60, 32, 32, GRenderer, FontShadowedWhite, GlyphSpace, 1.25, false);
+		}
+		DrawBitmapText(TempString, 420 + i * (GlyphSpace * 32), 60, 32, 32, GRenderer, FontShadowedWhite, GlyphSpace, 1.25, false);
+
+		// Draw the world string
+		DrawBitmapText("WORLD", 578, 32, 32, 32, GRenderer, FontShadowedWhite, GlyphSpace, 1.25, false);
+		DrawBitmapText(TheGame->GetWorldName(), 602, 60, 32, 32, GRenderer, FontShadowedWhite, GlyphSpace, 1.25, false);
+
+		// Draw the time string	
+		itoa(TheMap->GetSecondsLeft(), TempString, 10);
+		DrawBitmapText("TIME", 827, 32, 32, 32, GRenderer, FontShadowedWhite, GlyphSpace, 1.25, false);
+		NumZeros = 3 - strlen(TempString);
+		NumZeros = NumZeros < 0 ? 0 : NumZeros;
+
+		if (TheMap->LevelPlaying())
+		{
+			for (i = 0; i < NumZeros; i++)
+			{
+				DrawBitmapText("0", 845 + i * (GlyphSpace * 32), 60, 32, 32, GRenderer, FontShadowedWhite, GlyphSpace, 1.25, false);
+			}
+			DrawBitmapText(TempString, 845 + i * (GlyphSpace * 32), 60, 32, 32, GRenderer, FontShadowedWhite, GlyphSpace, 1.25, false);
+		}
 	}
 	
 }
@@ -1913,6 +2025,8 @@ void PlayerSprite::BeginLevel()
 	bIsJumping = false;
 	bGrowing = false;
 	bShrinking = false;
+	bIsAdventure = false;
+	AdventureMoveIndex = 0;
 	bDucking = false;
 	StartJumpVelocity = 0;
 	CollisionRenderColor.r = 0;
@@ -2024,4 +2138,167 @@ void PlayerSprite::OnFlagFinished()
 bool PlayerSprite::HasExitedLevel()
 {
 	return bExitedLevel;
+}
+
+void PlayerSprite::AdventureHandleInput(double DeltaTime)
+{
+	MovingFlags = MOVING_NONE;
+
+	const Uint8 *state = SDL_GetKeyboardState(NULL);
+	LastKeyboardState = state;
+	SDL_JoystickUpdate();
+	bool bPlayerMoving = false;
+	bIsRunning = false;
+	bFirstFrameJump = false;
+
+	if (IsRightPressed(state))
+	{
+		MovingFlags |= MOVING_RIGHT;
+		bPlayerMoving = true;
+
+	}
+	else if (IsLeftPressed(state))
+	{
+		MovingFlags |= MOVING_LEFT;
+		bPlayerMoving = true;
+
+	}
+
+	if (IsUpPressed(state))
+	{
+		MovingFlags |= MOVING_UP;
+		bPlayerMoving = true;
+	}
+	else if (IsDownPressed(state))
+	{
+		MovingFlags |= MOVING_DOWN;
+		bPlayerMoving = true;
+	}
+
+}
+
+void PlayerSprite::AdventureTick(double DeltaTime)
+{
+	if (bWarping)
+	{
+		UpdateWarpSequence();
+		return;
+	}
+
+	VelocityX = 0;
+	VelocityY = 0;
+	if (MovingFlags)
+	{
+		if (MovingFlags & MOVING_UP || MovingFlags & MOVING_DOWN)
+		{
+			int NumPixelsToMove = ADVENTURE_MOVE_PIXELS_PER_FRAME;
+			bool bCollided = false;;
+
+			VelocityY = MovingFlags & MOVING_DOWN ? 1 : -1;
+			
+			SDL_Rect NewRect = GetScreenSpaceCollisionRect();
+			for (int x = 0; x < AdventurePixelsToMove[AdventureMoveIndex]; x++)
+			{
+				NewRect.y += VelocityY;
+				if (EndOfLevelCountdown == 0 && bExitingLevel && Rect.x >= ExitLevelX)
+				{
+					bSpriteVisible = false;
+					EndOfLevelCountdown = 40;
+					VelocityX = 0;
+					VelocityY = 0;
+				}
+
+				if (TheMap->CheckCollision(NewRect, false, 0))
+				{
+					// Cap max speed when colliding with a wall
+					bCollided = true;
+					VelocityY = 0;
+					break;
+				}
+
+				PosY += VelocityY;
+			}
+		}
+		else if (MovingFlags & MOVING_RIGHT || MovingFlags & MOVING_LEFT)
+		{
+			int NumPixelsToMove = ADVENTURE_MOVE_PIXELS_PER_FRAME;
+			bool bCollided = false;;
+
+			VelocityX = MovingFlags & MOVING_RIGHT ? 1 : -1;
+
+			SetFlip(VelocityX >= 1 ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
+
+			SDL_Rect NewRect = GetScreenSpaceCollisionRect();
+			for (int x = 0; x < AdventurePixelsToMove[AdventureMoveIndex]; x++)
+			{
+				NewRect.x += VelocityX;
+				if (EndOfLevelCountdown == 0 && bExitingLevel && Rect.x >= ExitLevelX)
+				{
+					bSpriteVisible = false;
+					EndOfLevelCountdown = 40;
+					VelocityX = 0;
+					VelocityY = 0;
+				}
+
+				if (TheMap->CheckCollision(NewRect, false, 0))
+				{
+					// Cap max speed when colliding with a wall
+					bCollided = true;
+					VelocityX = 0;
+					break;
+				}
+
+				PosX += VelocityX;
+			}
+		}
+
+		Rect.x = PosX;
+		Rect.y = PosY;
+		AdventureMoveIndex++;
+
+		if (AdventureMoveIndex > 15)
+		{
+			AdventureMoveIndex = 1;
+		}
+	}
+	else
+	{
+		AdventureMoveIndex = 0;
+	}
+	// Don't mess with animation play rates if we are growing
+	if (MovingFlags)
+	{
+		SetAnimationPlayRate(1);
+		
+		if (MovingFlags & MOVING_UP)
+		{
+			SetFlip(SDL_FLIP_NONE);
+			if (AnimData.Anim != GResourceManager->AdventureUpAnimation)
+			{
+				PlayAnimation(GResourceManager->AdventureUpAnimation);
+			}
+		}
+		else if (MovingFlags & MOVING_DOWN)
+		{
+			SetFlip(SDL_FLIP_NONE);
+			if (AnimData.Anim != GResourceManager->AdventureDownAnimation)
+			{
+				PlayAnimation(GResourceManager->AdventureDownAnimation);
+			}
+		}		
+		else if ((MovingFlags & MOVING_LEFT) || (MovingFlags & MOVING_RIGHT))
+		{
+			if (AnimData.Anim != GResourceManager->AdventureSideAnimation)
+			{
+				PlayAnimation(GResourceManager->AdventureSideAnimation);
+			}
+		}		
+	}
+	else
+	{
+		SetAnimationPlayRate(0);
+	}
+
+	Sprite::Tick(DeltaTime);
+
 }

@@ -27,6 +27,9 @@ public:
 	virtual void TickAnimation(double DeltaTime);
 	virtual void UpdateStarAnimation();
 
+	virtual void AdventureTick(double DeltaTime);
+	virtual void AdventureHandleInput(double DeltaTime);
+
 	bool IsRightPressed(const Uint8 *state);
 	bool IsLeftPressed(const Uint8 *state);
 	bool IsUpPressed(const Uint8 *state);
@@ -131,6 +134,9 @@ protected:
 	bool bDead;
 	eDirection EjectionDirection;
 	int NumRedCoins;
+
+	bool bIsAdventure;
+	int AdventureMoveIndex;
 	
 	void StopJumping();
 	bool HandleVerticalMovement();

@@ -95,7 +95,7 @@ public:
 	void AddGatheredRedCoinLocation(SDL_Point RedCoinLocation);
 	bool HasRedCoinBeenGathered(int TileX, int TileY);
 	int GetNumberOfRedCoinsFound() { return GatheredRedCoinLocations.size(); }
-	void DoTextBox(int InPosX, int InPosY, int InWidth, int InHeight, string InText, bool bIsPlotDevice = false);
-
+	void DoTextBox(int InPosX, int InPosY, int InWidth, int InHeight, string InText, bool bIsPlotDevice = false, eTextBoxStyle Style = TBS_Modern);
+	void EndTextBox();
 	bool IsDoingTextBox();
 };

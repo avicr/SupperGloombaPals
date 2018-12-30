@@ -683,10 +683,10 @@ void TMXMap::Render(SDL_Renderer* Renderer, int ScreenX, int ScreenY, int Source
 {
 	SimpleSprites.Render(Renderer, RENDER_LAYER_BEHIND_BG);
 
-	if (bPlayingLevel && ThePlayer->IsWarping())
+	/*if (bPlayingLevel && ThePlayer->IsWarping())
 	{
 		ThePlayer->Render(Renderer);
-	}
+	}*/
 
 	for (int i = 0; i < Layers.size(); i++)
 	{
@@ -696,7 +696,7 @@ void TMXMap::Render(SDL_Renderer* Renderer, int ScreenX, int ScreenY, int Source
 			ItemSprites.Render(Renderer, RENDER_LAYER_BEHIND_FG);
 			EnemySprites.Render(Renderer, RENDER_LAYER_BEHIND_FG);
 
-			if (bPlayingLevel && !ThePlayer->IsWarping() && ThePlayer->GetRenderLayer() == RENDER_LAYER_BEHIND_FG)
+			if (bPlayingLevel && /*!ThePlayer->IsWarping() && */ThePlayer->GetRenderLayer() == RENDER_LAYER_BEHIND_FG)
 			{				
 				ThePlayer->Render(Renderer);
 			}

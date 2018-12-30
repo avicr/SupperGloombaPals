@@ -14,6 +14,7 @@
 #include "inc/ItemSprite.h"
 #include "inc/TextBox.h"
 #include "inc/Game.h"
+#include "inc/AdventurePlayerSprite.h"
 #include <iostream>
 #include <fstream>
 
@@ -72,7 +73,7 @@ SDL_Point FireworkLocations[] = {
 };
 
 LevelInfo Levels[] = {
-/*Level 1*/		   { LEVEL_PATH + (string)"Level1_1_64x64.tmx", "1-1", 2, 1 },	      
+/*Level 1*/		   { LEVEL_PATH + (string)"Level1_1_64x64Experimental.tmx", "1-1", 2, 1 },	      
 /*Secret Level 1*/ { LEVEL_PATH + (string)"Level2.tmx"        , "1-1S", 2, 3 },
 /*Level 2*/		   { LEVEL_PATH + (string)"Level2.tmx"        , "1-2", 4, 3 },
 /*Secret Level 2*/ { LEVEL_PATH + (string)"Level2S.tmx"       , "1-2S", 4, 5 },

@@ -287,7 +287,7 @@ bool FireBallSprite::Interact(EnemySprite* Enemy)
 		ThePlayer->AddScore(100, Enemy->GetPosX(), Enemy->GetPosY());
 		Enemy->GetFired();
 	}
-	else
+	else if (!Enemy->IsDying())
 	{
 		Mix_PlayChannel(CHANNEL_BUMP, BumpSound, 0);
 		bPendingDelete = true;

@@ -34,12 +34,18 @@ class ResourceManager
 	friend AssetResource;
 
 public:
+	
 	DECLARE_TEXTURE_RESOURCE(PlayerGoombaTexture, "goomba.bmp", true)
 	DECLARE_TEXTURE_RESOURCE(PlayerGoombaTallTexture, "PlayerGoombaTall.bmp", true)
 	DECLARE_TEXTURE_RESOURCE(GoombaGrowTexture, "playergrow.bmp", true)
 	DECLARE_TEXTURE_RESOURCE(GoombaDuckTexture, "goombaduck.bmp", true)
 	DECLARE_TEXTURE_RESOURCE(PlayerGoombaDeadTexture, "goombadead.bmp", true)
 	DECLARE_TEXTURE_RESOURCE(EventBoxTexture, "eventbox.bmp", true)
+
+	DECLARE_TEXTURE_RESOURCE(AdventureHUDTexture, "AdventureHUD.bmp", false);
+	DECLARE_TEXTURE_RESOURCE(AdventureDownTexture, "AdventureDown.bmp", false)
+	DECLARE_TEXTURE_RESOURCE(AdventureUpTexture, "AdventureUp.bmp", false)
+	DECLARE_TEXTURE_RESOURCE(AdventureSideTexture, "AdventureSide.bmp", false)
 
 	DECLARE_TEXTURE_RESOURCE(EmptyBlockSpriteTexture, "EmptyBlockSprite.bmp", false)
 	DECLARE_TEXTURE_RESOURCE(EmptyBlockUSpriteTexture, "EmptyBlockSpriteU.bmp", false)
@@ -87,7 +93,55 @@ public:
 		
 	}
 	END_DECLARE_ANIMATION_RESOURCE(SunAnimation)
+
+	BEGIN_DECLARE_ANIMATION_RESORCE(AdventureDownAnimation)
+	{
+		bUseAbsoluteFrameCount = true;
+
+		int SpriteWidth = 64;
+		int SpriteHeight = 64;
+
+		SDL_Rect SrcRect = { 0, 0, SpriteWidth, SpriteHeight };
+		Frames.push_back(new Frame(ResourceManager::AdventureDownTexture, SrcRect, 6));
+
+		SrcRect.x += SpriteWidth;
+		Frames.push_back(new Frame(ResourceManager::AdventureDownTexture, SrcRect, 6));
+
+	}
+	END_DECLARE_ANIMATION_RESOURCE(AdventureDownAnimation)
 	
+	BEGIN_DECLARE_ANIMATION_RESORCE(AdventureUpAnimation)
+	{
+		bUseAbsoluteFrameCount = true;
+
+		int SpriteWidth = 64;
+		int SpriteHeight = 64;
+
+		SDL_Rect SrcRect = { 0, 0, SpriteWidth, SpriteHeight };
+		Frames.push_back(new Frame(ResourceManager::AdventureUpTexture, SrcRect, 6));
+
+		SrcRect.x += SpriteWidth;
+		Frames.push_back(new Frame(ResourceManager::AdventureUpTexture, SrcRect, 6));
+
+	}
+	END_DECLARE_ANIMATION_RESOURCE(AdventureUpAnimation)
+
+	BEGIN_DECLARE_ANIMATION_RESORCE(AdventureSideAnimation)
+	{
+		bUseAbsoluteFrameCount = true;
+
+		int SpriteWidth = 64;
+		int SpriteHeight = 64;
+
+		SDL_Rect SrcRect = { 0, 0, SpriteWidth, SpriteHeight };
+		Frames.push_back(new Frame(ResourceManager::AdventureSideTexture, SrcRect, 6));
+
+		SrcRect.x += SpriteWidth;
+		Frames.push_back(new Frame(ResourceManager::AdventureSideTexture, SrcRect, 6));
+
+	}
+	END_DECLARE_ANIMATION_RESOURCE(AdventureSideAnimation)
+
 	BEGIN_DECLARE_ANIMATION_RESORCE(GoombaGrowAnimation)
 	{
 		

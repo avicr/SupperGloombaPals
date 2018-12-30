@@ -100,6 +100,11 @@ void Game::HandleControl(ControlTrigger* Control)
 	{
 		ThePlayer->SetFrozen(true);
 	}
+	else
+	if (Control->Event == EVENT_OLD_MAN_TALK)
+	{		
+		DoTextBox(SCREEN_WIDTH / 2 - 350, 358, 700, 430, "IT'S DANGEROUS TO GO \\n  \\S \\S ALONE! TAKE THIS.", false, TBS_Zelda);
+	}
 
 	if (Control->bIsCheckPoint)
 	{
@@ -113,8 +118,9 @@ void Game::HandleControl(ControlTrigger* Control)
 		if (FirstWarpIndex != -1)
 		{
 			ControlWarp = TheMap->GetWarps()[FirstWarpIndex].Exits[0];
+			EnforceWarpControls(ControlWarp);
 		}
-		EnforceWarpControls(ControlWarp);
+		
 	}
 }
 
@@ -446,7 +452,7 @@ void Game::DetermineCurrentLevel()
 		CurrentLevel = 0;
 	}
 
-	CurrentLevel = 11;
+	CurrentLevel = 0;
 }
 
 string Game::GetWorldName()
@@ -485,11 +491,20 @@ bool Game::HasRedCoinBeenGathered(int TileX, int TileY)
 	return false;
 }
 
-void Game::DoTextBox(int InPosX, int InPosY, int InWidth, int InHeight, string InText, bool bIsPlotDevice)
+void Game::DoTextBox(int InPosX, int InPosY, int InWidth, int InHeight, string InText, bool bIsPlotDevice, eTextBoxStyle Style)
 {
 	if (TheTextBox == nullptr)
 	{
-		TheTextBox = new TextBox(InPosX, InPosY, InWidth, InHeight, InText, bIsPlotDevice);
+		TheTextBox = new TextBox(InPosX, InPosY, InWidth, InHeight, InText, bIsPlotDevice, Style);
+	}
+}
+
+void Game::EndTextBox()
+{
+	if (TheTextBox)
+	{
+		delete TheTextBox;
+		TheTextBox = NULL;
 	}
 }
 

@@ -142,6 +142,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\AdventurePlayerSprite.cpp" />
     <ClCompile Include="src\Animation.cpp" />
     <ClCompile Include="src\AssetResource.cpp" />
     <ClCompile Include="src\EmptyBlockSprite.cpp" />
@@ -163,6 +164,7 @@
     <ClCompile Include="tinyxml\tinyxmlparser.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="inc\AdventurePlayerSprite.h" />
     <ClInclude Include="inc\Animation.h" />
     <ClInclude Include="inc\AssetResource.h" />
     <ClInclude Include="inc\EmptyBlockSprite.h" />

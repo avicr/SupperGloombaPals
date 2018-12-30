@@ -48,7 +48,7 @@ protected:
 	vector< vector <string> > Pages;
 
 public:
-	TextBox(int InPosX, int InPosY, int InWidth, int InHeight, string InText, bool bIsPlotDevice = false);
+	TextBox(int InPosX, int InPosY, int InWidth, int InHeight, string InText, bool bIsPlotDevice = false, eTextBoxStyle InStyle = TBS_Modern);
 	~TextBox();
 	
 	void Tick();

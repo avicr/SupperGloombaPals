@@ -4,12 +4,12 @@
 #include <queue>
 #include <sstream>
 
-TextBox::TextBox(int InPosX, int InPosY, int InWidth, int InHeight, string InText, bool bIsPlotDevice)
+TextBox::TextBox(int InPosX, int InPosY, int InWidth, int InHeight, string InText, bool bIsPlotDevice, eTextBoxStyle InStyle)
 {
 	SDL_assert(InText.length() < 4096);
 	
 	bPlotDevice = bIsPlotDevice;
-	Style = TBS_Modern;
+	Style = InStyle;
 
 	if (Style == TBS_Zelda)
 	{

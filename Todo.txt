@@ -4,15 +4,9 @@ point sprite should draw above all other simple sprites but below enemies
 play hurry up timer music
 show time up message
 hidden blocks should not reappear on level retry
-piranha plant
 red turtle
-can fire off of flagpole
 koopa come back to life
 koopa goes to shell when bricked?
 
-Add fire destroyable tile that leaves behind collision
 Add fade transition for BG colors to control?
 Add smooth scroll to position for control?
-Add scroll velocity and individual scroll direction lock flags
-add variable for player render layer
-

@@ -2,7 +2,11 @@
 
 vector <AssetResource*> ResourceManager::AllResources;
 
+INIT_TEXTURE_RESOURCE(AdventureHUDTexture)
 INIT_TEXTURE_RESOURCE(PlayerGoombaTexture)
+INIT_TEXTURE_RESOURCE(AdventureDownTexture)
+INIT_TEXTURE_RESOURCE(AdventureUpTexture)
+INIT_TEXTURE_RESOURCE(AdventureSideTexture)
 INIT_TEXTURE_RESOURCE(PlayerGoombaTallTexture)
 INIT_TEXTURE_RESOURCE(EmptyBlockSpriteTexture)
 INIT_TEXTURE_RESOURCE(EmptyBlockUSpriteTexture)
@@ -40,6 +44,9 @@ INIT_TEXTURE_RESOURCE(PlotDeviceTexture)
 INIT_TEXTURE_RESOURCE(SunTexture)
 
 INIT_ANIMATION_RESOURCE(PlayerGoombaAnimation)
+INIT_ANIMATION_RESOURCE(AdventureDownAnimation)
+INIT_ANIMATION_RESOURCE(AdventureUpAnimation)
+INIT_ANIMATION_RESOURCE(AdventureSideAnimation)
 INIT_ANIMATION_RESOURCE(PlayerGoombaTallAnimation)
 INIT_ANIMATION_RESOURCE(EmptyBlockSpriteAnimation);
 INIT_ANIMATION_RESOURCE(EmptyBlockUSpriteAnimation);
