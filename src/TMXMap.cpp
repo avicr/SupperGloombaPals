@@ -224,6 +224,7 @@ void TMXMap::ReadMap(const char* FileName)
 					NewAnimation.AddFrame(64, 16);
 
 					StandardTiles->TileAnimations.push_back(NewAnimation);
+					
 				}
 			}			
 		}
@@ -355,6 +356,51 @@ void TMXMap::LoadObjects(TiXmlElement* ObjectElement)
 				NewEnemySpawnPoint = new EnemySpawnPoint((eEnemyType)EnemyType, X, Y - 64);
 			}
  			SimpleSprites.push_back(NewEnemySpawnPoint);
+		}
+		else if (TileId == TILE_SPAWN_SPRITE)
+		{
+			int X;
+			int Y;
+			bool bUseSpawnAnimation = false;
+			int FrameDelay = 0;
+
+			ObjElem->QueryIntAttribute("x", &X);
+			ObjElem->QueryIntAttribute("y", &Y);
+
+			int SpriteType = 0;
+
+			// Find the ENEMY_ID property if available...		
+			TiXmlElement* PropElem = ObjElem->FirstChildElement("properties");
+
+			if (PropElem)
+			{
+				PropElem = PropElem->FirstChildElement("property");
+			}
+
+			while (PropElem)
+			{
+				if (strcmp(PropElem->Attribute("name"), "SPRITE_ID") == 0)
+				{
+					PropElem->QueryIntAttribute("value", &SpriteType);
+				}
+				else if (strcmp(PropElem->Attribute("name"), "bUseSpawnAnimation") == 0)
+				{
+					PropElem->QueryBoolAttribute("value", &bUseSpawnAnimation);
+				}
+				else if (strcmp(PropElem->Attribute("name"), "FrameDelay") == 0)
+				{
+					PropElem->QueryIntAttribute("value", &FrameDelay);
+				}
+				PropElem = PropElem->NextSiblingElement();
+			}
+
+			SpriteSpawnPoint* NewSpriteSpawnPoint;
+			NewSpriteSpawnPoint = new SpriteSpawnPoint(X, Y - 64, (eSpriteType)SpriteType, bUseSpawnAnimation, FrameDelay);
+			
+			if (NewSpriteSpawnPoint)
+			{
+				SimpleSprites.push_back(NewSpriteSpawnPoint);
+			}
 		}
 		// Warp entrances
 		else if (TileId == 4)
@@ -920,6 +966,16 @@ void TMXMap::AdjustScrollX(double Amount)
 			ScrollX = MaxScrollX;
 		}	
 	}
+
+	static double LastScrollX = 0;
+
+	SDL_Log("Scroll Delta: %f", ScrollX - LastScrollX);
+	if (LastScrollX > ScrollX)
+	{
+		SDL_Log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!%f", ScrollX - LastScrollX);
+	}
+
+	LastScrollX = ScrollX;
 }
 
 void TMXMap::AdjustScrollY(double Amount)
@@ -1002,7 +1058,7 @@ TMXMap::TMXMap()
 	MaxScrollY = 0;
 	KillY = -1;
 	bPlayingLevel = false;	
-	SecondsLeft = 3000;
+	SecondsLeft = 300;
 	bRenderCollision = false;
 	ScrollX = 0;
 	ScrollY = 26;

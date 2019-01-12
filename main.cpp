@@ -709,12 +709,12 @@ void Tick(double DeltaTime)
 		}
 	}
 	else
-	{
+	{		
+		TheMap->Tick(DeltaTime);
+		SimpleSprites.Tick(DeltaTime);
+
 		if (!TheGame->IsDoingTextBox())
 		{
-			TheMap->Tick(DeltaTime);
-			SimpleSprites.Tick(DeltaTime);
-
 			if (!ThePlayer->IsChangingSize())
 			{
 				EnemySprites.Tick(DeltaTime);

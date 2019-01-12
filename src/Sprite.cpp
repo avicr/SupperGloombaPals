@@ -8,10 +8,13 @@ Sprite::Sprite() :
 {	
 	bForceDrawWhenNotInWindow = true;
 	bDeleteWhenNotVisible = true;
+	RenderAngle = 0;
 }
 
 Sprite::Sprite(SDL_Texture *InTexture)
 {
+	RenderAngle = 0;
+	bDeleteAfterAnimation = true;
 	bForceDrawWhenNotInWindow = true;
 	RenderLayer = RENDER_LAYER_TOP;
 	bDrawScreenSpace = false;
@@ -20,6 +23,7 @@ Sprite::Sprite(SDL_Texture *InTexture)
 	CollisionRenderColor.r = 255;
 	CollisionRenderColor.g = 255;
 	CollisionRenderColor.b = 255;
+	bVisible = true;
 
 	Scale = 1;
 	CountDown = -1;
@@ -94,7 +98,7 @@ void Sprite::TickAnimation(double DeltaTime)
 				{
 					AnimData.bFinished = true;
 
-					//if (bDeleteAfterAnimation)
+					if (bDeleteAfterAnimation)
 					{
 						bPendingDelete = true;
 					}
@@ -187,7 +191,7 @@ void Sprite::SetHeight(int NewHeight)
 
 void Sprite::Render(SDL_Renderer* Renderer, int ResourceNum)
 {
-	if (!bDrawScreenSpace && !InMapWindow() && !bForceDrawWhenNotInWindow)
+	if (!bVisible || !bDrawScreenSpace && !InMapWindow() && !bForceDrawWhenNotInWindow)
 	{
 		return;
 	}
@@ -216,6 +220,9 @@ void Sprite::Render(SDL_Renderer* Renderer, int ResourceNum)
 			ShadowRect.h = (double)Rect.h * 0.15;
 
 			SDL_RenderCopyEx(Renderer, ResourceManager::ShadowTexture->Texture, &ShadowSrcRect, &ShadowRect, 0, NULL, SDL_FLIP_NONE);*/
+
+			DstRect.w *= Scale;
+			DstRect.h *= Scale;
 
 			DstRect.x *= RenderScale;
 			DstRect.y *= RenderScale;
@@ -257,7 +264,9 @@ void Sprite::Render(SDL_Renderer* Renderer, int ResourceNum)
 		}
 		else
 		{
-			SDL_RenderCopyEx(Renderer, Texture, &SrcRect, &DstRect, 0, NULL, Flip);
+			SDL_Point P = { 32, 32 };
+			//SDL_RenderCopyEx(Renderer, Texture, &SrcRect, &DstRect, 0, NULL, Flip);
+			SDL_RenderCopyEx(Renderer, Texture, &SrcRect, &DstRect, RenderAngle, &P, Flip);
 		}
 	}
 
@@ -477,4 +486,9 @@ SDL_Texture* Sprite::GetTexture(int ResourceNum)
 	}
 
 	return Texture;
+}
+
+void Sprite::SetRenderAngle(double InAngle)
+{
+	RenderAngle = InAngle;
 }

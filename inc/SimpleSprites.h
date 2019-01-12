@@ -8,6 +8,14 @@ enum eCoinType
 	COIN_RED
 };
 
+enum eSpriteType
+{
+	ST_NONE,
+	ST_OLD_MAN,
+	ST_FIRE,
+	ST_SWORD
+};
+
 class CoinEffectSprite : public Sprite
 {
 	int EndPosY;
@@ -90,4 +98,48 @@ public:
 	~EventSprite();
 	virtual void Render(SDL_Renderer* Renderer, int ResourceNum = 0);
 	virtual void Tick(double DeltaTime);
+};
+
+class SpriteSpawnPoint : public Sprite
+{
+protected:
+	eSpriteType SpriteTypeToSpawn;
+	bool bUseSpawnAnimation;
+	bool bInRange;
+	bool bWaitingForAnimation = false;  // Flags that we are waiting for animation to stop before we spawn
+	int FrameDelay; // How many frames to delay before spawning
+
+	void SpawnSprite();
+
+public:
+	SpriteSpawnPoint(int X, int Y, eSpriteType SpriteToSpawn, bool bInUseSpawnAnimation, int InFrameDelay);
+	virtual void Tick(double DeltaTime);
+	virtual void Render(SDL_Renderer* Renderer, int ResourceNum);
+
+};
+
+class OldManSprite : public Sprite
+{
+public:
+	OldManSprite(int X, int Y);
+	void FadeOut();
+
+	virtual void Tick(double DeltaTime);
+};
+
+class AdventureFireSprite : public Sprite
+{
+public:
+	AdventureFireSprite(int X, int Y);
+};
+
+class AdventureSwordAttack : public Sprite
+{
+public:
+	AdventureSwordAttack(int X, int Y, bool bShoot);
+	virtual void SetDirection(eDirection NewDirection);
+	virtual SDL_Rect GetScreenSpaceCollisionRect();
+	virtual void Tick(double DeltaTime);
+	virtual bool Interact(class EnemySprite* Enemy);
+
 };

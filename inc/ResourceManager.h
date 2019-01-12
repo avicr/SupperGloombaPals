@@ -43,10 +43,22 @@ public:
 	DECLARE_TEXTURE_RESOURCE(EventBoxTexture, "eventbox.bmp", true)
 
 	DECLARE_TEXTURE_RESOURCE(AdventureHUDTexture, "AdventureHUD.bmp", false);
+	DECLARE_TEXTURE_RESOURCE(AdventureAttackDownTexture, "AdventureAttackDown.bmp", false);
+	DECLARE_TEXTURE_RESOURCE(AdventureAttackUpTexture, "AdventureAttackUp.bmp", false);
+	DECLARE_TEXTURE_RESOURCE(AdventureAttackSideTexture, "AdventureAttackSide.bmp", false);
 	DECLARE_TEXTURE_RESOURCE(AdventureDownTexture, "AdventureDown.bmp", false)
 	DECLARE_TEXTURE_RESOURCE(AdventureUpTexture, "AdventureUp.bmp", false)
 	DECLARE_TEXTURE_RESOURCE(AdventureSideTexture, "AdventureSide.bmp", false)
+	DECLARE_TEXTURE_RESOURCE(AdventureGetTexture, "AdventureGet.bmp", false)
 
+	DECLARE_TEXTURE_RESOURCE(AdventureDoorCloseTexture, "AdventureDoorClose.bmp", false)
+	DECLARE_TEXTURE_RESOURCE(OktoTexture, "okto.bmp", false)
+	DECLARE_TEXTURE_RESOURCE(OktoEyesTexture, "OktoEyes.bmp", false)
+
+	DECLARE_TEXTURE_RESOURCE(AdventureSwordTexture, "sword.bmp", false)
+	DECLARE_TEXTURE_RESOURCE(OldManTexture, "guy.bmp", false)
+	DECLARE_TEXTURE_RESOURCE(AdventureFireTexture, "AdventureFire.bmp", false)
+	DECLARE_TEXTURE_RESOURCE(SpriteSpawnTexture, "SpawnSprite.bmp", false)
 	DECLARE_TEXTURE_RESOURCE(EmptyBlockSpriteTexture, "EmptyBlockSprite.bmp", false)
 	DECLARE_TEXTURE_RESOURCE(EmptyBlockUSpriteTexture, "EmptyBlockSpriteU.bmp", false)
 	DECLARE_TEXTURE_RESOURCE(BrickBounceSpriteTexture, "BrickBounceSprite.bmp", false)
@@ -94,6 +106,74 @@ public:
 	}
 	END_DECLARE_ANIMATION_RESOURCE(SunAnimation)
 
+	BEGIN_DECLARE_ANIMATION_RESORCE(SpriteSpawnAnimation)
+	{
+		bUseAbsoluteFrameCount = true;
+
+		for (int i = 0; i < 3; i++)
+		{
+			int SpriteWidth = 64;
+			int SpriteHeight = 64;
+			SDL_Rect SrcRect = { i * SpriteWidth, 0, SpriteWidth, SpriteHeight };
+			bUseAbsoluteFrameCount = true;
+
+			Frames.push_back(new Frame(ResourceManager::SpriteSpawnTexture, SrcRect, 2));
+		}
+
+	}
+	END_DECLARE_ANIMATION_RESOURCE(SpriteSpawnAnimation)
+
+	BEGIN_DECLARE_ANIMATION_RESORCE(AdventureDoorCloseAnimation)
+	{
+		bUseAbsoluteFrameCount = true;
+
+		for (int i = 0; i < 4; i++)
+		{
+			int SpriteWidth = 128;
+			int SpriteHeight = 128;
+			SDL_Rect SrcRect = { i * SpriteWidth, 0, SpriteWidth, SpriteHeight };
+			bUseAbsoluteFrameCount = true;
+
+			Frames.push_back(new Frame(ResourceManager::AdventureDoorCloseTexture, SrcRect, 6));
+		}
+
+	}
+	END_DECLARE_ANIMATION_RESOURCE(AdventureDoorCloseAnimation)
+
+	BEGIN_DECLARE_ANIMATION_RESORCE(OktoAnimation)
+	{
+		bUseAbsoluteFrameCount = true;
+
+		for (int i = 0; i < 2; i++)
+		{
+			int SpriteWidth = 128;
+			int SpriteHeight = 128;
+			SDL_Rect SrcRect = { i * SpriteWidth, 0, SpriteWidth, SpriteHeight };
+			bUseAbsoluteFrameCount = true;
+
+			Frames.push_back(new Frame(ResourceManager::OktoTexture, SrcRect, 6));
+		}
+
+	}
+	END_DECLARE_ANIMATION_RESOURCE(OktoAnimation)
+
+	BEGIN_DECLARE_ANIMATION_RESORCE(AdventureFireAnimation)
+	{
+		bUseAbsoluteFrameCount = true;
+
+		for (int i = 0; i < 2; i++)
+		{
+			int SpriteWidth = 64;
+			int SpriteHeight = 64;
+			SDL_Rect SrcRect = { i * SpriteWidth, 0, SpriteWidth, SpriteHeight };
+			bUseAbsoluteFrameCount = true;
+
+			Frames.push_back(new Frame(ResourceManager::AdventureFireTexture, SrcRect, 6));
+		}
+
+	}
+	END_DECLARE_ANIMATION_RESOURCE(AdventureFireAnimation)
+
 	BEGIN_DECLARE_ANIMATION_RESORCE(AdventureDownAnimation)
 	{
 		bUseAbsoluteFrameCount = true;
@@ -109,6 +189,63 @@ public:
 
 	}
 	END_DECLARE_ANIMATION_RESOURCE(AdventureDownAnimation)
+
+	BEGIN_DECLARE_ANIMATION_RESORCE(AdventureAttackDownAnimation)
+	{
+		bUseAbsoluteFrameCount = true;
+
+		int SpriteWidth = 64;
+		int SpriteHeight = 64;
+
+		SDL_Rect SrcRect = { 0, 0, SpriteWidth, SpriteHeight };
+		Frames.push_back(new Frame(ResourceManager::AdventureAttackDownTexture, SrcRect, 12));
+
+		SrcRect.x += SpriteWidth;
+		Frames.push_back(new Frame(ResourceManager::AdventureAttackDownTexture, SrcRect, 1));
+
+		SrcRect.x += SpriteWidth;
+		Frames.push_back(new Frame(ResourceManager::AdventureAttackDownTexture, SrcRect, 1));
+
+	}
+	END_DECLARE_ANIMATION_RESOURCE(AdventureAttackDownAnimation)
+
+	BEGIN_DECLARE_ANIMATION_RESORCE(AdventureAttackUpAnimation)
+	{
+		bUseAbsoluteFrameCount = true;
+
+		int SpriteWidth = 64;
+		int SpriteHeight = 64;
+
+		SDL_Rect SrcRect = { 0, 0, SpriteWidth, SpriteHeight };
+		Frames.push_back(new Frame(ResourceManager::AdventureAttackUpTexture, SrcRect, 12));
+
+		SrcRect.x += SpriteWidth;
+		Frames.push_back(new Frame(ResourceManager::AdventureAttackUpTexture, SrcRect, 1));
+
+		SrcRect.x += SpriteWidth;
+		Frames.push_back(new Frame(ResourceManager::AdventureAttackUpTexture, SrcRect, 1));
+
+	}
+	END_DECLARE_ANIMATION_RESOURCE(AdventureAttackUpAnimation)
+
+	BEGIN_DECLARE_ANIMATION_RESORCE(AdventureAttackSideAnimation)
+	{
+		bUseAbsoluteFrameCount = true;
+
+		int SpriteWidth = 64;
+		int SpriteHeight = 64;
+
+		SDL_Rect SrcRect = { 0, 0, SpriteWidth, SpriteHeight };
+		Frames.push_back(new Frame(ResourceManager::AdventureAttackSideTexture, SrcRect, 12));
+
+		SrcRect.x += SpriteWidth;
+		Frames.push_back(new Frame(ResourceManager::AdventureAttackSideTexture, SrcRect, 1));
+
+		SrcRect.x += SpriteWidth;
+		Frames.push_back(new Frame(ResourceManager::AdventureAttackSideTexture, SrcRect, 1));
+
+	}
+	END_DECLARE_ANIMATION_RESOURCE(AdventureAttackSideAnimation)
 	
 	BEGIN_DECLARE_ANIMATION_RESORCE(AdventureUpAnimation)
 	{

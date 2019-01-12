@@ -17,6 +17,13 @@ enum eGiantGoombaState
 	GIANT_STATE_CHASE
 };
 
+enum eGiantOktoState
+{
+	GOS_FADE_IN_EYES = 0,
+	GOS_FADE_IN_BODY,
+	GOS_JUMP_BACK
+};
+
 enum ePlantState
 {
 	PLANT_STATE_RETRACTED = 0,
@@ -124,6 +131,27 @@ public:
 
 	virtual void GetStomped();
 	void UpdateScale();
+};
+
+class GiantOkto : public EnemySprite
+{
+protected:
+	eGiantOktoState CurrentState;
+	int ScaleCountDown;	
+
+	void EnterState(eGiantOktoState NewState);
+	void LeaveState(eGiantOktoState PreviousState);
+		
+	void OnInteractedWith(EnemySprite* Other) {}
+	void HandleMovement();
+	//virtual void Interact(Sprite *OtherSprite);
+
+public:
+	GiantOkto(int X, int Y);
+	~GiantOkto();
+
+	void Tick(double DeltaTime);	
+	virtual void Render(SDL_Renderer* Renderer, int ResourceNum);		
 };
 
 class PlantEnemySprite : public EnemySprite

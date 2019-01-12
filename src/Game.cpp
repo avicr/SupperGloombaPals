@@ -1,6 +1,7 @@
 #include "../inc/Globals.h"
 #include "../inc/TMXMap.h"
 #include "../inc/Game.h"
+#include "../inc/ScriptedEvent.h"
 #include "../inc/SimpleSprites.h"
 #include "../inc/SpriteList.h"
 #include <iostream>
@@ -103,7 +104,17 @@ void Game::HandleControl(ControlTrigger* Control)
 	else
 	if (Control->Event == EVENT_OLD_MAN_TALK)
 	{		
-		DoTextBox(SCREEN_WIDTH / 2 - 350, 358, 700, 430, "IT'S DANGEROUS TO GO \\n  \\S \\S ALONE! TAKE THIS.", false, TBS_Zelda);
+		//DoTextBox(SCREEN_WIDTH / 2 - 350, 358, 700, 430, "IT'S DANGEROUS TO GO \\n  \\S \\S ALONE! TAKE THIS.", false, TBS_Zelda);
+		// Keep reseting the event until the player walks through with the sword!
+		if (!ThePlayer->HasSword())
+		{
+			Control->bTriggered = false;
+		}
+		else
+		{
+			ScriptedEvents.push_back(new OktoSpawnEvent());
+			Control->bResetWhenPlayerLeaves = false;
+		}
 	}
 
 	if (Control->bIsCheckPoint)
@@ -154,7 +165,16 @@ void Game::Tick()
 		}				
 	}
 
-	if (GameState == STATE_TIMER_AWARD)
+	if (GameState == STATE_LEVEL_PLAY)
+	{
+		for (int i = 0; i < ScriptedEvents.size(); i++)
+		{
+			ScriptedEvents[i]->Tick();
+
+			// TODO: Delete scripted event if done
+		}
+	}
+	else if (GameState == STATE_TIMER_AWARD)
 	{
 		UpdateTimerAward();
 	}

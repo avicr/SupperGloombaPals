@@ -54,4 +54,5 @@
    <property name="item" type="int" value="5"/>
   </properties>
  </tile>
+ <tile id="25" type="SPRITE_SPAWN"/>
 </tileset>

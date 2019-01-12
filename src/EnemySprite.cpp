@@ -10,6 +10,18 @@
 #define PI 3.14159265
 #define MUSHROOM_COUNTDOWN 420
 
+float EaseLerp(float time, float startValue, float change, float duration) {
+	time /= duration / 2;
+	if (time < 1) {
+		return change / 2 * time * time + startValue;
+	}
+
+	time--;
+	return -change / 2 * (time * (time - 2) - 1) + startValue;
+};
+
+float Ease2(float t) { return t*t*t*t*t; }
+
 EnemySprite::EnemySprite(EnemySpawnPoint* Spawner)
 {
 	bGotBricked = false;
@@ -859,6 +871,255 @@ void GiantGoomba::GetBricked(int TileX, int TileY)
 	// TODO: If the player doesn't have a star, play the music
 	Mix_PlayMusic(BGMusic, -1);
 }
+
+GiantOkto::GiantOkto(int X, int Y) :
+	EnemySprite(nullptr)
+{		
+	SetPosition(X, Y);
+	SetTexture(GResourceManager->OktoEyesTexture->Texture);	
+	SetWidth(128);
+	SetHeight(128);	
+	
+	EnterState(GOS_FADE_IN_EYES);	
+
+	SDL_SetTextureBlendMode(Texture, SDL_BLENDMODE_BLEND);	
+	SDL_SetTextureAlphaMod(Texture, 0);
+	CollisionRect = { 28, 15, 72, 64 };
+	// TODO: Need custom collision using two rects at least	
+	
+}
+
+GiantOkto::~GiantOkto()
+{
+	//if (CurrentState >= GIANT_STATE_CHASE)
+	{		
+		SDL_DestroyTexture(Texture);		
+	}
+}
+
+void GiantOkto::Tick(double DeltaTime)
+{
+	if (ThePlayer->IsWarping())
+	{
+		return;
+	}
+	
+	if (DyingCount == 0 && !bGotBricked)
+	{
+		PhysicsSprite::Tick(DeltaTime);
+		HandleMovement();
+
+		
+		CountDown--;
+
+		if (CurrentState == GOS_FADE_IN_EYES)
+		{
+			float Alpha = EaseLerp(OKTO_FADE_IN - CountDown, 0, 255, OKTO_FADE_IN);
+			Alpha = 255 * Ease2((OKTO_FADE_IN - CountDown) / OKTO_FADE_IN);
+			SDL_SetTextureAlphaMod(Texture, round(Alpha));
+
+			if (CountDown <= 0)
+			{
+				LeaveState(GOS_FADE_IN_EYES);
+				EnterState(GOS_FADE_IN_BODY);
+			}
+		}
+		else if (CurrentState == GIANT_STATE_MUSHROOM)
+		{
+			float Alpha = EaseLerp(OKTO_FADE_IN - CountDown, 0, 255, OKTO_FADE_IN);
+			Alpha = 255 * Ease2((OKTO_FADE_IN - CountDown) / OKTO_FADE_IN);
+			SDL_SetTextureAlphaMod(Texture, round(Alpha));
+
+			if (CountDown <= 0)
+			{
+				LeaveState(GOS_FADE_IN_BODY);
+				EnterState(GOS_JUMP_BACK);
+			}
+		}
+		else if (CurrentState == GOS_JUMP_BACK)
+		{
+
+			if (CountDown == 50)
+			{
+				SetAnimationPlayRate(2);
+			}
+			else  if (CountDown == 12)
+			{
+				VelocityY = -26;				
+			}
+			else if (CountDown == 0)
+			{
+				VelocityY = 0;
+				SetAnimationPlayRate(1);
+			}
+		}
+	}
+	else if (bGotBricked)
+	{
+		PosX += VelocityX;
+		PosY += VelocityY;
+		Rect.x = PosX;// -TheMap->GetScrollX();
+		Rect.y = PosY;
+		VelocityY += BASE_FALL_VELOCITY / 2;
+		Flip = SDL_FLIP_VERTICAL;
+		if (PosY >= TheMap->GetHeightInPixels())
+		{
+			bPendingDelete = true;
+		}
+
+	}
+	else
+	{
+		DyingCount++;
+
+		if (DyingCount == DYING_COUNT)
+		{
+			bPendingDelete = true;
+		}
+	}
+}
+
+
+void GiantOkto::EnterState(eGiantOktoState NewState)
+{
+	switch (NewState)
+	{
+	case GOS_FADE_IN_EYES:
+		Mix_HaltMusic();		
+		DyingCount = 0;
+		CountDown = OKTO_FADE_IN;
+		ScaleCountDown = 0;		
+		break;
+
+	case GOS_FADE_IN_BODY:
+		DyingCount = 0;
+		CountDown = OKTO_FADE_IN;
+		ScaleCountDown = 0;
+
+		SetTexture(GResourceManager->OktoTexture->Texture);
+		SDL_SetTextureBlendMode(Texture, SDL_BLENDMODE_BLEND);
+		SDL_SetTextureAlphaMod(Texture, 0);
+		break;
+
+	case GOS_JUMP_BACK:						
+		CountDown = 90;	
+		SetAnimationPlayRate(1);			
+		break;	
+	default:
+		break;
+	}
+	
+	CurrentState = NewState;
+}
+
+void GiantOkto::LeaveState(eGiantOktoState PreviousState)
+{
+	switch (PreviousState)
+	{
+	case GIANT_STATE_MUSHROOM:
+		break;
+
+	default:
+		break;
+	}
+}
+
+
+void GiantOkto::Render(SDL_Renderer* Renderer, int ResourceNum)
+{
+	if (CurrentState == GOS_FADE_IN_BODY)
+	{
+		SetTexture(GResourceManager->OktoEyesTexture->Texture);
+		EnemySprite::Render(Renderer, ResourceNum);
+
+		PlayAnimation(GResourceManager->OktoAnimation);
+		SetAnimationPlayRate(0);
+	}
+
+	EnemySprite::Render(Renderer, ResourceNum);
+}
+
+void GiantOkto::HandleMovement()
+{
+	if (DyingCount == 0 && !bGotBricked)
+	{		
+		int NumPixelsToMove = round(fabs(VelocityY));
+		SDL_Rect NewRect = GetScreenSpaceCustomRect();
+
+		for (int x = 0; x < NumPixelsToMove; x++)
+		{
+			NewRect.y += VelocityY > 0 ? 1 : -1;
+
+			PosY += VelocityY > 0 ? 1 : -1;
+			CheckCollisionWithSprites();			
+		}
+
+		bool bIsInAir = !IsOnGround();
+
+		if (CurrentState == GIANT_STATE_MUSHROOM)
+		{
+			
+			if (bIsInAir)
+			{
+				//VelocityY += BASE_FALL_VELOCITY;				
+			}
+
+			NumPixelsToMove = round(fabs(VelocityY));
+			NewRect = GetScreenSpaceCustomRect();
+
+			for (int y = 0; y < NumPixelsToMove; y++)
+			{
+				NewRect.y += VelocityY > 0 ? 1 : -1;
+
+				if (!TheMap->CheckCollision(NewRect, true))
+				{
+					PosY += VelocityY > 0 ? 1 : -1;
+					CheckCollisionWithSprites();
+				}
+			}			
+		}
+		else
+		{
+			VelocityX = 0;
+		}
+		
+		Rect.x = PosX;// -TheMap->GetScrollX();
+		Rect.y = PosY;
+
+		// If we've landed, break bricks
+		if (CurrentState == GIANT_STATE_MUSHROOM && bIsInAir && IsOnGround())
+		{
+			bIsInAir = false;
+			Mix_PlayChannel(CHANNEL_FIRE_BALL, FireworkSound, 0);
+			Mix_PlayChannel(CHANNEL_BUMP, BumpSound, 0);
+						
+		}		
+	}
+	else if (bGotBricked)
+	{
+		PosX += VelocityX;
+		PosY += VelocityY;
+		Rect.x = PosX;// -TheMap->GetScrollX();
+		Rect.y = PosY;
+		//VelocityY += BASE_FALL_VELOCITY / 2;
+
+		if (PosY >= TheMap->GetHeightInPixels())
+		{
+			bPendingDelete = true;
+		}
+
+	}
+	else
+	{
+		DyingCount++;
+
+		if (DyingCount == DYING_COUNT)
+		{
+			bPendingDelete = true;
+		}
+	}
+}
+
 
 PlantEnemySprite::PlantEnemySprite(EnemySpawnPoint* Spawner) :
 	EnemySprite(Spawner)

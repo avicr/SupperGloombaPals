@@ -523,3 +523,202 @@ EventSprite::~EventSprite()
 {
 	SDL_DestroyTexture(CaptionTexture);
 }
+
+SpriteSpawnPoint::SpriteSpawnPoint(int X, int Y, eSpriteType SpriteToSpawn, bool bInUseSpawnAnimation, int InFrameDelay) :
+	Sprite(GResourceManager->SpriteSpawnTexture->Texture)
+{	
+	bDeleteAfterAnimation = false;
+	bDeleteWhenNotVisible = false;
+	bInRange = false;
+	bUseSpawnAnimation = bInUseSpawnAnimation;
+	SpriteTypeToSpawn = SpriteToSpawn;
+	
+	SetWidth(64);
+	SetHeight(64);
+	SetPosition(X, Y);
+
+	FrameDelay = InFrameDelay;
+	CountDown = InFrameDelay;
+}
+
+void SpriteSpawnPoint::Render(SDL_Renderer* Renderer, int ResourceNum)
+{
+	if (bRenderCollision || AnimData.Anim)
+	{
+		Sprite::Render(Renderer, ResourceNum);
+	}
+}
+
+void SpriteSpawnPoint::Tick(double DeltaTime)
+{
+	if (bPendingDelete)
+	{
+		return;
+	}
+
+	Sprite::Tick(DeltaTime);
+
+	if (bWaitingForAnimation)
+	{		
+		if (AnimData.bFinished)
+		{
+			SpawnSprite();
+			bWaitingForAnimation = false;
+			PlayAnimation(nullptr);
+			
+		}
+		else
+		{
+			return;
+		}
+	}
+
+	if (InMapWindow({ SPAWN_DISTANCE, SPAWN_DISTANCE }))
+	{		
+		if (CountDown <= 0)  // Have to be in range for as long as FrameDelay before spawning
+		{
+			if (!bInRange)
+			{
+				if (bUseSpawnAnimation)
+				{
+					bWaitingForAnimation = true;
+					PlayAnimation(GResourceManager->SpriteSpawnAnimation);
+					AnimData.bLoop = false;
+				}
+				else
+				{
+					SpawnSprite();
+				}
+
+			}
+			bInRange = true;
+		}
+		else
+		{
+			CountDown--;
+		}
+	}
+	else
+	{
+		CountDown = FrameDelay;
+		bInRange = false;
+	}
+	
+}
+
+void SpriteSpawnPoint::SpawnSprite()
+{
+	
+
+	switch (SpriteTypeToSpawn)
+	{
+	case ST_OLD_MAN:		
+		SimpleSprites.push_back(new OldManSprite(Rect.x, Rect.y));
+		break;
+
+	case ST_FIRE:		
+		SimpleSprites.push_back(new AdventureFireSprite(Rect.x, Rect.y));
+		break;
+
+	case ST_SWORD:		
+		ItemSprites.push_back(new AdventureSwordItemSprite(Rect.x, Rect.y));
+		break;
+
+	}
+
+	CountDown = FrameDelay;
+}
+
+OldManSprite::OldManSprite(int X, int Y) :
+	Sprite(GResourceManager->OldManTexture->Texture)
+{
+	CountDown = 0;
+	SetWidth(64);
+	SetHeight(64);
+	SetPosition(X, Y);
+	TheGame->DoTextBox(SCREEN_WIDTH / 2 - 350, 358, 700, 430, "IT'S DANGEROUS TO GO \\n  \\S \\S ALONE! TAKE THIS.", false, TBS_Zelda);
+}
+
+void OldManSprite::Tick(double DeltaTime)
+{
+	if (CountDown > 0)
+	{
+		bVisible = (int)CountDown % 2;
+
+		CountDown--;
+
+		if (CountDown == 0)
+		{
+			Delete();
+		}
+	}
+}
+
+void OldManSprite::FadeOut()
+{
+	CountDown = 63;
+}
+
+AdventureFireSprite::AdventureFireSprite(int X, int Y) :
+	Sprite(nullptr)
+{	
+	PlayAnimation(GResourceManager->AdventureFireAnimation);
+	SetWidth(64);
+	SetHeight(64);
+	SetPosition(X, Y);
+}
+
+AdventureSwordAttack::AdventureSwordAttack(int X, int Y, bool bShoot)
+	: Sprite(GResourceManager->AdventureSwordTexture->Texture)
+{
+	SetWidth(64);
+	SetHeight(64);
+	SetPosition(X, Y);
+	CollisionRect = { 27, 0, 12, 46 };
+}
+
+void AdventureSwordAttack::SetDirection(eDirection NewDirection)
+{
+	CurrentDirection = NewDirection;
+	SetFlip(SDL_FLIP_NONE);
+
+	if (CurrentDirection == DIRECTION_UP)
+	{
+		CollisionRect = { 27, 0, 12, 46 };
+		RenderAngle = 0;
+	}
+	else if (CurrentDirection == DIRECTION_DOWN)
+	{
+		SetFlip(SDL_FLIP_VERTICAL);
+		CollisionRect = { 27, 18, 12, 46 };
+		RenderAngle = 0;
+	}
+	else if (CurrentDirection == DIRECTION_LEFT)
+	{
+		CollisionRect = {  0, 25, 46, 12 };
+		RenderAngle = 270;
+	}
+	else if (CurrentDirection == DIRECTION_RIGHT)
+	{
+		CollisionRect = { 18, 27, 46, 12 };
+		RenderAngle = 90;
+	}
+}
+
+SDL_Rect AdventureSwordAttack::GetScreenSpaceCollisionRect()
+{
+	return Sprite::GetScreenSpaceCollisionRect();
+}
+
+void AdventureSwordAttack::Tick(double DeltaTime)
+{
+	Sprite::Tick(DeltaTime);
+	CheckCollisionWithSprites();
+}
+
+bool AdventureSwordAttack::Interact(class EnemySprite* Enemy)
+{
+	Enemy->GetFired();
+
+	return false;
+}

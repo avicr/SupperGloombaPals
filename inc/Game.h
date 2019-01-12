@@ -50,6 +50,7 @@ class Game
 	int NumberOfTimesPortaled;
 	vector<SDL_Point> GatheredRedCoinLocations;
 	TextBox* TheTextBox;
+	vector<class ScriptedEvent*> ScriptedEvents;
 
 public:
 	Game();

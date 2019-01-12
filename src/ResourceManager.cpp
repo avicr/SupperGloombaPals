@@ -2,6 +2,7 @@
 
 vector <AssetResource*> ResourceManager::AllResources;
 
+INIT_TEXTURE_RESOURCE(AdventureGetTexture)
 INIT_TEXTURE_RESOURCE(AdventureHUDTexture)
 INIT_TEXTURE_RESOURCE(PlayerGoombaTexture)
 INIT_TEXTURE_RESOURCE(AdventureDownTexture)
@@ -42,7 +43,24 @@ INIT_TEXTURE_RESOURCE(BulletTexture)
 INIT_TEXTURE_RESOURCE(GuyTexture)
 INIT_TEXTURE_RESOURCE(PlotDeviceTexture)
 INIT_TEXTURE_RESOURCE(SunTexture)
+INIT_TEXTURE_RESOURCE(SpriteSpawnTexture)
+INIT_TEXTURE_RESOURCE(OldManTexture)
+INIT_TEXTURE_RESOURCE(AdventureFireTexture)
+INIT_TEXTURE_RESOURCE(AdventureSwordTexture)
+INIT_TEXTURE_RESOURCE(AdventureAttackUpTexture)
+INIT_TEXTURE_RESOURCE(AdventureAttackDownTexture)
+INIT_TEXTURE_RESOURCE(AdventureAttackSideTexture)
+INIT_TEXTURE_RESOURCE(AdventureDoorCloseTexture)
+INIT_TEXTURE_RESOURCE(OktoTexture);
+INIT_TEXTURE_RESOURCE(OktoEyesTexture);
 
+INIT_ANIMATION_RESOURCE(OktoAnimation)
+INIT_ANIMATION_RESOURCE(AdventureDoorCloseAnimation)
+INIT_ANIMATION_RESOURCE(AdventureAttackSideAnimation)
+INIT_ANIMATION_RESOURCE(AdventureAttackDownAnimation)
+INIT_ANIMATION_RESOURCE(AdventureAttackUpAnimation)
+INIT_ANIMATION_RESOURCE(AdventureFireAnimation)
+INIT_ANIMATION_RESOURCE(SpriteSpawnAnimation)
 INIT_ANIMATION_RESOURCE(PlayerGoombaAnimation)
 INIT_ANIMATION_RESOURCE(AdventureDownAnimation)
 INIT_ANIMATION_RESOURCE(AdventureUpAnimation)

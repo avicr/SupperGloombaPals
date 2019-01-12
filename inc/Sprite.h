@@ -34,9 +34,11 @@ enum eMovingFlags
 class Sprite
 {
 protected:
+	eDirection CurrentDirection;
 	SDL_Color CollisionRenderColor;
 	SDL_Rect CollisionRect;
 	double CountDown;
+	double RenderAngle;
 	SDL_RendererFlip Flip;
 	// Screen region to render the sprite to
 	SDL_Rect Rect;
@@ -48,6 +50,7 @@ protected:
 	AnimInfo AnimData;	
 
 	bool bPendingDelete;	
+	bool bDeleteAfterAnimation;
 
 	double PosX;
 	double PosY;
@@ -64,6 +67,7 @@ protected:
 
 	// Used for the window hack!
 	bool bForceDrawWhenNotInWindow;
+	bool bVisible;
 
 	eRenderLayer RenderLayer;
 public:
@@ -117,6 +121,8 @@ public:
 	virtual bool IsInteractable() { return !bPendingDelete; }
 	virtual eRenderLayer GetRenderLayer() { return RenderLayer; }
 	virtual SDL_Texture* GetTexture(int ResourceNum = 0);
+	void SetRenderAngle(double InAngle);
+	virtual void SetDirection(eDirection NewDirection) { CurrentDirection = NewDirection; }
 };
 
 #endif

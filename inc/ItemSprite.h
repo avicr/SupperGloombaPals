@@ -11,6 +11,7 @@ enum eItemType
 	ITEM_ONE_UP,
 	ITEM_MAGIC_MUSHROOM,
 	ITEM_PLOT_DEVICE,
+	ITEM_ADVENTURE_SWORD,
 	ITEM_NONE = 255
 };
 
@@ -69,4 +70,11 @@ class PlotDeviceItemSprite : public FlowerItemSprite
 {
 public:
 	PlotDeviceItemSprite(int X, int Y, bool bGrowAnmation = true);
+};
+
+class AdventureSwordItemSprite : public ItemSprite
+{
+public:
+	AdventureSwordItemSprite(int X, int Y);	
+	void GetCollected();
 };

@@ -492,7 +492,7 @@ void PlayerSprite::Tick(double DeltaTime)
 		}
 		else*/
 
-		if (HitTiles[0].MetaTileType != TILE_ONEWAY_UP)
+		if (HitTiles.size() > 0 && HitTiles[0].MetaTileType != TILE_ONEWAY_UP)
 		{
 			// Go left if there is an emtpy tile to the left
 			if (EjectionDirection == DIRECTION_LEFT || (EjectionDirection != DIRECTION_RIGHT && PosX - TheMap->GetScrollX() > 0 && HitTiles.size() > 0 && !TheMap->IsCollidableTile(HitTiles[0].MetaTileType, HitTiles[0].Location.x, HitTiles[0].Location.y)))
@@ -665,8 +665,20 @@ void PlayerSprite::Interact(ItemSprite* Item)
 		int DialogRoll = rand() % NumberDialogs;
 		DoDialogTest(PlotDeviceTextFiles[DialogRoll]);
 	}
+	else if (ItemType == ITEM_ADVENTURE_SWORD)
+	{
+		// TODO: Play item fanfare
+		//Mix_PlayChannel(CHANNEL_ADVENTURE_ITEMFANFARE, AdventureItemFanfare, 0);
+		Mix_PlayChannel(CHANNEL_POWER_UP, PowerUpGetSound, 0);
+
+		SetTexture(GResourceManager->AdventureDownTexture->Texture);
+		SetWidth(64);
+		SwordAnimationCount = 0;
+		bHasSword = true;
+		TheGame->EndTextBox();
+	}
 	
-	if (ItemType != ITEM_PLOT_DEVICE)
+	if (ItemType != ITEM_PLOT_DEVICE && ItemType != ITEM_ADVENTURE_SWORD)
 	{
 		AddScore(1000, Item->GetPosX(), Item->GetPosY(), bIsOneUp);
 	}
@@ -964,7 +976,12 @@ void PlayerSprite::HandleJump()
 
 PlayerSprite::PlayerSprite()
 {	
+	bHasSword = false;
+	bDeleteAfterAnimation = false;
+	CurrentAdventureAttack = NULL;
 	NumRedCoins = 0;
+	CountDown = 0;
+	bAdventureAttacking = false;
 	bDrawHUD = true;
 	bExitedLevel = false;
 	EndOfLevelCountdown = 0;
@@ -1001,6 +1018,7 @@ PlayerSprite::PlayerSprite()
 	CollisionRenderColor.r = 0;
 	CollisionRenderColor.g = 255;
 	CollisionRenderColor.b = 0;
+	SwordAnimationCount = 129;
 	//CollisionRect = { 8, 16, 54, 48 };
 	//CollisionRect = { 5, 8, 54, 56 }; USE THIS ONE
 
@@ -1661,7 +1679,9 @@ void PlayerSprite::UpdateWarpExitSequence()
 
 		if (WarpSeq.Exit.WarpType == WARP_PIPE_ZELDA_DOOR)
 		{
-			bIsAdventure = true;			
+			bIsAdventure = true;	
+			SwordAnimationCount = 129;
+			bSpriteVisible = true;			
 			SetPosition(WarpSeq.Exit.PosX, (WarpSeq.Exit.PosY - 1) - (Rect.h - 64));
 		}
 		else
@@ -1734,8 +1754,8 @@ void PlayerSprite::UpdateWarpExitSequence()
 		{
 			PlayAnimation(GResourceManager->AdventureUpAnimation);
 			SetWidth(64);
-			SetHeight(64);
-			CollisionRect = { 5, 16, 54, 48 };
+			SetHeight(64);			
+			CollisionRect = { 24, 35, 19, 19 };			
 			DeltaPos.y = -8;
 			StartDelta.y = 16;			
 		}
@@ -1805,16 +1825,12 @@ void PlayerSprite::UpdateWarpExitSequence()
 			{
 				RenderLayer = RENDER_LAYER_BEHIND_FG;
 			}
-			if (WarpSeq.FrameCount <= 30)
-			{
-
-			}
-			else if (WarpSeq.FrameCount <= 36)
+			else if (WarpSeq.FrameCount <= 6)
 			{
 				PosX += DeltaPos.x;
 				PosY += DeltaPos.y;
-			}
-			else
+			}			
+			else if (WarpSeq.FrameCount == 28)
 			{
 				WarpSeq.bWarpExitComplete = true;
 
@@ -1990,7 +2006,11 @@ void PlayerSprite::DrawHUD()
 
 void PlayerSprite::BeginLevel()
 {			
+	bHasSword = false;
+	CountDown = 0;
+	CurrentAdventureAttack = NULL;
 	SetAnimationPlayRate(1);
+	bAdventureAttacking = false;
 	bStompedLastFrame = false;
 	bFrozen = false;
 	NumRedCoins = TheGame->GetNumberOfRedCoinsFound();
@@ -2029,6 +2049,7 @@ void PlayerSprite::BeginLevel()
 	AdventureMoveIndex = 0;
 	bDucking = false;
 	StartJumpVelocity = 0;
+	SwordAnimationCount = 129;
 	CollisionRenderColor.r = 0;
 	CollisionRenderColor.g = 255;
 	CollisionRenderColor.b = 0;
@@ -2175,6 +2196,22 @@ void PlayerSprite::AdventureHandleInput(double DeltaTime)
 		bPlayerMoving = true;
 	}
 
+	if (bHasSword && IsButton2Pressed(state) && !bButtonPreviouslyPressed[0] && !CountDown)
+	{
+		bAdventureAttacking = true;
+		CountDown = 15;		
+	}
+
+	bool bPressingButton2 = IsButton2Pressed(state);
+	if (bPressingButton2)
+	{
+		bButtonPreviouslyPressed[0] = true;
+	}
+	else
+	{
+		bButtonPreviouslyPressed[0] = false;
+	}	
+
 }
 
 void PlayerSprite::AdventureTick(double DeltaTime)
@@ -2185,8 +2222,15 @@ void PlayerSprite::AdventureTick(double DeltaTime)
 		return;
 	}
 
+	if (SwordAnimationCount < 129)
+	{
+		UpdateGetSwordAnimation();
+		return;
+	}
+	
 	VelocityX = 0;
 	VelocityY = 0;
+
 	if (MovingFlags)
 	{
 		if (MovingFlags & MOVING_UP || MovingFlags & MOVING_DOWN)
@@ -2194,29 +2238,42 @@ void PlayerSprite::AdventureTick(double DeltaTime)
 			int NumPixelsToMove = ADVENTURE_MOVE_PIXELS_PER_FRAME;
 			bool bCollided = false;;
 
-			VelocityY = MovingFlags & MOVING_DOWN ? 1 : -1;
-			
-			SDL_Rect NewRect = GetScreenSpaceCollisionRect();
-			for (int x = 0; x < AdventurePixelsToMove[AdventureMoveIndex]; x++)
+			if (MovingFlags & MOVING_DOWN)
 			{
-				NewRect.y += VelocityY;
-				if (EndOfLevelCountdown == 0 && bExitingLevel && Rect.x >= ExitLevelX)
+				VelocityY = 1;
+				CurrentDirection = DIRECTION_DOWN;
+			}
+			else
+			{
+				VelocityY = -1;
+				CurrentDirection = DIRECTION_UP;
+			}
+			
+			// If we've attacked, don't actually do the move part
+			if (CountDown == 0)
+			{
+				SDL_Rect NewRect = GetScreenSpaceCustomRect();
+				for (int x = 0; x < AdventurePixelsToMove[AdventureMoveIndex]; x++)
 				{
-					bSpriteVisible = false;
-					EndOfLevelCountdown = 40;
-					VelocityX = 0;
-					VelocityY = 0;
-				}
+					NewRect.y += VelocityY;
+					if (EndOfLevelCountdown == 0 && bExitingLevel && Rect.x >= ExitLevelX)
+					{
+						bSpriteVisible = false;
+						EndOfLevelCountdown = 40;
+						VelocityX = 0;
+						VelocityY = 0;
+					}
 
-				if (TheMap->CheckCollision(NewRect, false, 0))
-				{
-					// Cap max speed when colliding with a wall
-					bCollided = true;
-					VelocityY = 0;
-					break;
-				}
+					if (TheMap->CheckCollision(NewRect, false, 0))
+					{
+						// Cap max speed when colliding with a wall
+						bCollided = true;
+						VelocityY = 0;
+						break;
+					}
 
-				PosY += VelocityY;
+					PosY += VelocityY;
+				}
 			}
 		}
 		else if (MovingFlags & MOVING_RIGHT || MovingFlags & MOVING_LEFT)
@@ -2224,31 +2281,45 @@ void PlayerSprite::AdventureTick(double DeltaTime)
 			int NumPixelsToMove = ADVENTURE_MOVE_PIXELS_PER_FRAME;
 			bool bCollided = false;;
 
-			VelocityX = MovingFlags & MOVING_RIGHT ? 1 : -1;
+			if (MovingFlags & MOVING_RIGHT)
+			{
+				VelocityX = 1;
+				CurrentDirection = DIRECTION_RIGHT;
+			}
+			else
+			{
+				VelocityX = -1;
+				CurrentDirection = DIRECTION_LEFT;
+			}
 
 			SetFlip(VelocityX >= 1 ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
 
-			SDL_Rect NewRect = GetScreenSpaceCollisionRect();
-			for (int x = 0; x < AdventurePixelsToMove[AdventureMoveIndex]; x++)
+			// If we've attacked, don't actually do the move part
+			// If we've attacked, don't actually do the move part
+			if (CountDown == 0)
 			{
-				NewRect.x += VelocityX;
-				if (EndOfLevelCountdown == 0 && bExitingLevel && Rect.x >= ExitLevelX)
+				SDL_Rect NewRect = GetScreenSpaceCustomRect();
+				for (int x = 0; x < AdventurePixelsToMove[AdventureMoveIndex]; x++)
 				{
-					bSpriteVisible = false;
-					EndOfLevelCountdown = 40;
-					VelocityX = 0;
-					VelocityY = 0;
-				}
+					NewRect.x += VelocityX;
+					if (EndOfLevelCountdown == 0 && bExitingLevel && Rect.x >= ExitLevelX)
+					{
+						bSpriteVisible = false;
+						EndOfLevelCountdown = 40;
+						VelocityX = 0;
+						VelocityY = 0;
+					}
 
-				if (TheMap->CheckCollision(NewRect, false, 0))
-				{
-					// Cap max speed when colliding with a wall
-					bCollided = true;
-					VelocityX = 0;
-					break;
-				}
+					if (TheMap->CheckCollision(NewRect, false, 0))
+					{
+						// Cap max speed when colliding with a wall
+						bCollided = true;
+						VelocityX = 0;
+						break;
+					}
 
-				PosX += VelocityX;
+					PosX += VelocityX;
+				}
 			}
 		}
 
@@ -2261,16 +2332,124 @@ void PlayerSprite::AdventureTick(double DeltaTime)
 			AdventureMoveIndex = 1;
 		}
 	}
-	else
+	
+	if (CountDown)
 	{
 		AdventureMoveIndex = 0;
 	}
-	// Don't mess with animation play rates if we are growing
-	if (MovingFlags)
+	
+	UpdateAdventureAnimation();
+
+	Sprite::Tick(DeltaTime);
+
+}
+
+void PlayerSprite::UpdateAdventureAnimation()
+{
+	if (CountDown > 0) // Countdown is used for attacking!
 	{
-		SetAnimationPlayRate(1);
-		
-		if (MovingFlags & MOVING_UP)
+		if (CountDown == 14)
+		{
+			SetAnimationPlayRate(1);
+			
+			if (CurrentDirection == DIRECTION_UP)
+			{
+				PlayAnimation(GResourceManager->AdventureAttackUpAnimation, false);
+			}
+			else if (CurrentDirection == DIRECTION_DOWN)
+			{
+				PlayAnimation(GResourceManager->AdventureAttackDownAnimation, false);
+			}
+			else if (CurrentDirection == DIRECTION_LEFT)
+			{
+				SetFlip(SDL_FLIP_HORIZONTAL);
+				PlayAnimation(GResourceManager->AdventureAttackSideAnimation, false);
+			}
+			else if (CurrentDirection == DIRECTION_RIGHT)
+			{			
+				PlayAnimation(GResourceManager->AdventureAttackSideAnimation, false);
+			}			
+		}
+		else if (CountDown <= 12)
+		{					
+			int SwordPosX = PosX;
+			int SwordPosY = PosY;
+
+			if (CountDown == 12)
+			{
+				CurrentAdventureAttack = new AdventureSwordAttack(SwordPosX, SwordPosY, false);
+				SimpleSprites.push_back(CurrentAdventureAttack);
+			}
+
+			int SwordDistance = 44;
+
+			if (CountDown == 3)
+			{
+				SwordDistance = 30;
+			}
+			else if(CountDown == 2)
+			{
+				SwordDistance = 13;
+			}
+
+			if ((int)CountDown % 2 == 0)
+			{				
+				CurrentAdventureAttack->SetDirection(CurrentDirection);
+
+				SetFlip(SDL_FLIP_NONE);
+
+				// Just swap the animation if we changed directions, keep the same frame count
+				if (CurrentDirection == DIRECTION_UP)
+				{
+					SwordPosY -= SwordDistance;
+					CurrentAdventureAttack->SetPosition(SwordPosX, SwordPosY);
+
+					AnimData.Anim = GResourceManager->AdventureAttackUpAnimation;
+				}
+				else if (CurrentDirection == DIRECTION_DOWN)
+				{
+					SwordPosY += SwordDistance;
+					CurrentAdventureAttack->SetPosition(SwordPosX, SwordPosY);
+
+					AnimData.Anim = GResourceManager->AdventureAttackDownAnimation;
+				}
+				else if (CurrentDirection == DIRECTION_LEFT)
+				{
+					SwordPosX -= SwordDistance;
+					SwordPosY += 8;
+					CurrentAdventureAttack->SetPosition(SwordPosX, SwordPosY);
+
+					SetFlip(SDL_FLIP_HORIZONTAL);
+					AnimData.Anim = GResourceManager->AdventureAttackSideAnimation;
+				}
+				else if (CurrentDirection == DIRECTION_RIGHT)
+				{
+					SwordPosX += SwordDistance;
+					SwordPosY += 8;
+					CurrentAdventureAttack->SetPosition(SwordPosX, SwordPosY);
+					
+					SetFlip(SDL_FLIP_NONE);
+					AnimData.Anim = GResourceManager->AdventureAttackSideAnimation;
+				}			
+
+				SetWidth(64);
+				SetHeight(64);
+			}						
+		}		
+					
+
+		CountDown--;
+
+		if (CountDown == 0)
+		{
+			CurrentAdventureAttack->Delete();
+			CurrentAdventureAttack = NULL;
+
+		}
+	}
+	else
+	{		
+		if (CurrentDirection == DIRECTION_UP)
 		{
 			SetFlip(SDL_FLIP_NONE);
 			if (AnimData.Anim != GResourceManager->AdventureUpAnimation)
@@ -2278,27 +2457,94 @@ void PlayerSprite::AdventureTick(double DeltaTime)
 				PlayAnimation(GResourceManager->AdventureUpAnimation);
 			}
 		}
-		else if (MovingFlags & MOVING_DOWN)
+		else if (CurrentDirection == DIRECTION_DOWN)
 		{
 			SetFlip(SDL_FLIP_NONE);
 			if (AnimData.Anim != GResourceManager->AdventureDownAnimation)
 			{
 				PlayAnimation(GResourceManager->AdventureDownAnimation);
 			}
-		}		
-		else if ((MovingFlags & MOVING_LEFT) || (MovingFlags & MOVING_RIGHT))
+		}
+		else if (CurrentDirection == DIRECTION_LEFT || CurrentDirection == DIRECTION_RIGHT)
 		{
 			if (AnimData.Anim != GResourceManager->AdventureSideAnimation)
 			{
 				PlayAnimation(GResourceManager->AdventureSideAnimation);
 			}
-		}		
+		}
+
+		if (MovingFlags)
+		{
+			SetAnimationPlayRate(1);
+		}
+		else
+		{
+			SetAnimationPlayRate(0);
+		}
+	}
+}
+
+SDL_Rect PlayerSprite::GetScreenSpaceCustomRect()
+{
+	if (!bIsAdventure)
+	{
+		return Sprite::GetScreenSpaceCustomRect();
 	}
 	else
 	{
-		SetAnimationPlayRate(0);
+		SDL_Rect CollisionToUse = { 5, 16, 54, 48 };
+
+		if (Flip == SDL_FLIP_HORIZONTAL)
+		{
+			CollisionToUse.x = Rect.w - (CollisionToUse.x + CollisionToUse.w);
+		}
+		CollisionToUse.x += PosX - floor(TheMap->GetScrollX());
+		CollisionToUse.y += PosY - floor(TheMap->GetScrollY());
+		return CollisionToUse;		
 	}
+}
 
-	Sprite::Tick(DeltaTime);
-
+void PlayerSprite::UpdateGetSwordAnimation()
+{
+	if (SwordAnimationCount == 0)
+	{
+		StopAnimation();
+		SetTexture(GResourceManager->AdventureGetTexture->Texture);
+		SetFlip(SDL_FLIP_NONE);
+	}
+	if (SwordAnimationCount == 2)
+	{
+		for (int i = 0; i < ItemSprites.size(); i++)
+		{
+			if (dynamic_cast<AdventureSwordItemSprite*>(ItemSprites[i]))
+			{
+				ItemSprites[i]->SetPosition(Rect.x - 26, Rect.y - 60);
+			}
+		}
+	}
+	else if (SwordAnimationCount == 4)
+	{
+		// TODO: delete the sword
+		for (int i = 0; i < SimpleSprites.size(); i++)
+		{
+			OldManSprite* OldMan = dynamic_cast<OldManSprite*>(SimpleSprites[i]);
+			
+			if (OldMan)
+			{
+				OldMan->FadeOut();
+			}
+		}
+	}
+	else if (SwordAnimationCount == 128)
+	{
+		for (int i = 0; i < ItemSprites.size(); i++)
+		{
+			if (dynamic_cast<AdventureSwordItemSprite*>(ItemSprites[i]))
+			{
+				ItemSprites[i]->Delete();
+			}
+		}
+	}
+	
+	SwordAnimationCount++;
 }

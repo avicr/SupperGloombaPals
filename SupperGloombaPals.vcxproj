@@ -153,6 +153,7 @@
     <ClCompile Include="src\PhysicsSprite.cpp" />
     <ClCompile Include="src\PlayerSprite.cpp" />
     <ClCompile Include="src\ResourceManager.cpp" />
+    <ClCompile Include="src\ScriptedEvent.cpp" />
     <ClCompile Include="src\SimpleSprites.cpp" />
     <ClCompile Include="src\Sprite.cpp" />
     <ClCompile Include="src\SpriteList.cpp" />
@@ -176,6 +177,7 @@
     <ClInclude Include="inc\PhysicsSprite.h" />
     <ClInclude Include="inc\PlayerSprite.h" />
     <ClInclude Include="inc\ResourceManager.h" />
+    <ClInclude Include="inc\ScriptedEvent.h" />
     <ClInclude Include="inc\SimpleSprites.h" />
     <ClInclude Include="inc\Sprite.h" />
     <ClInclude Include="inc\SpriteList.h" />

@@ -381,3 +381,17 @@ PlotDeviceItemSprite::PlotDeviceItemSprite(int X, int Y, bool bDoGrowAnimation)
 	CollisionRect = { 8, 0, 50, 50 };
 
 }
+
+AdventureSwordItemSprite::AdventureSwordItemSprite(int X, int Y) :
+	ItemSprite(X, Y, false)
+{
+	SetTexture(GResourceManager->AdventureSwordTexture->Texture);	
+	ItemType = ITEM_ADVENTURE_SWORD;
+
+	CollisionRect = { 26, 40, 18, 24 };
+}
+
+void AdventureSwordItemSprite::GetCollected()
+{
+	// Do nothing!
+}

@@ -210,6 +210,8 @@ extern float RenderScale;
 
 #define GIANT_GOOMBA_SIZE 320
 
+#define OKTO_FADE_IN 80
+
 #define UGLY_TIME 48
 
 void CreateWindow2();

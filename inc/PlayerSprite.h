@@ -90,11 +90,13 @@ public:
 		}
 	}
 
-	//virtual SDL_Rect GetScreenSpaceCustomRect();
+	virtual SDL_Rect GetScreenSpaceCustomRect();
 
-	PlayerSprite();
+	bool HasSword() {return bHasSword;}
+	PlayerSprite();	
 
 protected:
+	class AdventureSwordAttack* CurrentAdventureAttack;
 	bool bStompedLastFrame;
 	bool bFrozen;
 	bool bDrawHUD;
@@ -106,12 +108,15 @@ protected:
 	int JumpOffPoleCountDown;
 	int FlagStopY;
 	bool bRidingFlagPole;
+	int SwordAnimationCount;
 	int StompCount;	
 	int TripLevel;
 	bool bSpriteVisible;
+	bool bAdventureAttacking;
 	ePowerUpState PowerUpState;
 	WarpSequenceInfo WarpSeq;
 
+	bool bHasSword;
 	int NumFireBalls;
 	const Uint8 *LastKeyboardState;
 	float StartJumpVelocity;
@@ -140,5 +145,6 @@ protected:
 	
 	void StopJumping();
 	bool HandleVerticalMovement();
-	
+	void UpdateGetSwordAnimation();		
+	void UpdateAdventureAnimation();
 };
