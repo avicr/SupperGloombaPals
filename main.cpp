@@ -73,7 +73,8 @@ SDL_Point FireworkLocations[] = {
 };
 
 LevelInfo Levels[] = {
-/*Level 1*/		   { LEVEL_PATH + (string)"Level1_1_64x64Experimental.tmx", "1-1", 2, 1 },	      
+///*Level 1*/		   { LEVEL_PATH + (string)"Level1_1_64x64Experimental.tmx", "1-1", 2, 1 },	      
+/*Level 1*/{ LEVEL_PATH + (string)"Level1_1_64x64Experimental.tmx", "1-1", 2, 1 },
 /*Secret Level 1*/ { LEVEL_PATH + (string)"Level2.tmx"        , "1-1S", 2, 3 },
 /*Level 2*/		   { LEVEL_PATH + (string)"Level2.tmx"        , "1-2", 4, 3 },
 /*Secret Level 2*/ { LEVEL_PATH + (string)"Level2S.tmx"       , "1-2S", 4, 5 },
@@ -922,7 +923,7 @@ void InitSDL()
 			Mix_VolumeMusic(VOLUME_NORMAL);
 			
 			//Mix_Volume(-1, 0);
-			Mix_VolumeMusic(0);
+			//Mix_VolumeMusic(0);
 		}
 
 #ifdef FULLSCREEN_1920_1080

@@ -729,10 +729,10 @@ void TMXMap::Render(SDL_Renderer* Renderer, int ScreenX, int ScreenY, int Source
 {
 	SimpleSprites.Render(Renderer, RENDER_LAYER_BEHIND_BG);
 
-	/*if (bPlayingLevel && ThePlayer->IsWarping())
+	if (bPlayingLevel && ThePlayer->IsWarping())
 	{
 		ThePlayer->Render(Renderer);
-	}*/
+	}
 
 	for (int i = 0; i < Layers.size(); i++)
 	{
@@ -969,11 +969,11 @@ void TMXMap::AdjustScrollX(double Amount)
 
 	static double LastScrollX = 0;
 
-	SDL_Log("Scroll Delta: %f", ScrollX - LastScrollX);
+	/*SDL_Log("Scroll Delta: %f", ScrollX - LastScrollX);
 	if (LastScrollX > ScrollX)
 	{
 		SDL_Log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!%f", ScrollX - LastScrollX);
-	}
+	}*/
 
 	LastScrollX = ScrollX;
 }

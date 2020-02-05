@@ -393,5 +393,14 @@ AdventureSwordItemSprite::AdventureSwordItemSprite(int X, int Y) :
 
 void AdventureSwordItemSprite::GetCollected()
 {
-	// Do nothing!
+	// FIXME HACK
+	// Hardcode the entrance to be solid so the player can't get out	
+	TheMap->SetMetaLayerTile(58, 40, eTileMetaType::TILE_COLLISION);
+	TheMap->SetMetaLayerTile(59, 40, eTileMetaType::TILE_COLLISION);
+
+	// Make the row where the fire is passable now
+	for (int i = 0; i < 12; i++)
+	{
+		TheMap->SetMetaLayerTile(53 + i, 35, eTileMetaType::TILE_NONE);
+	}
 }

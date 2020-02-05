@@ -64,7 +64,7 @@ public:
 	void AddScore(int Amount, int PointSpriteX = -1, int PointSpriteY = -1, bool bIsOneUp = false);
 	void IncreaseStompCounter(int Amount);
 	void SetColorModForAllTextures(SDL_Color ColorMod);
-	void TakeDamage();
+	virtual void TakeDamage();
 	virtual void Render(SDL_Renderer* Renderer, int ResourceNum = 0);
 	void UpdateDyingAnimation();
 	void DrawHUD();
@@ -97,6 +97,7 @@ public:
 
 protected:
 	class AdventureSwordAttack* CurrentAdventureAttack;
+	int HP;
 	bool bStompedLastFrame;
 	bool bFrozen;
 	bool bDrawHUD;
@@ -147,4 +148,5 @@ protected:
 	bool HandleVerticalMovement();
 	void UpdateGetSwordAnimation();		
 	void UpdateAdventureAnimation();
+	void AdventureTakeDamage();
 };

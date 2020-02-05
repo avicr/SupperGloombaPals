@@ -196,6 +196,11 @@ void Sprite::Render(SDL_Renderer* Renderer, int ResourceNum)
 		return;
 	}
 
+	if (CurrentDirection == DIRECTION_DOWN)
+	{
+		int ll = 0;
+		ll += 3;
+	}
 	SDL_Rect SrcRect = { 0, 0, Rect.w, Rect.h};
 	if (AnimData.Anim)
 	{

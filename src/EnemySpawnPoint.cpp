@@ -13,6 +13,7 @@ EnemySpawnPoint::EnemySpawnPoint(eEnemyType InEnemyType, int X, int Y)
 
 	if (EnemyType == ENEMY_GOOMBA)
 	{
+		bCanSpawnWhileVisible = true;
 		SetTexture(GResourceManager->EGoombaSpriteTexture->Texture);
 	}
 	if (EnemyType == ENEMY_TURTLE)

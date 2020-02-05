@@ -1019,6 +1019,7 @@ PlayerSprite::PlayerSprite()
 	CollisionRenderColor.g = 255;
 	CollisionRenderColor.b = 0;
 	SwordAnimationCount = 129;
+	HP = 6;
 	//CollisionRect = { 8, 16, 54, 48 };
 	//CollisionRect = { 5, 8, 54, 56 }; USE THIS ONE
 
@@ -1681,8 +1682,9 @@ void PlayerSprite::UpdateWarpExitSequence()
 		{
 			bIsAdventure = true;	
 			SwordAnimationCount = 129;
-			bSpriteVisible = true;			
-			SetPosition(WarpSeq.Exit.PosX, (WarpSeq.Exit.PosY - 1) - (Rect.h - 64));
+			bSpriteVisible = true;		
+			//ThePlayer = new AdventurePlayerSprite();			
+			SetPosition(WarpSeq.Exit.PosX, (WarpSeq.Exit.PosY - 1) - (Rect.h - 64));			
 		}
 		else
 		{
@@ -1804,6 +1806,9 @@ void PlayerSprite::UpdateWarpExitSequence()
 
 		if (WarpSeq.Exit.WarpType != WARP_PIPE_ZELDA_DOOR)
 		{
+			/*PosX += DeltaPos.x;
+			PosY += DeltaPos.y;*/
+
 			if (WarpSeq.FrameCount <= 67)
 			{
 
@@ -1861,6 +1866,12 @@ void PlayerSprite::UpdateWarpExitSequence()
 
 void PlayerSprite::TakeDamage()
 {
+	if (bIsAdventure)
+	{
+		AdventureTakeDamage();
+		return;
+	}
+
 	if (PowerUpState >= POWER_BIG)
 	{
 		OnGetSmall();
@@ -1869,6 +1880,21 @@ void PlayerSprite::TakeDamage()
 	else
 	{
 		BeginDie();
+	}
+}
+
+void PlayerSprite::AdventureTakeDamage()
+{
+	HP--;
+
+	if (HP <= 0)
+	{
+		// TODO: Player adventure death animation
+		BeginDie();
+	}
+	else
+	{
+		InvincibleCount = NUM_INVINCIBLE_FRAMES;
 	}
 }
 
@@ -2053,6 +2079,7 @@ void PlayerSprite::BeginLevel()
 	CollisionRenderColor.r = 0;
 	CollisionRenderColor.g = 255;
 	CollisionRenderColor.b = 0;
+	HP = 6;
 	//CollisionRect = { 8, 16, 54, 48 };
 	//CollisionRect = { 5, 8, 54, 56 }; USE THIS ONE
 
@@ -2165,6 +2192,11 @@ void PlayerSprite::AdventureHandleInput(double DeltaTime)
 {
 	MovingFlags = MOVING_NONE;
 
+	if (EndOfLevelCountdown || bFrozen)
+	{
+		return;
+	}
+
 	const Uint8 *state = SDL_GetKeyboardState(NULL);
 	LastKeyboardState = state;
 	SDL_JoystickUpdate();
@@ -2238,15 +2270,19 @@ void PlayerSprite::AdventureTick(double DeltaTime)
 			int NumPixelsToMove = ADVENTURE_MOVE_PIXELS_PER_FRAME;
 			bool bCollided = false;;
 
-			if (MovingFlags & MOVING_DOWN)
+			// We can't look right/left if we are attacking and facing up/down
+			if (CountDown <= 0 || (CurrentDirection != DIRECTION_LEFT && CurrentDirection != DIRECTION_RIGHT))
 			{
-				VelocityY = 1;
-				CurrentDirection = DIRECTION_DOWN;
-			}
-			else
-			{
-				VelocityY = -1;
-				CurrentDirection = DIRECTION_UP;
+				if (MovingFlags & MOVING_DOWN)
+				{
+					VelocityY = 1;
+					CurrentDirection = DIRECTION_DOWN;
+				}
+				else
+				{
+					VelocityY = -1;
+					CurrentDirection = DIRECTION_UP;
+				}
 			}
 			
 			// If we've attacked, don't actually do the move part
@@ -2281,20 +2317,24 @@ void PlayerSprite::AdventureTick(double DeltaTime)
 			int NumPixelsToMove = ADVENTURE_MOVE_PIXELS_PER_FRAME;
 			bool bCollided = false;;
 
-			if (MovingFlags & MOVING_RIGHT)
+			// We can't look up/down if we are attacking and facing right/left
+			if (CountDown <= 0 || (CurrentDirection != DIRECTION_UP && CurrentDirection != DIRECTION_DOWN))
 			{
-				VelocityX = 1;
-				CurrentDirection = DIRECTION_RIGHT;
-			}
-			else
-			{
-				VelocityX = -1;
-				CurrentDirection = DIRECTION_LEFT;
+				if (MovingFlags & MOVING_RIGHT)
+				{
+					VelocityX = 1;
+					CurrentDirection = DIRECTION_RIGHT;
+				}
+				else
+				{
+					VelocityX = -1;
+					CurrentDirection = DIRECTION_LEFT;
+				}
+				SetFlip(VelocityX >= 1 ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
 			}
 
-			SetFlip(VelocityX >= 1 ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
-
-			// If we've attacked, don't actually do the move part
+			
+			
 			// If we've attacked, don't actually do the move part
 			if (CountDown == 0)
 			{
@@ -2338,6 +2378,20 @@ void PlayerSprite::AdventureTick(double DeltaTime)
 		AdventureMoveIndex = 0;
 	}
 	
+	if (InvincibleCount > 0)
+	{
+		InvincibleCount--;
+
+		if (InvincibleCount == 0 || InvincibleCount % 2 == 0)
+		{
+			bSpriteVisible = true;
+		}
+		else
+		{
+			bSpriteVisible = false;
+		}
+	}
+
 	UpdateAdventureAnimation();
 
 	Sprite::Tick(DeltaTime);
@@ -2401,17 +2455,21 @@ void PlayerSprite::UpdateAdventureAnimation()
 				// Just swap the animation if we changed directions, keep the same frame count
 				if (CurrentDirection == DIRECTION_UP)
 				{
+					int CurrentAnimFrameIndex = AnimData.CurrentFrameIndex;
 					SwordPosY -= SwordDistance;
 					CurrentAdventureAttack->SetPosition(SwordPosX, SwordPosY);
-
-					AnimData.Anim = GResourceManager->AdventureAttackUpAnimation;
+				
+					PlayAnimation(GResourceManager->AdventureAttackUpAnimation, false);
+					AnimData.CurrentFrameIndex = AnimData.CurrentFrameIndex;
 				}
 				else if (CurrentDirection == DIRECTION_DOWN)
 				{
+					int CurrentAnimFrameIndex = AnimData.CurrentFrameIndex;
 					SwordPosY += SwordDistance;
 					CurrentAdventureAttack->SetPosition(SwordPosX, SwordPosY);
 
-					AnimData.Anim = GResourceManager->AdventureAttackDownAnimation;
+					PlayAnimation(GResourceManager->AdventureAttackDownAnimation, false);
+					AnimData.CurrentFrameIndex = AnimData.CurrentFrameIndex;
 				}
 				else if (CurrentDirection == DIRECTION_LEFT)
 				{
