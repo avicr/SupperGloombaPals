@@ -144,6 +144,7 @@ protected:
 		
 	void OnInteractedWith(EnemySprite* Other) {}
 	void HandleMovement();
+	void GetBricked(int TileX, int TileY);
 	//virtual void Interact(Sprite *OtherSprite);
 
 public:

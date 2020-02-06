@@ -73,8 +73,8 @@
     <LibraryPath>E:\Work\SDL2-2.0.5\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>E:\Work\SDL2-2.0.8\include;E:\Projects\SupperGloombaPals\SDL2_image-2.0.3\include;$(IncludePath)</IncludePath>
-    <LibraryPath>E:\Work\SDL2-2.0.8\lib\x64;E:\Projects\SupperGloombaPals\SDL2_image-2.0.3\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>E:\Work\SDL2-2.0.8\include;E:\Projects\SupperGloombaPals\SDL2_image-2.0.3\include;$(IncludePath);C:\SDL2-2.0.10\include</IncludePath>
+    <LibraryPath>E:\Work\SDL2-2.0.8\lib\x64;E:\Projects\SupperGloombaPals\SDL2_image-2.0.3\lib\x64;$(LibraryPath);C:\SDL2-2.0.10\lib\x64</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>E:\Work\SDL2-2.0.5\include;$(IncludePath)</IncludePath>
@@ -103,6 +103,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <BufferSecurityCheck>true</BufferSecurityCheck>
+      <DisableSpecificWarnings>4305;4244;4267;4838</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <AdditionalDependencies>SDL2main.lib;SDL2.lib;%(AdditionalDependencies);SDl2_mixer.lib;SDL2_ttf.lib;SDL2_Image.lib</AdditionalDependencies>

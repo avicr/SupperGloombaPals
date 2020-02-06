@@ -1,5 +1,7 @@
 #include "../inc/ItemSprite.h"
 #include "../inc/TMXMap.h"
+#include "../inc/SpriteList.h"
+#include "../inc/ScriptedEvent.h"
 
 ItemSprite::ItemSprite(int X, int Y, bool bDoGrowAnimation)
 {	
@@ -403,4 +405,22 @@ void AdventureSwordItemSprite::GetCollected()
 	{
 		TheMap->SetMetaLayerTile(53 + i, 35, eTileMetaType::TILE_NONE);
 	}
+}
+
+TriforceItemSprite::TriforceItemSprite(int X, int Y)
+	: ItemSprite(X, Y, false)
+{
+	SetTexture(GResourceManager->AdventureTriangleTexture->Texture);
+	AnimData.Anim = NULL;
+	SetWidth(64);
+	SetHeight(64);
+	ItemType = ITEM_ADVENTURE_TRIANGLE;
+
+	CollisionRect = { 8, 0, 50, 50 };
+}
+
+void TriforceItemSprite::GetCollected()
+{
+
+	ItemSprite::GetCollected();
 }

@@ -110,6 +110,7 @@ protected:
 	int FlagStopY;
 	bool bRidingFlagPole;
 	int SwordAnimationCount;
+	int TriforceAnimationCount;
 	int StompCount;	
 	int TripLevel;
 	bool bSpriteVisible;
@@ -143,10 +144,12 @@ protected:
 
 	bool bIsAdventure;
 	int AdventureMoveIndex;
+	Sprite* HeldItemSprite;
 	
 	void StopJumping();
 	bool HandleVerticalMovement();
-	void UpdateGetSwordAnimation();		
+	void UpdateGetSwordAnimation();
+	void UpdateGetTriforceAnimation();
 	void UpdateAdventureAnimation();
 	void AdventureTakeDamage();
 };

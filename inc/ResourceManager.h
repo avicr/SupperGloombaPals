@@ -88,6 +88,7 @@ public:
 	DECLARE_TEXTURE_RESOURCE(BulletTexture, "bullet.bmp", false);
 	DECLARE_TEXTURE_RESOURCE(GuyTexture, "guy.bmp", false);
 	DECLARE_TEXTURE_RESOURCE(PlotDeviceTexture, "PlotDevice.bmp", false);
+	DECLARE_TEXTURE_RESOURCE(AdventureTriangleTexture, "AdventureTriangle.bmp", false);
 	DECLARE_TEXTURE_RESOURCE(SunTexture, "sun.bmp", false);
 
 	BEGIN_DECLARE_ANIMATION_RESORCE(SunAnimation)
@@ -122,6 +123,23 @@ public:
 
 	}
 	END_DECLARE_ANIMATION_RESOURCE(SpriteSpawnAnimation)
+
+	BEGIN_DECLARE_ANIMATION_RESORCE(AdventureDoorOpenAnimation)
+	{
+		bUseAbsoluteFrameCount = true;
+
+		for (int i = 3; i >= 0; i--)
+		{
+			int SpriteWidth = 128;
+			int SpriteHeight = 128;
+			SDL_Rect SrcRect = { i * SpriteWidth, 0, SpriteWidth, SpriteHeight };
+			bUseAbsoluteFrameCount = true;
+
+			Frames.push_back(new Frame(ResourceManager::AdventureDoorCloseTexture, SrcRect, 6));
+		}
+
+	}
+	END_DECLARE_ANIMATION_RESOURCE(AdventureDoorOpenAnimation)
 
 	BEGIN_DECLARE_ANIMATION_RESORCE(AdventureDoorCloseAnimation)
 	{

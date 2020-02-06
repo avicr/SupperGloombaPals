@@ -6,6 +6,7 @@
 #include "../inc/SimpleSprites.h"
 #include "../inc/Game.h"
 #include <fstream>
+#include "../inc/ScriptedEvent.h"
 
 int oldx;
 int oldy;
@@ -677,8 +678,18 @@ void PlayerSprite::Interact(ItemSprite* Item)
 		bHasSword = true;
 		TheGame->EndTextBox();
 	}
+	else if (ItemType == ITEM_ADVENTURE_TRIANGLE)
+	{
+		// TODO: Play item fanfare
+		//Mix_PlayChannel(CHANNEL_ADVENTURE_ITEMFANFARE, AdventureItemFanfare, 0);
+		Mix_PlayChannel(CHANNEL_POWER_UP, PowerUpGetSound, 0);
+
+		SetTexture(GResourceManager->AdventureDownTexture->Texture);
+		SetWidth(64);
+		TriforceAnimationCount = 0;
+	}
 	
-	if (ItemType != ITEM_PLOT_DEVICE && ItemType != ITEM_ADVENTURE_SWORD)
+	if (ItemType != ITEM_PLOT_DEVICE && ItemType != ITEM_ADVENTURE_SWORD && ItemType != ITEM_ADVENTURE_TRIANGLE)
 	{
 		AddScore(1000, Item->GetPosX(), Item->GetPosY(), bIsOneUp);
 	}
@@ -1019,6 +1030,7 @@ PlayerSprite::PlayerSprite()
 	CollisionRenderColor.g = 255;
 	CollisionRenderColor.b = 0;
 	SwordAnimationCount = 129;
+	TriforceAnimationCount = 129;
 	HP = 6;
 	//CollisionRect = { 8, 16, 54, 48 };
 	//CollisionRect = { 5, 8, 54, 56 }; USE THIS ONE
@@ -1682,6 +1694,7 @@ void PlayerSprite::UpdateWarpExitSequence()
 		{
 			bIsAdventure = true;	
 			SwordAnimationCount = 129;
+			TriforceAnimationCount = 129;
 			bSpriteVisible = true;		
 			//ThePlayer = new AdventurePlayerSprite();			
 			SetPosition(WarpSeq.Exit.PosX, (WarpSeq.Exit.PosY - 1) - (Rect.h - 64));			
@@ -2076,6 +2089,7 @@ void PlayerSprite::BeginLevel()
 	bDucking = false;
 	StartJumpVelocity = 0;
 	SwordAnimationCount = 129;
+	TriforceAnimationCount = 129;
 	CollisionRenderColor.r = 0;
 	CollisionRenderColor.g = 255;
 	CollisionRenderColor.b = 0;
@@ -2260,6 +2274,11 @@ void PlayerSprite::AdventureTick(double DeltaTime)
 		return;
 	}
 	
+	if (TriforceAnimationCount < 129)
+	{
+		UpdateGetTriforceAnimation();
+		return;
+	}
 	VelocityX = 0;
 	VelocityY = 0;
 
@@ -2600,9 +2619,60 @@ void PlayerSprite::UpdateGetSwordAnimation()
 			if (dynamic_cast<AdventureSwordItemSprite*>(ItemSprites[i]))
 			{
 				ItemSprites[i]->Delete();
+				TheGame->BeginScriptedEvent(new OktoSpawnEvent());
 			}
 		}
 	}
 	
 	SwordAnimationCount++;
+}
+
+void PlayerSprite::UpdateGetTriforceAnimation()
+{
+	if (TriforceAnimationCount == 0)
+	{
+		HeldItemSprite = new Sprite(ResourceManager::AdventureTriangleTexture->Texture);
+		HeldItemSprite->SetTexture(ResourceManager::AdventureTriangleTexture->Texture);
+		HeldItemSprite->SetWidth(64);
+		HeldItemSprite->SetHeight(64);
+		HeldItemSprite->SetPosition(Rect.x - 26, Rect.y - 60);
+
+		SimpleSprites.push_back(HeldItemSprite);
+
+		StopAnimation();
+		SetTexture(GResourceManager->AdventureGetTexture->Texture);
+		SetFlip(SDL_FLIP_NONE);
+		
+	}
+
+	if (HeldItemSprite != nullptr)
+	{
+		if (TriforceAnimationCount == 2)
+		{
+			HeldItemSprite->SetPosition(Rect.x - 26, Rect.y - 60);
+		}
+		else if (TriforceAnimationCount == 128)
+		{
+			
+			HeldItemSprite->Delete();
+			HeldItemSprite = nullptr;
+			
+			for (int i = 0; i < SimpleSprites.size(); i++)
+			{
+				if (dynamic_cast<AdventureLockedDoorSprite*>(SimpleSprites[i]))
+				{
+					SimpleSprites[i]->PlayAnimation(ResourceManager::AdventureDoorOpenAnimation, false);
+					SimpleSprites[i]->SetDeleteWhenAnimationCompletes(true);
+
+					break;
+				}
+			}
+
+			// Make the door area passable
+			TheMap->SetMetaLayerTile(58, 40, eTileMetaType::TILE_NONE);
+			TheMap->SetMetaLayerTile(59, 40, eTileMetaType::TILE_NONE);
+		
+		}
+	}
+	TriforceAnimationCount++;
 }

@@ -123,6 +123,7 @@ public:
 	virtual SDL_Texture* GetTexture(int ResourceNum = 0);
 	void SetRenderAngle(double InAngle);
 	virtual void SetDirection(eDirection NewDirection) { CurrentDirection = NewDirection; }
+	virtual void SetDeleteWhenAnimationCompletes(bool bDelete) { bDeleteAfterAnimation = bDelete; }
 };
 
 #endif

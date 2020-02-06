@@ -112,7 +112,7 @@ void Game::HandleControl(ControlTrigger* Control)
 		}
 		else
 		{
-			ScriptedEvents.push_back(new OktoSpawnEvent());
+			
 			Control->bResetWhenPlayerLeaves = false;
 		}
 	}
@@ -531,4 +531,9 @@ void Game::EndTextBox()
 bool Game::IsDoingTextBox()
 {
 	return TheTextBox != nullptr && !TheTextBox->IsDone();
+}
+
+void Game::BeginScriptedEvent(ScriptedEvent* NewEvent)
+{
+	ScriptedEvents.push_back(NewEvent);
 }

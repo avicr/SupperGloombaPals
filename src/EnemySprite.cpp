@@ -939,7 +939,7 @@ void GiantOkto::Tick(double DeltaTime)
 		else if (CurrentState == GOS_JUMP_BACK)
 		{
 
-			if (CountDown == 50)
+			/*if (CountDown == 50)
 			{
 				SetAnimationPlayRate(2);
 			}
@@ -951,7 +951,7 @@ void GiantOkto::Tick(double DeltaTime)
 			{
 				VelocityY = 0;
 				SetAnimationPlayRate(1);
-			}
+			}*/
 		}
 	}
 	else if (bGotBricked)
@@ -1120,6 +1120,16 @@ void GiantOkto::HandleMovement()
 	}
 }
 
+void GiantOkto::GetBricked(int TileX, int TileY)
+{
+	if (!IsDying())
+	{
+		EnemySprite::GetBricked(TileX, TileY);
+		// TODO: Spawn triforce
+
+		ItemSprites.push_back(new TriforceItemSprite(PosX, PosY));
+	}
+}
 
 PlantEnemySprite::PlantEnemySprite(EnemySpawnPoint* Spawner) :
 	EnemySprite(Spawner)

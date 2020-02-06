@@ -12,6 +12,7 @@ enum eItemType
 	ITEM_MAGIC_MUSHROOM,
 	ITEM_PLOT_DEVICE,
 	ITEM_ADVENTURE_SWORD,
+	ITEM_ADVENTURE_TRIANGLE,
 	ITEM_NONE = 255
 };
 
@@ -76,5 +77,12 @@ class AdventureSwordItemSprite : public ItemSprite
 {
 public:
 	AdventureSwordItemSprite(int X, int Y);	
+	void GetCollected();
+};
+
+class TriforceItemSprite : public ItemSprite
+{
+public:
+	TriforceItemSprite(int X, int Y);
 	void GetCollected();
 };

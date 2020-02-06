@@ -99,4 +99,6 @@ public:
 	void DoTextBox(int InPosX, int InPosY, int InWidth, int InHeight, string InText, bool bIsPlotDevice = false, eTextBoxStyle Style = TBS_Modern);
 	void EndTextBox();
 	bool IsDoingTextBox();
+
+	void BeginScriptedEvent(class ScriptedEvent* NewEvent);
 };
