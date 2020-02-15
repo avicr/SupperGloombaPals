@@ -81,6 +81,8 @@ public:
 	void UpdateFlagPoleAnimation();
 	void OnFlagFinished();
 	bool HasExitedLevel();	
+	bool IsGrowing() { return bGrowing; }
+	bool IsShrinking() { return bShrinking; }
 	void SetFrozen(bool bInFrozen) 
 	{
 		bFrozen = bInFrozen; 

@@ -18,13 +18,31 @@
 #include <iostream>
 #include <fstream>
 
+bool MakeWindowTransparent(SDL_Window* window, COLORREF colorKey) {
+	// Get window handle (https://stackoverflow.com/a/24118145/3357935)
+	SDL_SysWMinfo wmInfo;
+	SDL_VERSION(&wmInfo.version);  // Initialize wmInfo
+	SDL_GetWindowWMInfo(window, &wmInfo);
+	HWND hWnd = wmInfo.info.win.window;
+
+	// Change window type to layered (https://stackoverflow.com/a/3970218/3357935)
+	SetWindowLong(hWnd, GWL_EXSTYLE, GetWindowLong(hWnd, GWL_EXSTYLE) | WS_EX_LAYERED);
+
+	// Set transparency color
+	return SetLayeredWindowAttributes(hWnd, colorKey, 0, LWA_COLORKEY);
+}
+
+
+eWindow2Mode Window2Mode;
+
+float DeltaWindowYRate = 0;
 bool bDrawDeltaTime = false;
 Glyph FontShadowedWhite[128];
 SDL_Texture *BackBuffer;
 SDL_Texture* BackBuffer2;
 SDL_Texture* Texture2;
-int WindowWidth;
-int WindowHeight;
+float WindowWidth;
+float WindowHeight;
 bool bSwapSprites = false;
 bool bRenderCollision = false;
 double GTickDelay = 0.01666667;
@@ -334,7 +352,8 @@ bool DoPreLevel()
 	SDL_Event TheEvent;
 	
 	//ThePlayer->BeginLevel();	
-
+	WindowHeight = SCREEN_HEIGHT;
+	SDL_SetWindowSize(GWindow, 1024, SCREEN_HEIGHT);
 	while (!bDone && !bUserQuit)
 	{	
 		if (!bLevelLoaded)
@@ -454,9 +473,10 @@ void DoGameOver()
 
 int GameLoop()
 {
-	int DeltaWindow = 0;
+	
 	bool bDone = false;
 	const int ScrollRate = 5;
+	DeltaWindowYRate = -0;
 	bool bGameDone = false;
 	SDL_Event TheEvent;
 	TickFreq = SDL_GetPerformanceFrequency();
@@ -484,19 +504,32 @@ int GameLoop()
 			}
 
 			StartTime = CurrentTime;
-
+			
 			// Only tick at 60 fps
 			do
 			{
 				CurrentTime = SDL_GetPerformanceCounter();
 				DeltaTime = (double)((CurrentTime - StartTime) * 1000 / (double)SDL_GetPerformanceFrequency());
 				DeltaTime *= (double)0.001;
-			} while (DeltaTime < GTickDelay && !TheGame->IsLevelComplete());
-			//SDL_SetWindowSize(GWindow, 1024 + DeltaWindow++, 960);
+			} while (DeltaTime < GTickDelay && !TheGame->IsLevelComplete());			
 			
+			
+						
 			Tick(0.0166667);
 
 			Render(DeltaTime);
+
+			if (DeltaWindowYRate != 0 && !ThePlayer->IsGrowing() && !ThePlayer->IsDying() && !ThePlayer->IsShrinking())
+			{
+				WindowHeight += DeltaWindowYRate;
+				//DeltaWindowYRate = 0;
+				//if (DeltaWindowYRate > 0)
+				//{
+				////	DeltaWindowYRate = 0;
+				//}
+
+				SDL_SetWindowSize(GWindow, 1024, WindowHeight);
+			}
 
 			//Handle events on queue
 			while (SDL_PollEvent(&TheEvent) != 0)
@@ -504,12 +537,16 @@ int GameLoop()
 				if (TheEvent.type == SDL_WINDOWEVENT)
 				{
 					if (TheEvent.window.event == SDL_WINDOWEVENT_RESIZED)
-					{
-						/*ThePlayer->SetPosition(ThePlayer->GetPosX() - (TheEvent.window.data1 - CachedWindowX), ThePlayer->GetPosY() - (TheEvent.window.data2 - CachedWindowY));
-						*/
+					{						
 						CachedWindowX = TheEvent.window.data1;
 						CachedWindowY = TheEvent.window.data2;
+						
+					}
 
+					if (TheEvent.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
+					{
+						// Hopefully not a memory leak!!!!!
+						LoadBitMapFont("letters_shadow.bmp", FontShadowedWhite);
 					}
 				}
 
@@ -543,7 +580,16 @@ void HandleCheatInput(SDL_Event& TheEvent)
 {
 	if (TheEvent.key.state == SDL_PRESSED && TheEvent.key.keysym.scancode == SDL_SCANCODE_1)
 	{
-		bRenderCollision = !bRenderCollision;
+		//bRenderCollision = !bRenderCollision;
+		// Hopefully not a memory leak!!!!!
+		if (Window2Mode == WINDOW2_MODE_NONE)
+		{
+			ShowWindow2(WINDOW2_MODE_TRANSPARENT, true);
+		}
+		else
+		{
+			ShowWindow2(WINDOW2_MODE_NONE, false);
+		}
 	}
 
 	// Draw deltatime
@@ -745,6 +791,7 @@ void Render(double DeltaTime)
 		if (!bWorldSmear)
 		{
 			SDL_SetRenderDrawColor(GRenderer, BGColor.r, BGColor.g, BGColor.b, BGColor.a);
+			//SDL_SetRenderDrawColor(GRenderer, 255, 0, 255, BGColor.a);
 			SDL_RenderClear(GRenderer);
 		}						
 		TheMap->Render(GRenderer, 0, 0, 1024 / RenderScale, 960 / RenderScale);		
@@ -763,22 +810,46 @@ void Render(double DeltaTime)
 
 		if (bShowWindow2)
 		{
-			SDL_SetRenderDrawColor(GRenderer2, BGColor.r, BGColor.g, BGColor.b, BGColor.a);
-			SDL_RenderClear(GRenderer2);
+			if (Window2Mode == WINDOW2_MODE_WARP_ZONE)
+			{
+				SDL_SetRenderDrawColor(GRenderer2, BGColor.r, BGColor.g, BGColor.b, BGColor.a);
+				SDL_RenderClear(GRenderer2);
 
-			double CachedX = ThePlayer->GetPosX();
-			double CachedY = ThePlayer->GetPosY();
+				double CachedX = ThePlayer->GetPosX();
+				double CachedY = ThePlayer->GetPosY();
 
-			ThePlayer->SetPosition(CachedX - 195 * 64 + TheMap->GetScrollX(), CachedY - 30 * 64 + TheMap->GetScrollY());
-			ThePlayer->Render(GRenderer2, 2);
-			ThePlayer->SetPosition(CachedX, CachedY);
+				ThePlayer->SetPosition(CachedX - 195 * 64 + TheMap->GetScrollX(), CachedY - 30 * 64 + TheMap->GetScrollY());
+				ThePlayer->Render(GRenderer2, 2);
+				ThePlayer->SetPosition(CachedX, CachedY);
+				SDL_Rect Texture2DstRect = { 0, 0, 512, 512 };
+				SDL_RenderCopy(GRenderer2, Texture2, NULL, &Texture2DstRect);
+				SDL_Rect SrcRect = { 0, 0, ThePlayer->GetWidth(), ThePlayer->GetHeight() };
+				SDL_Rect DstRect = { ThePlayer->GetPosX() - TheMap->GetScrollX(), ThePlayer->GetPosY() - TheMap->GetScrollY() - 448, SrcRect.w, SrcRect.h };
 
-			SDL_RenderCopy(GRenderer2, Texture2, NULL, NULL);
-			SDL_Rect SrcRect = { 0, 0, ThePlayer->GetWidth(), ThePlayer->GetHeight() };
-			SDL_Rect DstRect = { ThePlayer->GetPosX() - TheMap->GetScrollX(), ThePlayer->GetPosY() - TheMap->GetScrollY() - 448, SrcRect.w, SrcRect.h };
+
+				PresentBackBuffer2();
+			}
+			else if (Window2Mode == WINDOW2_MODE_TRANSPARENT)
+			{				
+				SDL_SetRenderDrawColor(GRenderer2, 255, 0, 255, 255);
+				SDL_RenderClear(GRenderer2);
+
+				double CachedX = ThePlayer->GetPosX();
+				double CachedY = ThePlayer->GetPosY();
+				
+				//ThePlayer->SetDrawScreenSpace(true);
+				ThePlayer->Render(GRenderer2, 2);
+				//ThePlayer->SetDrawScreenSpace(false);
+				ThePlayer->SetPosition(CachedX, CachedY);
+				
+				
+				SDL_Rect SrcRect = { 0, 0, ThePlayer->GetWidth(), ThePlayer->GetHeight() };
+				SDL_Rect DstRect = { ThePlayer->GetPosX() - TheMap->GetScrollX(), ThePlayer->GetPosY() - TheMap->GetScrollY() - 448, SrcRect.w, SrcRect.h };
 
 
-			PresentBackBuffer2();
+				PresentBackBuffer2();
+			}
+
 		}
 	}	
 }
@@ -830,12 +901,12 @@ void DoTripStuff()
 void PresentBackBuffer()
 {
 	SDL_SetRenderTarget(GRenderer, NULL);
-	SDL_Rect BackBufferRect = { 0, 0, 1024, SCREEN_HEIGHT };
+	SDL_Rect BackBufferRect = { 0, 0, 1024, WindowHeight };
 #ifdef FULLSCREEN_1920_1080
 	SDL_Rect BackBufferDstRect = { 42, 0, 1836, 1080 };
 #else
 	//SDL_Rect BackBufferDstRect = { WindowWidth / 2 - 512, WindowHeight / 2 - SCREEN_HEIGHT / 2, 1024, SCREEN_HEIGHT };
-	SDL_Rect BackBufferDstRect = { -RenderGrowth, -RenderGrowth, 1024 + RenderGrowth * 4, SCREEN_HEIGHT + RenderGrowth * 4};
+	SDL_Rect BackBufferDstRect = { -RenderGrowth, -RenderGrowth, 1024 + RenderGrowth * 4, WindowHeight + RenderGrowth * 4};
 #endif
 
 	DoTripStuff();
@@ -848,13 +919,16 @@ void PresentBackBuffer()
 
 void PresentBackBuffer2()
 {
+	int Window2Width;
+	int Window2Height;
 	SDL_SetRenderTarget(GRenderer2, NULL);
-	SDL_Rect BackBufferRect = { 0, 0, 512, 512};
+	SDL_GetWindowSize(GWindow2, &Window2Width, &Window2Height);
+	SDL_Rect BackBufferRect = { 0, 0, Window2Width, Window2Height };
 #ifdef FULLSCREEN_1920_1080
 	SDL_Rect BackBufferDstRect = { 42, 0, 1836, 1080 };
 #else
 	//SDL_Rect BackBufferDstRect = { WindowWidth / 2 - 512, WindowHeight / 2 - SCREEN_HEIGHT / 2, 1024, SCREEN_HEIGHT };
-	SDL_Rect BackBufferDstRect = { 0, 0, 512, 512};
+	SDL_Rect BackBufferDstRect = { 0, 0, Window2Width, Window2Height };
 #endif
 
 	DoTripStuff();
@@ -929,17 +1003,21 @@ void InitSDL()
 #ifdef FULLSCREEN_1920_1080
 		GWindow = SDL_CreateWindow("Supper Gloomba Pals", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1920, 1080, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP);
 #else
-		GWindow = SDL_CreateWindow("1-1", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, SCREEN_HEIGHT, SDL_WINDOW_OPENGL /*| SDL_WINDOW_FULLSCREEN_DESKTOP*/);
+		GWindow = SDL_CreateWindow("1-1", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, SCREEN_HEIGHT, SDL_WINDOW_OPENGL  /*| SDL_WINDOW_BORDERLESS */ /*| SDL_WINDOW_FULLSCREEN_DESKTOP*/);
+		
 		
 #endif		
 		CreateWindow2();
-
+		//MakeWindowTransparent(GWindow, RGB(255, 0, 255));
 		Uint32 global_pixel_format = SDL_GetWindowPixelFormat(GWindow);
 		const char* temp = SDL_GetPixelFormatName(global_pixel_format);
 		printf(" SDL_Window created with pixel format %s\n", temp);
 
 		//SDL_SetWindowResizable(GWindow, SDL_TRUE);
-		SDL_GetWindowSize(GWindow, &WindowWidth, &WindowHeight);
+		int iWindowWidth, iWindowHeight;
+		SDL_GetWindowSize(GWindow, &iWindowWidth, &iWindowHeight);
+		WindowWidth = iWindowWidth;
+		WindowHeight = iWindowHeight;
 		GRenderer = SDL_CreateRenderer(GWindow, -1, 0);
 		BackBuffer = SDL_CreateTexture(GRenderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, 1024, 960);
 		
@@ -1134,8 +1212,8 @@ void CopyGlyph(Glyph &TheGlyph, SDL_Texture *FontTexture, int TextureStartX)
 	SDL_SetRenderDrawColor(GRenderer, 255, 0, 255, 0);
 	SDL_RenderClear(GRenderer);
 	SDL_Rect DstRect = { 0, 0, 16, 16 };
-	SDL_RenderCopy(GRenderer, FontTexture, &SrcRect, &DstRect);
-	SDL_SetRenderTarget(GRenderer, NULL);
+	SDL_RenderCopy(GRenderer, FontTexture, &SrcRect, &DstRect);	
+	SDL_SetRenderTarget(GRenderer, BackBuffer);
 }
 
 void DrawBitmapText(string Text, int X, int Y, int SizeX, int SizeY, SDL_Renderer *Renderer, Glyph Glyphs[127], float SpaceScaleX, float SpaceScaleY, bool bRightJustify)
@@ -1224,16 +1302,16 @@ void CreateWindow2()
 {
 	int Window1X;
 	int Window1Y;
-	int Window2X;
-	int Window2Y;
+	
 	int Window1Width;
 	int Window1Height;
-	int Window2Width;
-	int Window2Height;	
+	
+	int Window2Width = 1024;
+	int Window2Height = SCREEN_HEIGHT;
 
-	GWindow2 = SDL_CreateWindow("Warp Zone", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 512, 512, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
+	GWindow2 = SDL_CreateWindow("Warp Zone", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, Window2Width, Window2Height, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
 	GRenderer2 = SDL_CreateRenderer(GWindow2, -1, 0);
-	BackBuffer2 = SDL_CreateTexture(GRenderer2, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, 512, 512);
+	BackBuffer2 = SDL_CreateTexture(GRenderer2, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, Window2Width, Window2Height);
 
 	SDL_GetWindowPosition(GWindow, &Window1X, &Window1Y);
 	
@@ -1260,7 +1338,7 @@ void DestroyWindow2()
 	Texture2 = NULL;
 }
 
-void ShowWindow2(bool bShow)
+void ShowWindow2(eWindow2Mode WindowMode, bool bShow)
 {
 	if (bShow)
 	{
@@ -1272,18 +1350,34 @@ void ShowWindow2(bool bShow)
 		int Window1Height;
 		int Window2Width;
 		int Window2Height;
+		
 
 		SDL_GetWindowPosition(GWindow, &Window1X, &Window1Y);
-
 		SDL_GetWindowSize(GWindow, &Window1Width, &Window1Height);
+
+		if (WindowMode == WINDOW2_MODE_WARP_ZONE)
+		{
+			//ShowWindow2(512, 512);
+			SDL_SetWindowSize(GWindow2, 512, 512);
+
+		}
+		else if (WindowMode == WINDOW2_MODE_TRANSPARENT)
+		{		
+			ThePlayer->SetRenderLayer(RENDER_LAYER_BEHIND_BG);
+			SDL_SetWindowSize(GWindow, 1024, SCREEN_HEIGHT);
+			MakeWindowTransparent(GWindow2, RGB(255, 0, 255));
+		}		
 		SDL_SetWindowPosition(GWindow2, Window1X + WindowWidth, Window1Y);
 		SDL_ShowWindow(GWindow2);
 	}
 	else
 	{
-		SDL_HideWindow(GWindow2);
+		
+		ThePlayer->SetRenderLayer(RENDER_LAYER_TOP);
+		SDL_HideWindow(GWindow2);	
 	}
 
+	Window2Mode = WindowMode;
 	bShowWindow2 = bShow;
 }
 

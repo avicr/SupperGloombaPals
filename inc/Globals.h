@@ -20,6 +20,13 @@
 
 void DoUgly();
 
+enum eWindow2Mode
+{
+	WINDOW2_MODE_NONE = 0,
+	WINDOW2_MODE_WARP_ZONE,
+	WINDOW2_MODE_TRANSPARENT
+};
+
 enum eDirection
 {
 	DIRECTION_UP = 0,
@@ -140,6 +147,9 @@ extern SDL_Point FireworkLocations[];
 extern struct LevelInfo Levels[];
 extern bool bShowWindow2;
 
+extern float WindowWidth;
+extern float WindowHeight;
+extern float DeltaWindowYRate;
 extern unsigned int SpecialEventKeys[];
 extern int NormalExitKeys[];
 extern int SecretExitKeys[];
@@ -216,7 +226,7 @@ extern float RenderScale;
 
 void CreateWindow2();
 void DestroyWindow2();
-void ShowWindow2(bool bShow);
+void ShowWindow2(eWindow2Mode WindowMode, bool bShow);
 
 SDL_Renderer *GetRenderer(int RendererNumber = 0);
 #endif

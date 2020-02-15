@@ -452,7 +452,7 @@ public:
 	bool LevelPlaying() { return bPlayingLevel; }
 	void StartLevel();
 	void EndLevel();
-	int GetKillY() { return KillY; }
+	int GetKillY();
 	int GetWidth() { return Width * TilePixelWidth; }
 	int GetHeight() { return Height * TilePixelHeight; }
 	bool IsDestroyableByFireTile(int ID);

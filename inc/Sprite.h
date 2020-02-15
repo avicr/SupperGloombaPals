@@ -73,6 +73,7 @@ protected:
 public:
 	Sprite();
 	Sprite(SDL_Texture *InTexture);
+	void SetDrawScreenSpace(bool bNewDrawScreenSpace) { bDrawScreenSpace = bNewDrawScreenSpace; }
 	void SetFlip(SDL_RendererFlip);
 	void SetMovingFlags(eMovingFlags NewFlags);	
 	int GetMovingFlags();
@@ -120,6 +121,7 @@ public:
 	virtual bool IsOnGround();
 	virtual bool IsInteractable() { return !bPendingDelete; }
 	virtual eRenderLayer GetRenderLayer() { return RenderLayer; }
+	virtual void SetRenderLayer(eRenderLayer NewRenderLayer) { RenderLayer = NewRenderLayer; }
 	virtual SDL_Texture* GetTexture(int ResourceNum = 0);
 	void SetRenderAngle(double InAngle);
 	virtual void SetDirection(eDirection NewDirection) { CurrentDirection = NewDirection; }

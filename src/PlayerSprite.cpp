@@ -30,6 +30,19 @@ int AdventurePixelsToMove[] = {
 	7,
 };
 
+int AdventurePixelsToMoveWhenHurt[] = {
+	0,
+	0,
+	15,
+	17,
+	16,
+	16,
+	16,
+	16,
+	16,
+	16,
+};
+
 const int NumberDialogs = 2;
 char* PlotDeviceTextFiles[NumberDialogs] =
 {
@@ -112,6 +125,7 @@ void PlayerSprite::Tick(double DeltaTime)
 	{
 		bSpriteVisible = false;
 		BeginDie();
+		DeltaWindowYRate = 0;
 	}
 
 	if (InvincibleCount > 0)
@@ -1654,7 +1668,7 @@ void PlayerSprite::UpdateWarpSequence()
 				
 				if (WarpSeq.Entrance.WarpType == WARP_PIPE_LEFT_FIRST_WINDOW)
 				{
-					ShowWindow2(false);
+					ShowWindow2(WINDOW2_MODE_NONE, false);					
 				}
 			}
 		}		
@@ -1812,8 +1826,8 @@ void PlayerSprite::UpdateWarpExitSequence()
 			}
 
 			if (WarpSeq.Entrance.WarpType == WARP_PIPE_RIGHT_SECOND_WINDOW)
-			{
-				ShowWindow2(true);
+			{				
+				ShowWindow2(WINDOW2_MODE_WARP_ZONE, true);
 			}
 		}
 
@@ -2282,7 +2296,36 @@ void PlayerSprite::AdventureTick(double DeltaTime)
 	VelocityX = 0;
 	VelocityY = 0;
 
-	if (MovingFlags)
+	if (InvincibleCount > 0)
+	{
+		/*if (InvincibleCount <= NUM_INVINCIBLE_FRAMES && InvincibleCount > NUM_INVINCIBLE_FRAMES - 10)
+		{
+			int MoveFrame = NUM_INVINCIBLE_FRAMES - InvincibleCount;
+
+			int PixelsToMove = AdventurePixelsToMoveWhenHurt[MoveFrame];
+
+			if (CurrentDirection == DIRECTION_DOWN)
+			{
+				VelocityY = -PixelsToMove;
+			}
+			else if (CurrentDirection == DIRECTION_UP)
+			{
+				VelocityY = PixelsToMove;
+			}
+			if (CurrentDirection == DIRECTION_LEFT)
+			{
+				VelocityX = PixelsToMove;
+			}
+			if (CurrentDirection == DIRECTION_RIGHT)
+			{
+				VelocityX = -PixelsToMove;
+			}
+		}*/
+
+		InvincibleCount--;
+		return;
+	}
+	else if (MovingFlags)
 	{
 		if (MovingFlags & MOVING_UP || MovingFlags & MOVING_DOWN)
 		{
@@ -2397,7 +2440,7 @@ void PlayerSprite::AdventureTick(double DeltaTime)
 		AdventureMoveIndex = 0;
 	}
 	
-	if (InvincibleCount > 0)
+	/*if (InvincibleCount > 0)
 	{
 		InvincibleCount--;
 
@@ -2409,7 +2452,7 @@ void PlayerSprite::AdventureTick(double DeltaTime)
 		{
 			bSpriteVisible = false;
 		}
-	}
+	}*/
 
 	UpdateAdventureAnimation();
 

@@ -1630,6 +1630,16 @@ int TMXMap::GetWarpIndex(int ID)
 	return -1;
 }
 
+int TMXMap::GetKillY()
+{
+	// If the window height is changing , set the killY to the bottom part of the window
+	if (DeltaWindowYRate != 0)
+	{
+		return WindowHeight + ScrollY;
+	}
+	return KillY;
+}
+
 bool TMXMap::InMapWindow(int X, int Y)
 {
 	SDL_Rect MapWindow = TheMap->GetVisibleWindow();
