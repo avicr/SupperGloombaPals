@@ -53,6 +53,7 @@ public:
 
 	DECLARE_TEXTURE_RESOURCE(AdventureDoorCloseTexture, "AdventureDoorClose.bmp", false)
 	DECLARE_TEXTURE_RESOURCE(OktoTexture, "okto.bmp", false)
+	DECLARE_TEXTURE_RESOURCE(OktoSideTexture, "oktoside.bmp", false)
 	DECLARE_TEXTURE_RESOURCE(OktoEyesTexture, "OktoEyes.bmp", false)
 
 	DECLARE_TEXTURE_RESOURCE(AdventureSwordTexture, "sword.bmp", false)
@@ -174,6 +175,23 @@ public:
 
 	}
 	END_DECLARE_ANIMATION_RESOURCE(OktoAnimation)
+		
+	BEGIN_DECLARE_ANIMATION_RESORCE(OktoSideAnimation)
+	{
+		bUseAbsoluteFrameCount = true;
+
+		for (int i = 0; i < 2; i++)
+		{
+			int SpriteWidth = 128;
+			int SpriteHeight = 128;
+			SDL_Rect SrcRect = { i * SpriteWidth, 0, SpriteWidth, SpriteHeight };
+			bUseAbsoluteFrameCount = true;
+
+			Frames.push_back(new Frame(ResourceManager::OktoSideTexture, SrcRect, 6));
+		}
+
+	}
+	END_DECLARE_ANIMATION_RESOURCE(OktoSideAnimation)
 
 	BEGIN_DECLARE_ANIMATION_RESORCE(AdventureFireAnimation)
 	{

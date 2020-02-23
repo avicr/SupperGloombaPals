@@ -21,7 +21,20 @@ enum eGiantOktoState
 {
 	GOS_FADE_IN_EYES = 0,
 	GOS_FADE_IN_BODY,
-	GOS_JUMP_BACK
+	GOS_JUMP_BACK,
+	GOS_WAIT_TO_MOVE_TO_EDGE,
+	GOS_MOVE_TO_EDGE,
+	GOS_WAIT_TO_ATTACK,
+	GOS_SHOOT_ROCK,
+	GOS_RUSH_PLAYER
+};
+
+enum eOktoAttackWall
+{
+	OAW_SOUTH,
+	OAW_NORTH,
+	OAW_EAST,
+	OAW_WEST
 };
 
 enum ePlantState
@@ -136,6 +149,7 @@ public:
 class GiantOkto : public EnemySprite
 {
 protected:
+	eOktoAttackWall TargetWall;
 	eGiantOktoState CurrentState;
 	int ScaleCountDown;	
 

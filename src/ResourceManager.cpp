@@ -53,9 +53,11 @@ INIT_TEXTURE_RESOURCE(AdventureAttackDownTexture)
 INIT_TEXTURE_RESOURCE(AdventureAttackSideTexture)
 INIT_TEXTURE_RESOURCE(AdventureDoorCloseTexture)
 INIT_TEXTURE_RESOURCE(OktoTexture);
+INIT_TEXTURE_RESOURCE(OktoSideTexture);
 INIT_TEXTURE_RESOURCE(OktoEyesTexture);
 
 INIT_ANIMATION_RESOURCE(OktoAnimation)
+INIT_ANIMATION_RESOURCE(OktoSideAnimation)
 INIT_ANIMATION_RESOURCE(AdventureDoorCloseAnimation)
 INIT_ANIMATION_RESOURCE(AdventureDoorOpenAnimation)
 INIT_ANIMATION_RESOURCE(AdventureAttackSideAnimation)

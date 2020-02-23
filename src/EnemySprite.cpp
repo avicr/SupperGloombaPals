@@ -865,11 +865,15 @@ void GiantGoomba::GetFired()
 
 void GiantGoomba::GetBricked(int TileX, int TileY)
 {
-	GoombaEnemySprite::GetBricked(TileX, TileY);
-	TheMap->SetAutoScrollX(0, false);
+	// Don't take damage until we've played the opening animation
+	if (CurrentState >= GOS_WAIT_TO_ATTACK)
+	{
+		GoombaEnemySprite::GetBricked(TileX, TileY);
+		TheMap->SetAutoScrollX(0, false);
 
-	// TODO: If the player doesn't have a star, play the music
-	Mix_PlayMusic(BGMusic, -1);
+		// TODO: If the player doesn't have a star, play the music
+		Mix_PlayMusic(BGMusic, -1);
+	}
 }
 
 GiantOkto::GiantOkto(int X, int Y) :
@@ -885,6 +889,7 @@ GiantOkto::GiantOkto(int X, int Y) :
 	SDL_SetTextureBlendMode(Texture, SDL_BLENDMODE_BLEND);	
 	SDL_SetTextureAlphaMod(Texture, 0);
 	CollisionRect = { 28, 15, 72, 64 };
+	bDeleteWhenNotVisible = false;
 	// TODO: Need custom collision using two rects at least	
 	
 }
@@ -896,6 +901,8 @@ GiantOkto::~GiantOkto()
 		SDL_DestroyTexture(Texture);		
 	}
 }
+
+// Wait 
 
 void GiantOkto::Tick(double DeltaTime)
 {
@@ -909,7 +916,6 @@ void GiantOkto::Tick(double DeltaTime)
 		PhysicsSprite::Tick(DeltaTime);
 		HandleMovement();
 
-		
 		CountDown--;
 
 		if (CurrentState == GOS_FADE_IN_EYES)
@@ -924,7 +930,7 @@ void GiantOkto::Tick(double DeltaTime)
 				EnterState(GOS_FADE_IN_BODY);
 			}
 		}
-		else if (CurrentState == GIANT_STATE_MUSHROOM)
+		else if (CurrentState == GOS_FADE_IN_BODY)
 		{
 			float Alpha = EaseLerp(OKTO_FADE_IN - CountDown, 0, 255, OKTO_FADE_IN);
 			Alpha = 255 * Ease2((OKTO_FADE_IN - CountDown) / OKTO_FADE_IN);
@@ -938,20 +944,95 @@ void GiantOkto::Tick(double DeltaTime)
 		}
 		else if (CurrentState == GOS_JUMP_BACK)
 		{
-
-			/*if (CountDown == 50)
+			if (CountDown == 70)
 			{
 				SetAnimationPlayRate(2);
 			}
-			else  if (CountDown == 12)
+			else  if (CountDown == 60)
 			{
-				VelocityY = -26;				
+				if (CurrentDirection == DIRECTION_DOWN)
+				{
+					VelocityY = -26;
+				}
+				else if (CurrentDirection == DIRECTION_UP)
+				{
+					VelocityY = 26;
+				}
+				else if (CurrentDirection == DIRECTION_RIGHT)
+				{
+					VelocityX = -26;
+				}
+				else if (CurrentDirection == DIRECTION_LEFT)
+				{
+					VelocityX = 26;
+				}
 			}
 			else if (CountDown == 0)
 			{
-				VelocityY = 0;
 				SetAnimationPlayRate(1);
-			}*/
+				LeaveState(GOS_JUMP_BACK);
+				EnterState(GOS_WAIT_TO_MOVE_TO_EDGE);
+			}
+		}
+		else if (CurrentState == GOS_WAIT_TO_MOVE_TO_EDGE)
+		{
+			if (CountDown == 0)
+			{
+				// Pick which wall to move to
+				LeaveState(GOS_WAIT_TO_MOVE_TO_EDGE);
+				EnterState(GOS_MOVE_TO_EDGE);
+			}
+		}
+		else if (CurrentState == GOS_MOVE_TO_EDGE)
+		{
+			bool bDone = false;
+			// If we're moving to an edge, stop at the appropriate location
+
+			if (CurrentDirection == DIRECTION_UP)
+			{
+				if (PosY <= TheMap->GetScrollY() + 816)
+				{
+					bDone = true;
+				}
+			}
+			else if (CurrentDirection == DIRECTION_DOWN)
+			{
+				if (PosY >= TheMap->GetScrollY() + 200)
+				{
+					bDone = true;
+				}
+			}
+			else if (CurrentDirection == DIRECTION_LEFT)
+			{
+				if (PosX <= TheMap->GetScrollX() + 928)
+				{
+					bDone = true;
+				}
+			}
+			else if (CurrentDirection == DIRECTION_RIGHT)
+			{
+				if (PosX >= TheMap->GetScrollX())
+				{
+					bDone = true;
+				}
+			}
+
+			if (bDone)
+			{
+				VelocityY = 0;
+				VelocityX = 0;
+				LeaveState(GOS_MOVE_TO_EDGE);
+				EnterState(GOS_WAIT_TO_ATTACK);
+			}
+
+		}
+		else if (CurrentState == GOS_WAIT_TO_ATTACK)
+		{
+			if (CountDown == 0)
+			{
+				LeaveState(GOS_WAIT_TO_ATTACK);
+				EnterState(GOS_JUMP_BACK);
+			}
 		}
 	}
 	else if (bGotBricked)
@@ -979,9 +1060,11 @@ void GiantOkto::Tick(double DeltaTime)
 	}
 }
 
-
 void GiantOkto::EnterState(eGiantOktoState NewState)
 {
+	int CountDownModifer = 0;
+	eOktoAttackWall TargetWallRandom;
+
 	switch (NewState)
 	{
 	case GOS_FADE_IN_EYES:
@@ -1002,9 +1085,66 @@ void GiantOkto::EnterState(eGiantOktoState NewState)
 		break;
 
 	case GOS_JUMP_BACK:						
-		CountDown = 90;	
+		CountDown = OKTO_INITIAL_JUMP_BACK_COUNT;
 		SetAnimationPlayRate(1);			
-		break;	
+		break;
+	case GOS_WAIT_TO_MOVE_TO_EDGE:
+	case GOS_WAIT_TO_ATTACK:
+		CountDownModifer = rand() % OKTO_ATTACK_COOL_DOWN_RANDOM_MODIFIER;
+
+		if (rand() % 2)
+		{
+			CountDownModifer *= -1;
+		}
+
+		CountDown = OKTO_ATTACK_COOL_DOWN_TIME + CountDownModifer;
+		break;
+	case GOS_MOVE_TO_EDGE:
+		TargetWallRandom = (eOktoAttackWall)(rand() % 4);
+
+		while (TargetWallRandom == TargetWall)
+		{
+			TargetWallRandom = (eOktoAttackWall)(rand() % 4);
+		}
+		TargetWall = TargetWallRandom;
+		CurrentDirection = (eDirection)TargetWall;
+
+		if (CurrentDirection == DIRECTION_UP || CurrentDirection == DIRECTION_DOWN)
+		{
+			PlayAnimation(GResourceManager->OktoAnimation);
+
+			if (CurrentDirection == DIRECTION_UP)
+			{
+				SetFlip(SDL_FLIP_VERTICAL);
+				SetPosition(TheMap->GetScrollX() + 449, TheMap->GetScrollY() + 1000);
+				VelocityY = -OKTO_MOVE_TO_LEDGE_VELOCITY;
+			}
+			else
+			{
+				SetFlip(SDL_FLIP_NONE);
+				SetPosition(TheMap->GetScrollX() + 449, TheMap->GetScrollY() - 256);
+				VelocityY = OKTO_MOVE_TO_LEDGE_VELOCITY;
+			}
+		}
+		else if (CurrentDirection == DIRECTION_RIGHT || CurrentDirection == DIRECTION_LEFT)
+		{
+			PlayAnimation(GResourceManager->OktoSideAnimation);
+
+			if (CurrentDirection == DIRECTION_LEFT)
+			{
+				SetFlip(SDL_FLIP_HORIZONTAL);
+				SetPosition(TheMap->GetScrollX() + 1172, TheMap->GetScrollY() + 512);
+				VelocityX = -OKTO_MOVE_TO_LEDGE_VELOCITY;
+			}
+			else
+			{
+				SetFlip(SDL_FLIP_NONE);
+				SetPosition(TheMap->GetScrollX() - 256, TheMap->GetScrollY() + 512);
+				VelocityX = OKTO_MOVE_TO_LEDGE_VELOCITY;
+			}
+		}
+
+		break;
 	default:
 		break;
 	}
@@ -1016,9 +1156,22 @@ void GiantOkto::LeaveState(eGiantOktoState PreviousState)
 {
 	switch (PreviousState)
 	{
-	case GIANT_STATE_MUSHROOM:
+	case GOS_FADE_IN_BODY:
+		CurrentDirection = DIRECTION_DOWN;
 		break;
+	case GOS_JUMP_BACK:
+		if (CurrentDirection == DIRECTION_DOWN || CurrentDirection == DIRECTION_UP)
+		{
+			VelocityY = 0;
+		}
+		else if (CurrentDirection == DIRECTION_LEFT || CurrentDirection == DIRECTION_RIGHT)
+		{
+			VelocityX = 0;
+		}
+		break;
+	case GOS_WAIT_TO_ATTACK:
 
+		break;
 	default:
 		break;
 	}
@@ -1043,57 +1196,36 @@ void GiantOkto::HandleMovement()
 {
 	if (DyingCount == 0 && !bGotBricked)
 	{		
-		int NumPixelsToMove = round(fabs(VelocityY));
+		int NumPixelsToMove = round(fabs(VelocityX));
 		SDL_Rect NewRect = GetScreenSpaceCustomRect();
 
 		for (int x = 0; x < NumPixelsToMove; x++)
 		{
+			NewRect.x += VelocityX > 0 ? 1 : -1;
+
+			vector<TileInfo> Tiles;
+
+			PosX += VelocityX > 0 ? 1 : -1;
+			CheckCollisionWithSprites();
+			
+		}
+
+		NumPixelsToMove = round(fabs(VelocityY));
+		NewRect = GetScreenSpaceCustomRect();
+
+		for (int y = 0; y < NumPixelsToMove; y++)
+		{
 			NewRect.y += VelocityY > 0 ? 1 : -1;
 
-			PosY += VelocityY > 0 ? 1 : -1;
-			CheckCollisionWithSprites();			
-		}
-
-		bool bIsInAir = !IsOnGround();
-
-		if (CurrentState == GIANT_STATE_MUSHROOM)
-		{
-			
-			if (bIsInAir)
+			//if (!TheMap->CheckCollision(NewRect, true))
 			{
-				//VelocityY += BASE_FALL_VELOCITY;				
+				PosY += VelocityY > 0 ? 1 : -1;
+				CheckCollisionWithSprites();
 			}
-
-			NumPixelsToMove = round(fabs(VelocityY));
-			NewRect = GetScreenSpaceCustomRect();
-
-			for (int y = 0; y < NumPixelsToMove; y++)
-			{
-				NewRect.y += VelocityY > 0 ? 1 : -1;
-
-				if (!TheMap->CheckCollision(NewRect, true))
-				{
-					PosY += VelocityY > 0 ? 1 : -1;
-					CheckCollisionWithSprites();
-				}
-			}			
 		}
-		else
-		{
-			VelocityX = 0;
-		}
-		
+	
 		Rect.x = PosX;// -TheMap->GetScrollX();
 		Rect.y = PosY;
-
-		// If we've landed, break bricks
-		if (CurrentState == GIANT_STATE_MUSHROOM && bIsInAir && IsOnGround())
-		{
-			bIsInAir = false;
-			Mix_PlayChannel(CHANNEL_FIRE_BALL, FireworkSound, 0);
-			Mix_PlayChannel(CHANNEL_BUMP, BumpSound, 0);
-						
-		}		
 	}
 	else if (bGotBricked)
 	{
