@@ -152,6 +152,8 @@ protected:
 	bool HandleVerticalMovement();
 	void UpdateGetSwordAnimation();
 	void UpdateGetTriforceAnimation();
+	bool SubstepXDirection(int NumPixels);
+	bool SubstepYDirection(int NumPixels);
 	void UpdateAdventureAnimation();
 	void AdventureTakeDamage();
 };

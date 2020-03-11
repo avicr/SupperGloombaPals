@@ -2298,7 +2298,7 @@ void PlayerSprite::AdventureTick(double DeltaTime)
 
 	if (InvincibleCount > 0)
 	{
-		/*if (InvincibleCount <= NUM_INVINCIBLE_FRAMES && InvincibleCount > NUM_INVINCIBLE_FRAMES - 10)
+		if (InvincibleCount <= NUM_INVINCIBLE_FRAMES && InvincibleCount > NUM_INVINCIBLE_FRAMES - 10)
 		{
 			int MoveFrame = NUM_INVINCIBLE_FRAMES - InvincibleCount;
 
@@ -2320,7 +2320,7 @@ void PlayerSprite::AdventureTick(double DeltaTime)
 			{
 				VelocityX = -PixelsToMove;
 			}
-		}*/
+		}
 
 		InvincibleCount--;
 		return;
@@ -2350,28 +2350,7 @@ void PlayerSprite::AdventureTick(double DeltaTime)
 			// If we've attacked, don't actually do the move part
 			if (CountDown == 0)
 			{
-				SDL_Rect NewRect = GetScreenSpaceCustomRect();
-				for (int x = 0; x < AdventurePixelsToMove[AdventureMoveIndex]; x++)
-				{
-					NewRect.y += VelocityY;
-					if (EndOfLevelCountdown == 0 && bExitingLevel && Rect.x >= ExitLevelX)
-					{
-						bSpriteVisible = false;
-						EndOfLevelCountdown = 40;
-						VelocityX = 0;
-						VelocityY = 0;
-					}
-
-					if (TheMap->CheckCollision(NewRect, false, 0))
-					{
-						// Cap max speed when colliding with a wall
-						bCollided = true;
-						VelocityY = 0;
-						break;
-					}
-
-					PosY += VelocityY;
-				}
+				SubstepYDirection(AdventurePixelsToMove[AdventureMoveIndex]);
 			}
 		}
 		else if (MovingFlags & MOVING_RIGHT || MovingFlags & MOVING_LEFT)
@@ -2400,28 +2379,7 @@ void PlayerSprite::AdventureTick(double DeltaTime)
 			// If we've attacked, don't actually do the move part
 			if (CountDown == 0)
 			{
-				SDL_Rect NewRect = GetScreenSpaceCustomRect();
-				for (int x = 0; x < AdventurePixelsToMove[AdventureMoveIndex]; x++)
-				{
-					NewRect.x += VelocityX;
-					if (EndOfLevelCountdown == 0 && bExitingLevel && Rect.x >= ExitLevelX)
-					{
-						bSpriteVisible = false;
-						EndOfLevelCountdown = 40;
-						VelocityX = 0;
-						VelocityY = 0;
-					}
-
-					if (TheMap->CheckCollision(NewRect, false, 0))
-					{
-						// Cap max speed when colliding with a wall
-						bCollided = true;
-						VelocityX = 0;
-						break;
-					}
-
-					PosX += VelocityX;
-				}
+				SubstepXDirection(AdventurePixelsToMove[AdventureMoveIndex]);
 			}
 		}
 
@@ -2440,7 +2398,7 @@ void PlayerSprite::AdventureTick(double DeltaTime)
 		AdventureMoveIndex = 0;
 	}
 	
-	/*if (InvincibleCount > 0)
+	if (InvincibleCount > 0)
 	{
 		InvincibleCount--;
 
@@ -2452,12 +2410,66 @@ void PlayerSprite::AdventureTick(double DeltaTime)
 		{
 			bSpriteVisible = false;
 		}
-	}*/
+	}
 
 	UpdateAdventureAnimation();
 
 	Sprite::Tick(DeltaTime);
 
+}
+
+bool PlayerSprite::SubstepXDirection(int NumPixels)
+{
+	SDL_Rect NewRect = GetScreenSpaceCustomRect();
+	for (int x = 0; x < NumPixels; x++)
+	{
+		NewRect.x += VelocityX;
+		if (EndOfLevelCountdown == 0 && bExitingLevel && Rect.x >= ExitLevelX)
+		{
+			bSpriteVisible = false;
+			EndOfLevelCountdown = 40;
+			VelocityX = 0;
+			VelocityY = 0;
+		}
+
+		if (TheMap->CheckCollision(NewRect, false, 0))
+		{
+			// Cap max speed when colliding with a wall			
+			VelocityX = 0;
+			return true;
+		}
+
+		PosX += VelocityX;
+	}
+
+	return false;
+}
+
+bool PlayerSprite::SubstepYDirection(int NumPixels)
+{
+	SDL_Rect NewRect = GetScreenSpaceCustomRect();
+	for (int x = 0; x < NumPixels; x++)
+	{
+		NewRect.y += VelocityY;
+		if (EndOfLevelCountdown == 0 && bExitingLevel && Rect.x >= ExitLevelX)
+		{
+			bSpriteVisible = false;
+			EndOfLevelCountdown = 40;
+			VelocityX = 0;
+			VelocityY = 0;
+		}
+
+		if (TheMap->CheckCollision(NewRect, false, 0))
+		{
+			// Cap max speed when colliding with a wall			
+			VelocityY = 0;
+			return true;
+		}
+
+		PosY += VelocityY;
+	}
+
+	return false;
 }
 
 void PlayerSprite::UpdateAdventureAnimation()
