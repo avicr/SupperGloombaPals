@@ -617,7 +617,7 @@ void SpriteSpawnPoint::SpawnSprite()
 		break;
 
 	case ST_FIRE:		
-		SimpleSprites.push_back(new AdventureFireSprite(Rect.x, Rect.y));
+		EnemySprites.push_back(new FireEnemySprite(this));
 		break;
 
 	case ST_SWORD:		

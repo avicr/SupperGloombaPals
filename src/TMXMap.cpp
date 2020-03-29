@@ -1117,6 +1117,7 @@ void TMXMap::EndLevel()
 	ReleaseAssets();
 }
 
+/** @param Rect Screenspace rect*/
 bool TMXMap::CheckCollision(SDL_Rect Rect, vector<TileInfo>& HitTileLocs, bool bIgnoreBorders, bool bSolidTilesOnly, float VelocityY)
 {	
 	/*if (ThePlayer-> ThePlayer->GetPosX() < TheMap->GetScrollX())

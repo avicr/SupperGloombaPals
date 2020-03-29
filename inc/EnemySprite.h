@@ -224,3 +224,26 @@ public:
 	virtual void GetBricked(int TileX, int TileY);
 	virtual void GetStarred(int TileX, int TileY);	
 };
+
+class FireEnemySprite : public EnemySprite
+{	
+public:
+	FireEnemySprite(class SpriteSpawnPoint* SpriteSpawner);
+
+	virtual void Tick(double DeltaTime);
+
+	virtual bool IsStompable() { return false; }
+	virtual bool IsFireable() { return false; }
+	virtual void GetBricked(int TileX, int TileY) { }
+};
+
+class FireBallEnemy : public EnemySprite
+{
+public:
+	FireBallEnemy(double PosX, double PosY);
+
+	virtual void Tick(double DeltaTime);
+	virtual bool IsStompable() { return false; }
+	virtual bool IsFireable() { return false; }
+	virtual void GetBricked(int TileX, int TileY) { }
+};

@@ -1271,6 +1271,20 @@ void PlayerSprite::SetColorModForAllTextures(SDL_Color ColorMod)
 	SDL_SetTextureColorMod(GResourceManager->PlayerGoombaTallTexture->Texture2, ColorMod.r, ColorMod.g, ColorMod.b);
 	SDL_SetTextureColorMod(GResourceManager->GoombaGrowTexture->Texture2, ColorMod.r, ColorMod.g, ColorMod.b);
 	SDL_SetTextureColorMod(GResourceManager->GoombaDuckTexture->Texture2, ColorMod.r, ColorMod.g, ColorMod.b);
+
+	SDL_SetTextureColorMod(GResourceManager->AdventureAttackDownTexture->Texture, ColorMod.r, ColorMod.g, ColorMod.b);
+	SDL_SetTextureColorMod(GResourceManager->AdventureAttackSideTexture->Texture, ColorMod.r, ColorMod.g, ColorMod.b);
+	SDL_SetTextureColorMod(GResourceManager->AdventureAttackUpTexture->Texture, ColorMod.r, ColorMod.g, ColorMod.b);
+	SDL_SetTextureColorMod(GResourceManager->AdventureDownTexture->Texture, ColorMod.r, ColorMod.g, ColorMod.b);
+	SDL_SetTextureColorMod(GResourceManager->AdventureUpTexture->Texture, ColorMod.r, ColorMod.g, ColorMod.b);
+	SDL_SetTextureColorMod(GResourceManager->AdventureSideTexture->Texture, ColorMod.r, ColorMod.g, ColorMod.b);
+
+	SDL_SetTextureColorMod(GResourceManager->AdventureAttackDownTexture->Texture2, ColorMod.r, ColorMod.g, ColorMod.b);
+	SDL_SetTextureColorMod(GResourceManager->AdventureAttackSideTexture->Texture2, ColorMod.r, ColorMod.g, ColorMod.b);
+	SDL_SetTextureColorMod(GResourceManager->AdventureAttackUpTexture->Texture2, ColorMod.r, ColorMod.g, ColorMod.b);
+	SDL_SetTextureColorMod(GResourceManager->AdventureDownTexture->Texture2, ColorMod.r, ColorMod.g, ColorMod.b);
+	SDL_SetTextureColorMod(GResourceManager->AdventureUpTexture->Texture2, ColorMod.r, ColorMod.g, ColorMod.b);
+	SDL_SetTextureColorMod(GResourceManager->AdventureSideTexture->Texture2, ColorMod.r, ColorMod.g, ColorMod.b);
 }
 
 void PlayerSprite::Stomp(Sprite* Other)
@@ -1584,7 +1598,7 @@ void PlayerSprite::CheckControlCollision()
 		}
 		else
 		{
-			if (Controls[i]->bTriggered && Controls[i]->bResetWhenPlayerLeaves)
+			if (Controls[i]->bTriggered && Controls[i]->bResetWhenPlayerLeaves && !TheMap->InMapWindow(Controls[i]->PosX, Controls[i]->PosY, Controls[i]->Width, Controls[i]->Height))
 			{
 				Controls[i]->bTriggered = false;
 			}
@@ -1784,7 +1798,8 @@ void PlayerSprite::UpdateWarpExitSequence()
 			PlayAnimation(GResourceManager->AdventureUpAnimation);
 			SetWidth(64);
 			SetHeight(64);			
-			CollisionRect = { 24, 35, 19, 19 };			
+			//CollisionRect = { 24, 35, 19, 19 };			
+			CollisionRect = { 16, 25, 32, 32 };
 			DeltaPos.y = -8;
 			StartDelta.y = 16;			
 		}
@@ -1921,6 +1936,7 @@ void PlayerSprite::AdventureTakeDamage()
 	}
 	else
 	{
+		Mix_PlayChannel(CHANNEL_FIREWORK, AdventureHurtSound, 0);
 		InvincibleCount = NUM_INVINCIBLE_FRAMES;
 	}
 }
@@ -2256,9 +2272,11 @@ void PlayerSprite::AdventureHandleInput(double DeltaTime)
 		bPlayerMoving = true;
 	}
 
+	// Attack with sword!!
 	if (bHasSword && IsButton2Pressed(state) && !bButtonPreviouslyPressed[0] && !CountDown)
 	{
-		bAdventureAttacking = true;
+		Mix_PlayChannel(CHANNEL_JUMP, AdventureSwordSound, 0);
+		bAdventureAttacking = true;		
 		CountDown = 15;		
 	}
 
@@ -2293,36 +2311,100 @@ void PlayerSprite::AdventureTick(double DeltaTime)
 		UpdateGetTriforceAnimation();
 		return;
 	}
-	VelocityX = 0;
-	VelocityY = 0;
 
+	VelocityX = 0;
+	VelocityY = 0;	
+	
 	if (InvincibleCount > 0)
 	{
-		if (InvincibleCount <= NUM_INVINCIBLE_FRAMES && InvincibleCount > NUM_INVINCIBLE_FRAMES - 10)
+		SDL_Color ColorMod;		
+
+		if (InvincibleCount % 8)
+		{
+			ColorMod.a = 200;
+			ColorMod.r = 200;
+			ColorMod.g = 125;
+			ColorMod.b = 0;
+		}
+		else
+		{
+			ColorMod.a = 255;
+			ColorMod.r = 255;
+			ColorMod.g = 255;
+			ColorMod.b = 255;
+		}
+		SetColorModForAllTextures(ColorMod);		
+
+		InvincibleCount--;
+		
+		// Last frame of invincible count
+		if (InvincibleCount == NUM_INVINCIBLE_FRAMES - 10)
+		{
+			// Flip the character moving direction since we are done getting knocked back
+			if (MovingFlags == MOVING_DOWN)
+			{
+				MovingFlags = MOVING_UP;
+			}
+			else if (MovingFlags == MOVING_LEFT)
+			{
+				MovingFlags = MOVING_RIGHT;
+			}
+			else if (MovingFlags == MOVING_UP)
+			{
+				MovingFlags = MOVING_DOWN;
+			}
+			else if (MovingFlags == MOVING_RIGHT)
+			{
+				MovingFlags = MOVING_LEFT;				
+			}
+		}		
+
+		if (InvincibleCount == 120)
+		{
+			InvincibleCount = 0;
+			ColorMod.a = 0;
+			ColorMod.r = 255;
+			ColorMod.g = 255;
+			ColorMod.b = 255;
+			SetColorModForAllTextures(ColorMod);
+		}
+	}
+
+	if (InvincibleCount > NUM_INVINCIBLE_FRAMES - 10)
+	{
+		//if (InvincibleCount <= NUM_INVINCIBLE_FRAMES && )
 		{
 			int MoveFrame = NUM_INVINCIBLE_FRAMES - InvincibleCount;
 
-			int PixelsToMove = AdventurePixelsToMoveWhenHurt[MoveFrame];
+			int PixelsToMove = AdventurePixelsToMoveWhenHurt[MoveFrame];			
 
+			// On the first frame we should probably cache the old direction we're going in so we can restore it
 			if (CurrentDirection == DIRECTION_DOWN)
 			{
 				VelocityY = -PixelsToMove;
+				SubstepYDirection(VelocityY);
+				MovingFlags = MOVING_UP;
 			}
 			else if (CurrentDirection == DIRECTION_UP)
 			{
 				VelocityY = PixelsToMove;
+				SubstepYDirection(VelocityY);
+				MovingFlags = MOVING_DOWN;
 			}
 			if (CurrentDirection == DIRECTION_LEFT)
 			{
 				VelocityX = PixelsToMove;
+				SubstepXDirection(VelocityX);
+				MovingFlags = MOVING_RIGHT;
 			}
 			if (CurrentDirection == DIRECTION_RIGHT)
 			{
 				VelocityX = -PixelsToMove;
-			}
+				SubstepXDirection(VelocityX);
+				MovingFlags = MOVING_LEFT;
+			}			
 		}
-
-		InvincibleCount--;
+		
 		return;
 	}
 	else if (MovingFlags)
@@ -2331,7 +2413,7 @@ void PlayerSprite::AdventureTick(double DeltaTime)
 		{
 			int NumPixelsToMove = ADVENTURE_MOVE_PIXELS_PER_FRAME;
 			bool bCollided = false;;
-
+			
 			// We can't look right/left if we are attacking and facing up/down
 			if (CountDown <= 0 || (CurrentDirection != DIRECTION_LEFT && CurrentDirection != DIRECTION_RIGHT))
 			{
@@ -2372,9 +2454,7 @@ void PlayerSprite::AdventureTick(double DeltaTime)
 					CurrentDirection = DIRECTION_LEFT;
 				}
 				SetFlip(VelocityX >= 1 ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
-			}
-
-			
+			}			
 			
 			// If we've attacked, don't actually do the move part
 			if (CountDown == 0)
@@ -2382,9 +2462,7 @@ void PlayerSprite::AdventureTick(double DeltaTime)
 				SubstepXDirection(AdventurePixelsToMove[AdventureMoveIndex]);
 			}
 		}
-
-		Rect.x = PosX;
-		Rect.y = PosY;
+		
 		AdventureMoveIndex++;
 
 		if (AdventureMoveIndex > 15)
@@ -2396,21 +2474,7 @@ void PlayerSprite::AdventureTick(double DeltaTime)
 	if (CountDown)
 	{
 		AdventureMoveIndex = 0;
-	}
-	
-	if (InvincibleCount > 0)
-	{
-		InvincibleCount--;
-
-		if (InvincibleCount == 0 || InvincibleCount % 2 == 0)
-		{
-			bSpriteVisible = true;
-		}
-		else
-		{
-			bSpriteVisible = false;
-		}
-	}
+	}	
 
 	UpdateAdventureAnimation();
 
@@ -2421,9 +2485,16 @@ void PlayerSprite::AdventureTick(double DeltaTime)
 bool PlayerSprite::SubstepXDirection(int NumPixels)
 {
 	SDL_Rect NewRect = GetScreenSpaceCustomRect();
-	for (int x = 0; x < NumPixels; x++)
+	for (int x = 0; x < abs(NumPixels); x++)
 	{
-		NewRect.x += VelocityX;
+		if (VelocityX > 0)
+		{
+			NewRect.x++;
+		}
+		else
+		{
+			NewRect.x--;
+		}
 		if (EndOfLevelCountdown == 0 && bExitingLevel && Rect.x >= ExitLevelX)
 		{
 			bSpriteVisible = false;
@@ -2439,7 +2510,15 @@ bool PlayerSprite::SubstepXDirection(int NumPixels)
 			return true;
 		}
 
-		PosX += VelocityX;
+		if (VelocityX > 0)
+		{
+			PosX++;
+		}
+		else
+		{
+			PosX--;
+		}
+		Rect.x = PosX;		
 	}
 
 	return false;
@@ -2448,9 +2527,18 @@ bool PlayerSprite::SubstepXDirection(int NumPixels)
 bool PlayerSprite::SubstepYDirection(int NumPixels)
 {
 	SDL_Rect NewRect = GetScreenSpaceCustomRect();
-	for (int x = 0; x < NumPixels; x++)
+
+	for (int x = 0; x < abs(NumPixels); x++)
 	{
-		NewRect.y += VelocityY;
+		if (VelocityY > 0)
+		{
+			NewRect.y++;
+		}
+		else
+		{
+			NewRect.y--;
+		}
+
 		if (EndOfLevelCountdown == 0 && bExitingLevel && Rect.x >= ExitLevelX)
 		{
 			bSpriteVisible = false;
@@ -2466,7 +2554,15 @@ bool PlayerSprite::SubstepYDirection(int NumPixels)
 			return true;
 		}
 
-		PosY += VelocityY;
+		if (VelocityY > 0)
+		{
+			PosY++;
+		}
+		else
+		{
+			PosY--;
+		}
+		Rect.y = PosY;
 	}
 
 	return false;

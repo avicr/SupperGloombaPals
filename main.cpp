@@ -90,6 +90,22 @@ SDL_Point FireworkLocations[] = {
 	{ 266, 461 },
 };
 
+//LevelInfo Levels[] = {
+//	///*Level 1*/		   { LEVEL_PATH + (string)"Level1_1_64x64Experimental.tmx", "1-1", 2, 1 },	      
+//	/*Level 1*/{ LEVEL_PATH + (string)"Level1_1_64x64Experimental.tmx", "1-1", 2, 1 },
+//	/*Secret Level 1*/ { LEVEL_PATH + (string)"Level2.tmx"        , "1-1", 2, 3 },
+//	/*Level 2*/		   { LEVEL_PATH + (string)"Level2.tmx"        , "1-1", 4, 3 },
+//	/*Secret Level 2*/ { LEVEL_PATH + (string)"Level2S.tmx"       , "1-1", 4, 5 },
+//	/*Level 3*/		   { LEVEL_PATH + (string)"Level3.tmx"        , "1-1", 6, 5 },
+//	/*Secret Level 3*/ { LEVEL_PATH + (string)"Level3S.tmx"       , "1-1", 6, 7 },
+//	/*Level 4*/		   { LEVEL_PATH + (string)"Level4.tmx"        , "1-1", 8, 7 },
+//	/*Secret Level 4*/ { LEVEL_PATH + (string)"Level1_1_64x64.tmx", "1-1", 8, 9 },
+//	/*Level 5*/	 	   { LEVEL_PATH + (string)"Level1_1_64x64.tmx", "1-1", 10, 9 },
+//	/*Secret Level 5*/ { LEVEL_PATH + (string)"Level2.tmx"        , "1-1", 10, 10 },
+//	/*Level 11*/	   { LEVEL_PATH + (string)"Level1_1_64x64.tmx", "1-1", -1, -1 },
+//	/*Level 12*/       { LEVEL_PATH + (string)"matt.tmx", "?-?", -1, -1 },
+//};
+
 LevelInfo Levels[] = {
 ///*Level 1*/		   { LEVEL_PATH + (string)"Level1_1_64x64Experimental.tmx", "1-1", 2, 1 },	      
 /*Level 1*/{ LEVEL_PATH + (string)"Level1_1_64x64Experimental.tmx", "1-1", 2, 1 },
@@ -185,6 +201,9 @@ Mix_Chunk* PipeSound = NULL;
 Mix_Chunk* FlagPoleSound = NULL;
 Mix_Chunk* TextSound = NULL;
 Mix_Chunk* FireworkSound = NULL;
+Mix_Chunk* AdventureHurtSound = NULL;
+Mix_Chunk* AdventureSwordSound = NULL;
+
 
 Mix_Music* BGMusic = NULL;
 Mix_Music* ChaseMusic = NULL;
@@ -580,16 +599,16 @@ void HandleCheatInput(SDL_Event& TheEvent)
 {
 	if (TheEvent.key.state == SDL_PRESSED && TheEvent.key.keysym.scancode == SDL_SCANCODE_1)
 	{
-		//bRenderCollision = !bRenderCollision;
+		bRenderCollision = !bRenderCollision;
 		// Hopefully not a memory leak!!!!!
-		if (Window2Mode == WINDOW2_MODE_NONE)
+		/*if (Window2Mode == WINDOW2_MODE_NONE)
 		{
 			ShowWindow2(WINDOW2_MODE_TRANSPARENT, true);
 		}
 		else
 		{
 			ShowWindow2(WINDOW2_MODE_NONE, false);
-		}
+		}*/
 	}
 
 	// Draw deltatime
@@ -970,6 +989,8 @@ void InitSDL()
 			FlagPoleSound = Mix_LoadWAV("resource/sounds/flagpole.wav");
 			TextSound = Mix_LoadWAV("resource/sounds/LOZ_Text.wav");
 			FireworkSound = Mix_LoadWAV("resource/sounds/firework.wav");
+			AdventureHurtSound = Mix_LoadWAV("resource/sounds/LOZ_Link_Hurt.wav");
+			AdventureSwordSound = Mix_LoadWAV("resource/sounds/LOZ_Sword_Slash.wav");
 			
 			BGMusic = Mix_LoadMUS("resource/sounds/bgmusic.wav");
 			ChaseMusic = Mix_LoadMUS("resource/sounds/chase.wav");
@@ -994,6 +1015,9 @@ void InitSDL()
 			Mix_VolumeChunk(FlagPoleSound, VOLUME_NORMAL);
 			Mix_VolumeChunk(TextSound, VOLUME_NORMAL);
 			Mix_VolumeChunk(FireworkSound, VOLUME_NORMAL);
+			Mix_VolumeChunk(AdventureHurtSound, VOLUME_NORMAL + 20);
+			Mix_VolumeChunk(AdventureSwordSound, VOLUME_NORMAL + 20);
+
 			Mix_VolumeMusic(VOLUME_NORMAL);
 			
 			//Mix_Volume(-1, 0);
@@ -1081,6 +1105,8 @@ void CleanUp()
 	Mix_FreeChunk(FlagPoleSound);
 	Mix_FreeChunk(TextSound);
 	Mix_FreeChunk(FireworkSound);
+	Mix_FreeChunk(AdventureHurtSound);
+	Mix_FreeChunk(AdventureSwordSound);
 
 	Mix_FreeMusic(BGMusic);
 	Mix_FreeMusic(ChaseMusic);

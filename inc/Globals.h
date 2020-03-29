@@ -100,6 +100,9 @@ enum eSpecialEvent
 
 #define TILE_TRANSPARENT_COLLISION 9
 
+#define FIRE_ENEMY_SHOOT_FIRE_BALL_COUNT_DOWN_BASE 220
+#define FIRE_ENEMY_SHOOT_FIRE_BALL_COUNT_DOWN_RANDOM 80
+
 struct Glyph
 {
 	int Width;
@@ -184,6 +187,8 @@ extern Mix_Chunk* PipeSound;
 extern Mix_Chunk* FlagPoleSound;
 extern Mix_Chunk* TextSound;
 extern Mix_Chunk* FireworkSound;
+extern Mix_Chunk* AdventureHurtSound;
+extern Mix_Chunk* AdventureSwordSound;
 
 extern Mix_Music *BGMusic;
 extern Mix_Music *ChaseMusic;

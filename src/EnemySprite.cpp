@@ -904,13 +904,286 @@ GiantOkto::~GiantOkto()
 
 // Wait 
 
+//void GiantOkto::Tick(double DeltaTime)
+//{
+//	if (ThePlayer->IsWarping())
+//	{
+//		return;
+//	}
+//	
+//	if (DyingCount == 0 && !bGotBricked)
+//	{
+//		PhysicsSprite::Tick(DeltaTime);
+//		HandleMovement();
+//
+//		CountDown--;
+//
+//		if (CurrentState == GOS_FADE_IN_EYES)
+//		{
+//			float Alpha = EaseLerp(OKTO_FADE_IN - CountDown, 0, 255, OKTO_FADE_IN);
+//			Alpha = 255 * Ease2((OKTO_FADE_IN - CountDown) / OKTO_FADE_IN);
+//			SDL_SetTextureAlphaMod(Texture, round(Alpha));
+//
+//			if (CountDown <= 0)
+//			{
+//				LeaveState(GOS_FADE_IN_EYES);
+//				EnterState(GOS_FADE_IN_BODY);
+//			}
+//		}
+//		else if (CurrentState == GOS_FADE_IN_BODY)
+//		{
+//			float Alpha = EaseLerp(OKTO_FADE_IN - CountDown, 0, 255, OKTO_FADE_IN);
+//			Alpha = 255 * Ease2((OKTO_FADE_IN - CountDown) / OKTO_FADE_IN);
+//			SDL_SetTextureAlphaMod(Texture, round(Alpha));
+//
+//			if (CountDown <= 0)
+//			{
+//				LeaveState(GOS_FADE_IN_BODY);
+//				EnterState(GOS_JUMP_BACK);
+//			}
+//		}
+//		else if (CurrentState == GOS_JUMP_BACK)
+//		{
+//			if (CountDown == 70)
+//			{
+//				SetAnimationPlayRate(2);
+//			}
+//			else  if (CountDown == 60)
+//			{
+//				if (CurrentDirection == DIRECTION_DOWN)
+//				{
+//					VelocityY = -26;
+//				}
+//				else if (CurrentDirection == DIRECTION_UP)
+//				{
+//					VelocityY = 26;
+//				}
+//				else if (CurrentDirection == DIRECTION_RIGHT)
+//				{
+//					VelocityX = -26;
+//				}
+//				else if (CurrentDirection == DIRECTION_LEFT)
+//				{
+//					VelocityX = 26;
+//				}
+//			}
+//			else if (CountDown == 0)
+//			{
+//				SetAnimationPlayRate(1);
+//				LeaveState(GOS_JUMP_BACK);
+//				EnterState(GOS_WAIT_TO_MOVE_TO_EDGE);
+//			}
+//		}
+//		else if (CurrentState == GOS_WAIT_TO_MOVE_TO_EDGE)
+//		{
+//			if (CountDown == 0)
+//			{
+//				// Pick which wall to move to
+//				LeaveState(GOS_WAIT_TO_MOVE_TO_EDGE);
+//				EnterState(GOS_MOVE_TO_EDGE);
+//			}
+//		}
+//		else if (CurrentState == GOS_MOVE_TO_EDGE)
+//		{
+//			bool bDone = false;
+//			// If we're moving to an edge, stop at the appropriate location
+//
+//			if (CurrentDirection == DIRECTION_UP)
+//			{
+//				if (PosY <= TheMap->GetScrollY() + 816)
+//				{
+//					bDone = true;
+//				}
+//			}
+//			else if (CurrentDirection == DIRECTION_DOWN)
+//			{
+//				if (PosY >= TheMap->GetScrollY() + 200)
+//				{
+//					bDone = true;
+//				}
+//			}
+//			else if (CurrentDirection == DIRECTION_LEFT)
+//			{
+//				if (PosX <= TheMap->GetScrollX() + 928)
+//				{
+//					bDone = true;
+//				}
+//			}
+//			else if (CurrentDirection == DIRECTION_RIGHT)
+//			{
+//				if (PosX >= TheMap->GetScrollX())
+//				{
+//					bDone = true;
+//				}
+//			}
+//
+//			if (bDone)
+//			{
+//				VelocityY = 0;
+//				VelocityX = 0;
+//				LeaveState(GOS_MOVE_TO_EDGE);
+//				EnterState(GOS_WAIT_TO_ATTACK);
+//			}
+//
+//		}
+//		else if (CurrentState == GOS_WAIT_TO_ATTACK)
+//		{
+//			if (CountDown == 0)
+//			{
+//				LeaveState(GOS_WAIT_TO_ATTACK);
+//				EnterState(GOS_JUMP_BACK);
+//			}
+//		}
+//	}
+//	else if (bGotBricked)
+//	{
+//		PosX += VelocityX;
+//		PosY += VelocityY;
+//		Rect.x = PosX;// -TheMap->GetScrollX();
+//		Rect.y = PosY;
+//		VelocityY += BASE_FALL_VELOCITY / 2;
+//		Flip = SDL_FLIP_VERTICAL;
+//		if (PosY >= TheMap->GetHeightInPixels())
+//		{
+//			bPendingDelete = true;
+//		}
+//
+//	}
+//	else
+//	{
+//		DyingCount++;
+//
+//		if (DyingCount == DYING_COUNT)
+//		{
+//			bPendingDelete = true;
+//		}
+//	}
+//}
+//
+//void GiantOkto::EnterState(eGiantOktoState NewState)
+//{
+//	int CountDownModifer = 0;
+//	eOktoAttackWall TargetWallRandom;
+//
+//	switch (NewState)
+//	{
+//	case GOS_FADE_IN_EYES:
+//		Mix_HaltMusic();		
+//		DyingCount = 0;
+//		CountDown = OKTO_FADE_IN;
+//		ScaleCountDown = 0;		
+//		break;
+//
+//	case GOS_FADE_IN_BODY:
+//		DyingCount = 0;
+//		CountDown = OKTO_FADE_IN;
+//		ScaleCountDown = 0;
+//
+//		SetTexture(GResourceManager->OktoTexture->Texture);
+//		SDL_SetTextureBlendMode(Texture, SDL_BLENDMODE_BLEND);
+//		SDL_SetTextureAlphaMod(Texture, 0);
+//		break;
+//
+//	case GOS_JUMP_BACK:						
+//		CountDown = OKTO_INITIAL_JUMP_BACK_COUNT;
+//		SetAnimationPlayRate(1);			
+//		break;
+//	case GOS_WAIT_TO_MOVE_TO_EDGE:
+//	case GOS_WAIT_TO_ATTACK:
+//		CountDownModifer = rand() % OKTO_ATTACK_COOL_DOWN_RANDOM_MODIFIER;
+//
+//		if (rand() % 2)
+//		{
+//			CountDownModifer *= -1;
+//		}
+//
+//		CountDown = OKTO_ATTACK_COOL_DOWN_TIME + CountDownModifer;
+//		break;
+//	case GOS_MOVE_TO_EDGE:
+//		TargetWallRandom = (eOktoAttackWall)(rand() % 4);
+//
+//		while (TargetWallRandom == TargetWall)
+//		{
+//			TargetWallRandom = (eOktoAttackWall)(rand() % 4);
+//		}
+//		TargetWall = TargetWallRandom;
+//		CurrentDirection = (eDirection)TargetWall;
+//
+//		if (CurrentDirection == DIRECTION_UP || CurrentDirection == DIRECTION_DOWN)
+//		{
+//			PlayAnimation(GResourceManager->OktoAnimation);
+//
+//			if (CurrentDirection == DIRECTION_UP)
+//			{
+//				SetFlip(SDL_FLIP_VERTICAL);
+//				SetPosition(TheMap->GetScrollX() + 449, TheMap->GetScrollY() + 1000);
+//				VelocityY = -OKTO_MOVE_TO_LEDGE_VELOCITY;
+//			}
+//			else
+//			{
+//				SetFlip(SDL_FLIP_NONE);
+//				SetPosition(TheMap->GetScrollX() + 449, TheMap->GetScrollY() - 256);
+//				VelocityY = OKTO_MOVE_TO_LEDGE_VELOCITY;
+//			}
+//		}
+//		else if (CurrentDirection == DIRECTION_RIGHT || CurrentDirection == DIRECTION_LEFT)
+//		{
+//			PlayAnimation(GResourceManager->OktoSideAnimation);
+//
+//			if (CurrentDirection == DIRECTION_LEFT)
+//			{
+//				SetFlip(SDL_FLIP_HORIZONTAL);
+//				SetPosition(TheMap->GetScrollX() + 1172, TheMap->GetScrollY() + 512);
+//				VelocityX = -OKTO_MOVE_TO_LEDGE_VELOCITY;
+//			}
+//			else
+//			{
+//				SetFlip(SDL_FLIP_NONE);
+//				SetPosition(TheMap->GetScrollX() - 256, TheMap->GetScrollY() + 512);
+//				VelocityX = OKTO_MOVE_TO_LEDGE_VELOCITY;
+//			}
+//		}
+//
+//		break;
+//	default:
+//		break;
+//	}
+//	
+//	CurrentState = NewState;
+//}
+//
+//void GiantOkto::LeaveState(eGiantOktoState PreviousState)
+//{
+//	switch (PreviousState)
+//	{
+//	case GOS_FADE_IN_BODY:
+//		CurrentDirection = DIRECTION_DOWN;
+//		break;
+//	case GOS_JUMP_BACK:
+//		if (CurrentDirection == DIRECTION_DOWN || CurrentDirection == DIRECTION_UP)
+//		{
+//			VelocityY = 0;
+//		}
+//		else if (CurrentDirection == DIRECTION_LEFT || CurrentDirection == DIRECTION_RIGHT)
+//		{
+//			VelocityX = 0;
+//		}
+//		break;
+//	case GOS_WAIT_TO_ATTACK:
+//
+//		break;
+//	default:
+//		break;
+//	}
+//}
+
 void GiantOkto::Tick(double DeltaTime)
 {
 	if (ThePlayer->IsWarping())
 	{
 		return;
 	}
-	
+
 	if (DyingCount == 0 && !bGotBricked)
 	{
 		PhysicsSprite::Tick(DeltaTime);
@@ -992,20 +1265,23 @@ void GiantOkto::Tick(double DeltaTime)
 			{
 				if (PosY <= TheMap->GetScrollY() + 816)
 				{
+					
 					bDone = true;
 				}
 			}
 			else if (CurrentDirection == DIRECTION_DOWN)
 			{
-				if (PosY >= TheMap->GetScrollY() + 200)
+				if (PosY >= TheMap->GetScrollY() + 210)
 				{
+					
 					bDone = true;
 				}
 			}
 			else if (CurrentDirection == DIRECTION_LEFT)
 			{
-				if (PosX <= TheMap->GetScrollX() + 928)
+				if (PosX <= TheMap->GetScrollX() + 916)
 				{
+					
 					bDone = true;
 				}
 			}
@@ -1013,6 +1289,7 @@ void GiantOkto::Tick(double DeltaTime)
 			{
 				if (PosX >= TheMap->GetScrollX())
 				{
+					
 					bDone = true;
 				}
 			}
@@ -1068,10 +1345,10 @@ void GiantOkto::EnterState(eGiantOktoState NewState)
 	switch (NewState)
 	{
 	case GOS_FADE_IN_EYES:
-		Mix_HaltMusic();		
+		Mix_HaltMusic();
 		DyingCount = 0;
 		CountDown = OKTO_FADE_IN;
-		ScaleCountDown = 0;		
+		ScaleCountDown = 0;
 		break;
 
 	case GOS_FADE_IN_BODY:
@@ -1084,9 +1361,9 @@ void GiantOkto::EnterState(eGiantOktoState NewState)
 		SDL_SetTextureAlphaMod(Texture, 0);
 		break;
 
-	case GOS_JUMP_BACK:						
+	case GOS_JUMP_BACK:
 		CountDown = OKTO_INITIAL_JUMP_BACK_COUNT;
-		SetAnimationPlayRate(1);			
+		SetAnimationPlayRate(1);
 		break;
 	case GOS_WAIT_TO_MOVE_TO_EDGE:
 	case GOS_WAIT_TO_ATTACK:
@@ -1116,13 +1393,13 @@ void GiantOkto::EnterState(eGiantOktoState NewState)
 			if (CurrentDirection == DIRECTION_UP)
 			{
 				SetFlip(SDL_FLIP_VERTICAL);
-				SetPosition(TheMap->GetScrollX() + 449, TheMap->GetScrollY() + 1000);
+				SetPosition(ThePlayer->GetPosX() - 32, TheMap->GetScrollY() + 1000);
 				VelocityY = -OKTO_MOVE_TO_LEDGE_VELOCITY;
 			}
 			else
 			{
 				SetFlip(SDL_FLIP_NONE);
-				SetPosition(TheMap->GetScrollX() + 449, TheMap->GetScrollY() - 256);
+				SetPosition(ThePlayer->GetPosX() - 32, TheMap->GetScrollY() - 256);
 				VelocityY = OKTO_MOVE_TO_LEDGE_VELOCITY;
 			}
 		}
@@ -1133,13 +1410,13 @@ void GiantOkto::EnterState(eGiantOktoState NewState)
 			if (CurrentDirection == DIRECTION_LEFT)
 			{
 				SetFlip(SDL_FLIP_HORIZONTAL);
-				SetPosition(TheMap->GetScrollX() + 1172, TheMap->GetScrollY() + 512);
+				SetPosition(TheMap->GetScrollX() + 1172, ThePlayer->GetPosY() - 32);
 				VelocityX = -OKTO_MOVE_TO_LEDGE_VELOCITY;
 			}
 			else
 			{
 				SetFlip(SDL_FLIP_NONE);
-				SetPosition(TheMap->GetScrollX() - 256, TheMap->GetScrollY() + 512);
+				SetPosition(TheMap->GetScrollX() - 256, ThePlayer->GetPosY() - 32);
 				VelocityX = OKTO_MOVE_TO_LEDGE_VELOCITY;
 			}
 		}
@@ -1148,7 +1425,7 @@ void GiantOkto::EnterState(eGiantOktoState NewState)
 	default:
 		break;
 	}
-	
+
 	CurrentState = NewState;
 }
 
@@ -1176,7 +1453,6 @@ void GiantOkto::LeaveState(eGiantOktoState PreviousState)
 		break;
 	}
 }
-
 
 void GiantOkto::Render(SDL_Renderer* Renderer, int ResourceNum)
 {
@@ -1259,7 +1535,7 @@ void GiantOkto::GetBricked(int TileX, int TileY)
 		EnemySprite::GetBricked(TileX, TileY);
 		// TODO: Spawn triforce
 
-		ItemSprites.push_back(new TriforceItemSprite(PosX, PosY));
+		ItemSprites.push_back(new TriforceItemSprite(3744, 2404));
 	}
 }
 
@@ -1697,7 +1973,76 @@ void SunEnemySprite::GetBricked(int TileX, int TileY)
 	}
 }
 
-void SunEnemySprite::GetStarred(int TileX, int TileY)
+void SunEnemySprite::GetStarred(int TileX, int TileY) 
 {
 	
+	
+}
+
+FireEnemySprite::FireEnemySprite(SpriteSpawnPoint* SpriteSpawner) : EnemySprite(NULL)
+{
+	Sprite::Sprite(GResourceManager->AdventureFireTexture->Texture);
+	SetPosition(SpriteSpawner->GetPosX(), SpriteSpawner->GetPosY());
+	PlayAnimation(GResourceManager->AdventureFireAnimation);
+	SetWidth(64);
+	SetHeight(64);
+
+	CollisionRect = { 16, 16, 48, 48 };
+	
+	CountDown = FIRE_ENEMY_SHOOT_FIRE_BALL_COUNT_DOWN_BASE + rand() % FIRE_ENEMY_SHOOT_FIRE_BALL_COUNT_DOWN_RANDOM - FIRE_ENEMY_SHOOT_FIRE_BALL_COUNT_DOWN_RANDOM;
+}
+
+void FireEnemySprite::Tick(double DeltaTime)
+{
+	EnemySprite::Tick(DeltaTime);
+
+	// Only shoot fireballs if we have the sword
+	if (ThePlayer->HasSword())
+	{
+		CountDown--;
+		if (CountDown == 0)
+		{
+			/*EnemySpawnPoint* NewBlock = new EnemySpawnPoint(ENEMY_GOOMBA, GetPosX(), GetPosY());
+			SimpleSprites.push_back(NewBlock);
+			NewBlock->SpawnEnemy();*/
+
+			EnemySprites.push_back(new FireBallEnemy(GetPosX() + 24, GetPosY() + 24));
+			CountDown = FIRE_ENEMY_SHOOT_FIRE_BALL_COUNT_DOWN_BASE + rand() % FIRE_ENEMY_SHOOT_FIRE_BALL_COUNT_DOWN_RANDOM - FIRE_ENEMY_SHOOT_FIRE_BALL_COUNT_DOWN_RANDOM;
+		}
+	}
+}
+
+FireBallEnemy::FireBallEnemy(double PosX, double PosY) : EnemySprite(NULL)
+{
+	Sprite::Sprite(GResourceManager->FireTexture->Texture);
+	PlayAnimation(GResourceManager->FireAnimation);
+
+	SetPosition(PosX, PosY);
+	SetWidth(32);
+	SetHeight(32);
+
+	CollisionRect = { 4, 4, 24, 24 };
+	VelocityX = 1;
+	VelocityY = 1;
+
+	float DirectionVectorX = ThePlayer->GetPosX() - PosX + 16;
+	float DirectionVectorY = ThePlayer->GetPosY() - PosY + 16;
+	float Length = sqrt((DirectionVectorX * DirectionVectorX) + (DirectionVectorY * DirectionVectorY));
+
+	// Normalize and set velocities
+	VelocityX = DirectionVectorX / Length * 6;
+	VelocityY = DirectionVectorY / Length * 6;
+
+}
+
+void FireBallEnemy::Tick(double DeltaTime)
+{
+	Sprite::Tick(DeltaTime);
+	TickAnimation(DeltaTime);
+
+	PosX += VelocityX;
+	PosY += VelocityY;
+
+	Rect.x = (int)round(PosX);
+	Rect.y = (int)round(PosY);
 }
