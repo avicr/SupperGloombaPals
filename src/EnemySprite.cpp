@@ -6,6 +6,7 @@
 #include "../inc/SpriteList.h"
 #include "../inc/TMXMap.h"
 #include "../inc/Game.h"
+#include "../inc/Animation.h"
 
 #define PI 3.14159265
 #define MUSHROOM_COUNTDOWN 420
@@ -1989,7 +1990,7 @@ FireEnemySprite::FireEnemySprite(SpriteSpawnPoint* SpriteSpawner) : EnemySprite(
 
 	CollisionRect = { 16, 16, 48, 48 };
 	
-	CountDown = FIRE_ENEMY_SHOOT_FIRE_BALL_COUNT_DOWN_BASE + rand() % FIRE_ENEMY_SHOOT_FIRE_BALL_COUNT_DOWN_RANDOM - FIRE_ENEMY_SHOOT_FIRE_BALL_COUNT_DOWN_RANDOM;
+	CountDown = FIRE_ENEMY_SHOOT_FIRE_BALL_COUNT_DOWN_BASE + rand() % FIRE_ENEMY_SHOOT_FIRE_BALL_COUNT_DOWN_RANDOM - FIRE_ENEMY_SHOOT_FIRE_BALL_COUNT_DOWN_RANDOM + 240;
 }
 
 void FireEnemySprite::Tick(double DeltaTime)
@@ -2002,40 +2003,53 @@ void FireEnemySprite::Tick(double DeltaTime)
 		CountDown--;
 		if (CountDown == 0)
 		{
-			/*EnemySpawnPoint* NewBlock = new EnemySpawnPoint(ENEMY_GOOMBA, GetPosX(), GetPosY());
-			SimpleSprites.push_back(NewBlock);
-			NewBlock->SpawnEnemy();*/
-
-			EnemySprites.push_back(new FireBallEnemy(GetPosX() + 24, GetPosY() + 24));
+			ShootFireball();
+	
+			// Add an extra 240 frames to let the giant okto spawn in
 			CountDown = FIRE_ENEMY_SHOOT_FIRE_BALL_COUNT_DOWN_BASE + rand() % FIRE_ENEMY_SHOOT_FIRE_BALL_COUNT_DOWN_RANDOM - FIRE_ENEMY_SHOOT_FIRE_BALL_COUNT_DOWN_RANDOM;
 		}
 	}
 }
 
-FireBallEnemy::FireBallEnemy(double PosX, double PosY) : EnemySprite(NULL)
+void FireEnemySprite::ShootFireball()
 {
-	Sprite::Sprite(GResourceManager->FireTexture->Texture);
-	PlayAnimation(GResourceManager->FireAnimation);
-
-	SetPosition(PosX, PosY);
-	SetWidth(32);
-	SetHeight(32);
-
-	CollisionRect = { 4, 4, 24, 24 };
-	VelocityX = 1;
-	VelocityY = 1;
-
 	float DirectionVectorX = ThePlayer->GetPosX() - PosX + 16;
 	float DirectionVectorY = ThePlayer->GetPosY() - PosY + 16;
 	float Length = sqrt((DirectionVectorX * DirectionVectorX) + (DirectionVectorY * DirectionVectorY));
 
 	// Normalize and set velocities
-	VelocityX = DirectionVectorX / Length * 6;
-	VelocityY = DirectionVectorY / Length * 6;
+	float VelX = DirectionVectorX / Length * 7;
+	float VelY = DirectionVectorY / Length * 7;
 
+	EnemySprites.push_back(new ProjectileEnemy(GetPosX() + 24, GetPosY() + 24, 32, 32, VelX, VelY, GResourceManager->FireAnimation));
 }
 
-void FireBallEnemy::Tick(double DeltaTime)
+ProjectileEnemy::ProjectileEnemy(double PosX, double PosY, int Width, int Height, float InitialVelocityX, float InitialVelocityY, SDL_Texture* InTexture) : EnemySprite(NULL)
+{
+	Sprite::Sprite(InTexture);	
+	Setup(PosX, PosY, Width, Height, InitialVelocityX, InitialVelocityY);
+}
+
+ProjectileEnemy::ProjectileEnemy(double PosX, double PosY, int Width, int Height, float InitialVelocityX, float InitialVelocityY, AnimationResource* Animation) : EnemySprite(NULL)
+{
+	Sprite::Sprite(Animation->GetFrame(0)->GetTexture(0));
+	PlayAnimation(Animation);
+	Setup(PosX, PosY, Width, Height, InitialVelocityX, InitialVelocityY);
+}
+
+void ProjectileEnemy::Setup(double PosX, double PosY, int Width, int Height, float InitialVelocityX, float InitialVelocityY)
+{
+	SetPosition(PosX, PosY);
+	SetWidth(Width);
+	SetHeight(Height);
+
+	// Should we pass in a collision rect?!
+	CollisionRect = { 4, 4, 24, 24 };
+	VelocityX = InitialVelocityX;
+	VelocityY = InitialVelocityY;	
+}
+
+void ProjectileEnemy::Tick(double DeltaTime)
 {
 	Sprite::Tick(DeltaTime);
 	TickAnimation(DeltaTime);

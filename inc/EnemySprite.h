@@ -235,15 +235,19 @@ public:
 	virtual bool IsStompable() { return false; }
 	virtual bool IsFireable() { return false; }
 	virtual void GetBricked(int TileX, int TileY) { }
+	virtual void ShootFireball();
 };
 
-class FireBallEnemy : public EnemySprite
+class ProjectileEnemy : public EnemySprite
 {
 public:
-	FireBallEnemy(double PosX, double PosY);
-
+	ProjectileEnemy(double PosX, double PosY, int Width, int Height, float InitialVelocityX, float InitialVelocityY, SDL_Texture* InTexture);
+	ProjectileEnemy(double PosX, double PosY, int Width, int Height, float InitialVelocityX, float InitialVelocityY, AnimationResource* Animation);
 	virtual void Tick(double DeltaTime);
 	virtual bool IsStompable() { return false; }
 	virtual bool IsFireable() { return false; }
 	virtual void GetBricked(int TileX, int TileY) { }
+
+protected:
+	void Setup(double PosX, double PosY, int Width, int Height, float InitialVelocityX, float InitialVelocityY);
 };
